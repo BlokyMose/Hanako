@@ -71,7 +71,7 @@ namespace Hanako
 
             foreach(GameObject obj in backGroundPool)
             {
-                if (obj.activeInHierarchy)
+                if (!obj.activeInHierarchy)
                 {
                     backGroundPosition = new Vector3(nextBackGroundXPos,backGround_Y_Pos,0f);
                     obj.transform.position = backGroundPosition;
