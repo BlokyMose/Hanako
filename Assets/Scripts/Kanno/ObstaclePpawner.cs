@@ -116,7 +116,7 @@ namespace Hanako
         {
             if(Time.time > spawnWaitTime)
             {
-                
+                spawnWaitTime = Time.time + Random.Range(minSpawnWaitTime,maxSpawnWaitTime);
             }
         }
     }
