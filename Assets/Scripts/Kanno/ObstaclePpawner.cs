@@ -8,23 +8,23 @@ namespace Hanako
     {
         [SerializeField] private GameObject deskPrefab, chairPrefab, lecternPrefab;
 
-        [SerializeField] private float deskYpos1 = 0.6f;
-        [SerializeField] private float deskYpos2 = -0.6f;
-        [SerializeField] private float deskYpos3 = -2.3f;
+        [SerializeField] private float deskYPos1 = 0.6f;
+        [SerializeField] private float deskYPos2 = -0.6f;
+        [SerializeField] private float deskYPos3 = -2.3f;
 
-        [SerializeField] private float chairYpos1 = 0.6f;
-        [SerializeField] private float chairpos2 = -0.6f;
-        [SerializeField] private float chairYpos3 = -2.3f;
+        [SerializeField] private float chairYPos1 = 0.6f;
+        [SerializeField] private float chairYPos2 = -0.6f;
+        [SerializeField] private float chairYPos3 = -2.3f;
 
-        [SerializeField] private float lecternYpos1 = 0.6f;
-        [SerializeField] private float lecternYpos2 = -0.6f;
-        [SerializeField] private float lecternYpos3 = -2.3f;
+        [SerializeField] private float lecternYPos1 = 0.6f;
+        [SerializeField] private float lecternYPos2 = -0.6f;
+        [SerializeField] private float lecternYPos3 = -2.3f;
 
         [SerializeField] private float minSpawnWaitTime = 2f, maxSpawnWaitTime = 3.5f;
 
         private float spawnWaitTime;
 
-        private int obstacleTypesCount = 3;
+        private int obstacleTypesCount = 9;
         private int obstacleToSpawn;
 
         private Camera mainCamera;
@@ -53,7 +53,7 @@ namespace Hanako
         // Update is called once per frame
         void Update()
         {
-
+            ObstacleSpawning();
         }
 
         void GenerateObstacles()
@@ -108,6 +108,8 @@ namespace Hanako
 
                     break;
 
+                
+
 
             }
         }
@@ -116,8 +118,199 @@ namespace Hanako
         {
             if(Time.time > spawnWaitTime)
             {
+                SpawneObstacleInGame();
+
                 spawnWaitTime = Time.time + Random.Range(minSpawnWaitTime,maxSpawnWaitTime);
             }
         }
+
+        void SpawneObstacleInGame()
+        {
+            obstacleToSpawn = Random.Range(0, obstacleTypesCount);
+
+            obstacleSpawnPos.x = mainCamera.transform.position.x + 20f;
+
+            switch (obstacleToSpawn)
+            {
+                case 0:
+
+                    for (int i = 0; i < deskPool.Count; i++)
+                    {
+                        if (!deskPool[i].activeInHierarchy)
+                        {
+                            deskPool[i].SetActive(true);
+
+                            obstacleSpawnPos.y = deskYPos1;
+
+                            newObstacle = deskPool[i];
+
+                            break;
+                        }
+
+                    }
+
+                    break;
+
+                case 1:
+
+                    for (int i = 0; i < chairPool.Count; i++)
+                    {
+                        if (!chairPool[i].activeInHierarchy)
+                        {
+                            chairPool[i].SetActive(true);
+
+                            obstacleSpawnPos.y = chairYPos1;
+
+                            newObstacle = chairPool[i];
+
+                            break;
+                        }
+
+                    }
+
+                    break;
+
+                case 2:
+
+                    for (int i = 0; i < lecternPool.Count; i++)
+                    {
+                        if (!lecternPool[i].activeInHierarchy)
+                        {
+                            lecternPool[i].SetActive(true);
+
+                            obstacleSpawnPos.y = lecternYPos1;
+
+                            newObstacle = lecternPool[i];
+
+                            break;
+                        }
+
+                    }
+
+                    break;
+
+                case 3:
+
+                    for (int i = 0; i < deskPool.Count; i++)
+                    {
+                        if (!deskPool[i].activeInHierarchy)
+                        {
+                            deskPool[i].SetActive(true);
+
+                            obstacleSpawnPos.y = deskYPos2;
+
+                            newObstacle = deskPool[i];
+
+                            break;
+                        }
+
+                    }
+
+                    break;
+
+                case 4:
+
+                    for (int i = 0; i < chairPool.Count; i++)
+                    {
+                        if (!chairPool[i].activeInHierarchy)
+                        {
+                            chairPool[i].SetActive(true);
+
+                            obstacleSpawnPos.y = chairYPos2;
+
+                            newObstacle = chairPool[i];
+
+                            break;
+                        }
+
+                    }
+
+                    break;
+
+                case 5:
+
+                    for (int i = 0; i < lecternPool.Count; i++)
+                    {
+                        if (!lecternPool[i].activeInHierarchy)
+                        {
+                            lecternPool[i].SetActive(true);
+
+                            obstacleSpawnPos.y = lecternYPos2;
+
+                            newObstacle = lecternPool[i];
+
+                            break;
+                        }
+
+                    }
+
+                    break;
+
+
+                case 6:
+
+                    for (int i = 0; i < deskPool.Count; i++)
+                    {
+                        if (!deskPool[i].activeInHierarchy)
+                        {
+                            deskPool[i].SetActive(true);
+
+                            obstacleSpawnPos.y = deskYPos3;
+
+                            newObstacle = deskPool[i];
+
+                            break;
+                        }
+
+                    }
+
+                    break;
+
+                case 7:
+
+                    for (int i = 0; i < chairPool.Count; i++)
+                    {
+                        if (!chairPool[i].activeInHierarchy)
+                        {
+                            chairPool[i].SetActive(true);
+
+                            obstacleSpawnPos.y = chairYPos3;
+
+                            newObstacle = chairPool[i];
+
+                            break;
+                        }
+
+                    }
+
+                    break;
+
+                case 8:
+
+                    for (int i = 0; i < lecternPool.Count; i++)
+                    {
+                        if (!lecternPool[i].activeInHierarchy)
+                        {
+                            lecternPool[i].SetActive(true);
+
+                            obstacleSpawnPos.y = lecternYPos3;
+
+                            newObstacle = lecternPool[i];
+
+                            break;
+                        }
+
+                    }
+
+                    break;
+            }
+
+
+
+
+            newObstacle.transform.position = obstacleSpawnPos;
+        }
+
+
     }
 }
