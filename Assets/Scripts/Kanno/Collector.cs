@@ -10,7 +10,7 @@ namespace Hanako
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if(collision.CompareTag("BG") || collision.CompareTag("desk") || collision.CompareTag("chair") || collision.CompareTag("lectern"))
+            if(collision.CompareTag("BG") || collision.CompareTag("desk") || collision.CompareTag("chair") || collision.CompareTag("lectern")|| collision.CompareTag("student"))
             {
                 collision.gameObject.SetActive(false);
             }
