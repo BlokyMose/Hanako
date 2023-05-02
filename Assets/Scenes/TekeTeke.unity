@@ -617,12 +617,12 @@ MonoBehaviour:
   deskYPos1: 1.26
   deskYPos2: 0.11
   deskYPos3: -1.68
-  chairYPos1: 0.6
-  chairYPos2: -0.6
-  chairYPos3: -2.3
-  lecternYPos1: 0.6
-  lecternYPos2: -0.6
-  lecternYPos3: -2.3
+  chairYPos1: -1.63
+  chairYPos2: 0.04
+  chairYPos3: -1.55
+  lecternYPos1: 1.85
+  lecternYPos2: 0.53
+  lecternYPos3: -1.32
   minSpawnWaitTime: 2
   maxSpawnWaitTime: 3.5
   deskPool: []
@@ -1641,7 +1641,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.82, y: 2.5}
+    oldSize: {x: 2.84, y: 3.14}
     newSize: {x: 1.82, y: 2.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -2321,7 +2321,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2012675018175657186, guid: 71e63121e5dc55047a80bb3e1b19c0d4, type: 3}
       propertyPath: m_Name
-      value: Triangle
+      value: Table
       objectReference: {fileID: 0}
     - target: {fileID: 2012675018175657186, guid: 71e63121e5dc55047a80bb3e1b19c0d4, type: 3}
       propertyPath: m_IsActive
@@ -2342,7 +2342,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2685331780660841168, guid: 83f9757886977fd4984a94fa93e23dd4, type: 3}
       propertyPath: m_Name
-      value: Isometric Diamond
+      value: Chair
       objectReference: {fileID: 0}
     - target: {fileID: 2685331780660841168, guid: 83f9757886977fd4984a94fa93e23dd4, type: 3}
       propertyPath: m_IsActive
@@ -2358,7 +2358,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2685331780660841170, guid: 83f9757886977fd4984a94fa93e23dd4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.72
+      value: -1.55
       objectReference: {fileID: 0}
     - target: {fileID: 2685331780660841170, guid: 83f9757886977fd4984a94fa93e23dd4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2392,6 +2392,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3422930705577529136, guid: 83f9757886977fd4984a94fa93e23dd4, type: 3}
+      propertyPath: m_Size.x
+      value: 2.8461564
+      objectReference: {fileID: 0}
+    - target: {fileID: 3422930705577529136, guid: 83f9757886977fd4984a94fa93e23dd4, type: 3}
+      propertyPath: m_Size.y
+      value: 2.1820529
+      objectReference: {fileID: 0}
+    - target: {fileID: 3422930705577529136, guid: 83f9757886977fd4984a94fa93e23dd4, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.020513177
+      objectReference: {fileID: 0}
+    - target: {fileID: 3422930705577529136, guid: 83f9757886977fd4984a94fa93e23dd4, type: 3}
+      propertyPath: m_Offset.y
+      value: -1.2923084
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 83f9757886977fd4984a94fa93e23dd4, type: 3}
 --- !u!1001 &3111551116113627096
@@ -2401,25 +2417,45 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 743928786259529002, guid: 6304d1c8a63eb5d44a7b0c89e5bc13f5, type: 3}
+      propertyPath: m_Size.x
+      value: 4.291756
+      objectReference: {fileID: 0}
+    - target: {fileID: 743928786259529002, guid: 6304d1c8a63eb5d44a7b0c89e5bc13f5, type: 3}
+      propertyPath: m_Size.y
+      value: 1.681053
+      objectReference: {fileID: 0}
+    - target: {fileID: 743928786259529002, guid: 6304d1c8a63eb5d44a7b0c89e5bc13f5, type: 3}
+      propertyPath: m_Offset.x
+      value: -0.028377295
+      objectReference: {fileID: 0}
+    - target: {fileID: 743928786259529002, guid: 6304d1c8a63eb5d44a7b0c89e5bc13f5, type: 3}
+      propertyPath: m_Offset.y
+      value: -1.7026324
+      objectReference: {fileID: 0}
     - target: {fileID: 3111551117286827577, guid: 6304d1c8a63eb5d44a7b0c89e5bc13f5, type: 3}
       propertyPath: m_Name
-      value: Square
+      value: lectern
       objectReference: {fileID: 0}
     - target: {fileID: 3111551117286827577, guid: 6304d1c8a63eb5d44a7b0c89e5bc13f5, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3111551117286827578, guid: 6304d1c8a63eb5d44a7b0c89e5bc13f5, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: c448ec4ae205c3642ba8251221ed6434, type: 3}
     - target: {fileID: 3111551117286827579, guid: 6304d1c8a63eb5d44a7b0c89e5bc13f5, type: 3}
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3111551117286827579, guid: 6304d1c8a63eb5d44a7b0c89e5bc13f5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.5505104
+      value: -2.26
       objectReference: {fileID: 0}
     - target: {fileID: 3111551117286827579, guid: 6304d1c8a63eb5d44a7b0c89e5bc13f5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.64
+      value: 1.85
       objectReference: {fileID: 0}
     - target: {fileID: 3111551117286827579, guid: 6304d1c8a63eb5d44a7b0c89e5bc13f5, type: 3}
       propertyPath: m_LocalPosition.z
