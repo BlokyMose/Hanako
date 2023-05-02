@@ -1,0 +1,151 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5e6fedc2472449cead18ef23b5cb30d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Library:
+  - m_Name: head
+    m_Hash: 670299804
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: cry
+      m_Hash: 16809607
+      m_Sprite: {fileID: 21300000, guid: 4881d7ec3a92cf6489fa35263dc08751, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: 4881d7ec3a92cf6489fa35263dc08751, type: 3}
+    - m_Name: sad
+      m_Hash: 533721276
+      m_Sprite: {fileID: 21300000, guid: d61aa0d3ff425b64c9e41bb117b41256, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: d61aa0d3ff425b64c9e41bb117b41256, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 2
+  - m_Name: hair
+    m_Hash: 485974297
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: pony
+      m_Hash: 458718252
+      m_Sprite: {fileID: 21300000, guid: 917ccfa857eeb8b48927a5d9a980e875, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: 917ccfa857eeb8b48927a5d9a980e875, type: 3}
+    - m_Name: Entry
+      m_Hash: 719368820
+      m_Sprite: {fileID: 21300000, guid: 438479161ecf5a248a8b094773482fb6, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: 438479161ecf5a248a8b094773482fb6, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 2
+  - m_Name: body
+    m_Hash: 463997874
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: white
+      m_Hash: 47173028
+      m_Sprite: {fileID: 21300000, guid: 820424f1eb9b4684395b696f809624db, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: 820424f1eb9b4684395b696f809624db, type: 3}
+    - m_Name: jacket
+      m_Hash: 504137097
+      m_Sprite: {fileID: 21300000, guid: 745e87bfa2eef8c4cb20b8d4997a6659, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: 745e87bfa2eef8c4cb20b8d4997a6659, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 2
+  - m_Name: shoulder
+    m_Hash: 798702877
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: white
+      m_Hash: 47173028
+      m_Sprite: {fileID: 21300000, guid: f8458562e9c2cb94aae7483b85043098, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: f8458562e9c2cb94aae7483b85043098, type: 3}
+    - m_Name: blue
+      m_Hash: 506907316
+      m_Sprite: {fileID: 21300000, guid: 74076547be1bbc542b2d5c488ba8fcaf, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: 74076547be1bbc542b2d5c488ba8fcaf, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 2
+  - m_Name: arm
+    m_Hash: 408845972
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: arm_skin
+      m_Hash: 796937682
+      m_Sprite: {fileID: 21300000, guid: aee5d7a0ee8951d4dbc80ccac34f744f, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: aee5d7a0ee8951d4dbc80ccac34f744f, type: 3}
+    - m_Name: Entry
+      m_Hash: 719368820
+      m_Sprite: {fileID: 21300000, guid: 17a670aef35363a4e91a82e742fdb0e1, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: 17a670aef35363a4e91a82e742fdb0e1, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 2
+  - m_Name: hand
+    m_Hash: 660750991
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: hand_skin
+      m_Hash: 207684315
+      m_Sprite: {fileID: 21300000, guid: ee638e865bbc2904283baf084211eaf2, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: ee638e865bbc2904283baf084211eaf2, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 1
+  - m_Name: skirt
+    m_Hash: 420496382
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: black
+      m_Hash: 159758888
+      m_Sprite: {fileID: 21300000, guid: b54d905146677cf4c971a9fd4e926256, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: b54d905146677cf4c971a9fd4e926256, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 1
+  - m_Name: thigh
+    m_Hash: 439454299
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: thigh
+      m_Hash: 439454299
+      m_Sprite: {fileID: 21300000, guid: 5524eb0356d6dc3449f2cc2a037457bc, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: 5524eb0356d6dc3449f2cc2a037457bc, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 1
+  - m_Name: knee
+    m_Hash: 712524545
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: knee_sock
+      m_Hash: 672866100
+      m_Sprite: {fileID: 21300000, guid: de11c5911ea8de44da7b22a978fac4e9, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: de11c5911ea8de44da7b22a978fac4e9, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 1
+  - m_Name: shoe
+    m_Hash: 28813385
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: black
+      m_Hash: 159758888
+      m_Sprite: {fileID: 21300000, guid: 473fd316563652f45b7dcd0ed1f95718, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 21300000, guid: 473fd316563652f45b7dcd0ed1f95718, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 1
+  m_PrimaryLibraryGUID: 
