@@ -31,5 +31,7 @@ namespace Hanako
         {
             this.transform.Translate(moveSpeed, 0, 0);
         }
+
+        
     }
 }
