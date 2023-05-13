@@ -1166,7 +1166,7 @@ SortingGroup:
   m_GameObject: {fileID: 824526085}
   m_Enabled: 1
   m_SortingLayerID: -2051010059
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 1
 --- !u!4 &824526089
 Transform:
@@ -1219,6 +1219,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 0.5
+  changeSpeed: 0.1
+  span: 3
 --- !u!61 &824526092
 BoxCollider2D:
   m_ObjectHideFlags: 0
