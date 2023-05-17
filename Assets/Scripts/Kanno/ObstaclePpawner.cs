@@ -8,23 +8,23 @@ namespace Hanako
     {
         [SerializeField] private GameObject deskPrefab, chairPrefab, lecternPrefab;
 
-        [SerializeField] private float deskYPos1 = 0.6f;
+        //[SerializeField] private float deskYPos1 = 0.6f;
         [SerializeField] private float deskYPos2 = -0.6f;
-        [SerializeField] private float deskYPos3 = -2.3f;
+        //[SerializeField] private float deskYPos3 = -2.3f;
 
-        [SerializeField] private float chairYPos1 = 0.6f;
+        //[SerializeField] private float chairYPos1 = 0.6f;
         [SerializeField] private float chairYPos2 = -0.6f;
-        [SerializeField] private float chairYPos3 = -2.3f;
+        //[SerializeField] private float chairYPos3 = -2.3f;
 
-        [SerializeField] private float lecternYPos1 = 0.6f;
+        //[SerializeField] private float lecternYPos1 = 0.6f;
         [SerializeField] private float lecternYPos2 = -0.6f;
-        [SerializeField] private float lecternYPos3 = -2.3f;
+        //[SerializeField] private float lecternYPos3 = -2.3f;
 
         [SerializeField] private float minSpawnWaitTime = 2f, maxSpawnWaitTime = 3.5f;
 
         private float spawnWaitTime;
 
-        private int obstacleTypesCount = 9;
+        private int obstacleTypesCount = 3;
         private int obstacleToSpawn;
 
         private Camera mainCamera;
@@ -140,7 +140,7 @@ namespace Hanako
                         {
                             deskPool[i].SetActive(true);
 
-                            obstacleSpawnPos.y = deskYPos1;
+                            obstacleSpawnPos.y = deskYPos2;
 
                             newObstacle = deskPool[i];
 
@@ -159,7 +159,7 @@ namespace Hanako
                         {
                             chairPool[i].SetActive(true);
 
-                            obstacleSpawnPos.y = chairYPos1;
+                            obstacleSpawnPos.y = chairYPos2;
 
                             newObstacle = chairPool[i];
 
@@ -178,63 +178,6 @@ namespace Hanako
                         {
                             lecternPool[i].SetActive(true);
 
-                            obstacleSpawnPos.y = lecternYPos1;
-
-                            newObstacle = lecternPool[i];
-
-                            break;
-                        }
-
-                    }
-
-                    break;
-
-                case 3:
-
-                    for (int i = 0; i < deskPool.Count; i++)
-                    {
-                        if (!deskPool[i].activeInHierarchy)
-                        {
-                            deskPool[i].SetActive(true);
-
-                            obstacleSpawnPos.y = deskYPos2;
-
-                            newObstacle = deskPool[i];
-
-                            break;
-                        }
-
-                    }
-
-                    break;
-
-                case 4:
-
-                    for (int i = 0; i < chairPool.Count; i++)
-                    {
-                        if (!chairPool[i].activeInHierarchy)
-                        {
-                            chairPool[i].SetActive(true);
-
-                            obstacleSpawnPos.y = chairYPos2;
-
-                            newObstacle = chairPool[i];
-
-                            break;
-                        }
-
-                    }
-
-                    break;
-
-                case 5:
-
-                    for (int i = 0; i < lecternPool.Count; i++)
-                    {
-                        if (!lecternPool[i].activeInHierarchy)
-                        {
-                            lecternPool[i].SetActive(true);
-
                             obstacleSpawnPos.y = lecternYPos2;
 
                             newObstacle = lecternPool[i];
@@ -246,63 +189,7 @@ namespace Hanako
 
                     break;
 
-
-                case 6:
-
-                    for (int i = 0; i < deskPool.Count; i++)
-                    {
-                        if (!deskPool[i].activeInHierarchy)
-                        {
-                            deskPool[i].SetActive(true);
-
-                            obstacleSpawnPos.y = deskYPos3;
-
-                            newObstacle = deskPool[i];
-
-                            break;
-                        }
-
-                    }
-
-                    break;
-
-                case 7:
-
-                    for (int i = 0; i < chairPool.Count; i++)
-                    {
-                        if (!chairPool[i].activeInHierarchy)
-                        {
-                            chairPool[i].SetActive(true);
-
-                            obstacleSpawnPos.y = chairYPos3;
-
-                            newObstacle = chairPool[i];
-
-                            break;
-                        }
-
-                    }
-
-                    break;
-
-                case 8:
-
-                    for (int i = 0; i < lecternPool.Count; i++)
-                    {
-                        if (!lecternPool[i].activeInHierarchy)
-                        {
-                            lecternPool[i].SetActive(true);
-
-                            obstacleSpawnPos.y = lecternYPos3;
-
-                            newObstacle = lecternPool[i];
-
-                            break;
-                        }
-
-                    }
-
-                    break;
+                
             }
 
 

@@ -26,12 +26,15 @@ namespace Hanako
             transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
 
             currentTime += Time.deltaTime;
-
-            if (currentTime > span)
+            if(moveSpeed <= 1 )
             {
-                moveSpeed += changeSpeed;
-                currentTime = 0f;
+                if (currentTime > span)
+                {
+                    moveSpeed += changeSpeed;
+                    currentTime = 0f;
+                }
             }
+            
         }
 
         private void FixedUpdate()

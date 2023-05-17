@@ -414,7 +414,7 @@ namespace DialogueSyntax
         public static string GenerateDialogueMultiBranches(DSyntaxSettings settings, List<string> actorNames = null)
         {
             if (actorNames == null) actorNames = new List<string>() { "Zach", "Gabriel" };
-           string GetRandomName() { return actorNames[UnityEngine.Random.Range(0, actorNames.Count)]; }
+           //string GetRandomName() { return actorNames[UnityEngine.Random.Range(0, actorNames.Count)]; }
 
             var result = WriteCommand(settings, settings.COMMAND_BRANCH, settings.START, true);
             foreach (var actorName in actorNames) result += WriteCommand(settings, actorName, "Hello, World!");
