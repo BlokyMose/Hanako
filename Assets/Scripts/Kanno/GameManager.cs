@@ -34,5 +34,22 @@ namespace Hanako
                 Time.timeScale = 0;
             }
         }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.gameObject.CompareTag("desk"))
+            {
+                countdownSeconds -= 10;
+            }
+
+            if (other.gameObject.CompareTag("chair"))
+            {
+                countdownSeconds -= 10;
+            }
+            if (other.gameObject.CompareTag("lectern"))
+            {
+                countdownSeconds -= 10;
+            }
+        }
     }
 }

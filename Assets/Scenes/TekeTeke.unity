@@ -172,7 +172,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &132497262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -180,7 +180,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 132497261}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1263086c68dbe5f43bcf88ae70217a91, type: 3}
   m_Name: 
@@ -354,7 +354,7 @@ MonoBehaviour:
   - {fileID: 1189049475}
   - {fileID: 1278082109}
   m_Bounds:
-    m_Center: {x: -0.0015405416, y: 0.0014849901, z: 0}
+    m_Center: {x: -0.0015405416, y: 0.0014851093, z: 0}
     m_Extent: {x: 1.61696, y: 1.388175, z: 0}
   m_UseBatching: 1
   m_AlwaysUpdate: 1
@@ -455,6 +455,7 @@ GameObject:
   m_Component:
   - component: {fileID: 437222908}
   - component: {fileID: 437222909}
+  - component: {fileID: 437222910}
   m_Layer: 0
   m_Name: shadow_ellipsis
   m_TagString: Untagged
@@ -529,6 +530,27 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!50 &437222910
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 437222907}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 2
 --- !u!1 &572260858
 GameObject:
   m_ObjectHideFlags: 0
@@ -933,8 +955,8 @@ MonoBehaviour:
   deskYPos2: -0.22
   chairYPos2: -0.04
   lecternYPos2: 0.59
-  minSpawnWaitTime: 2
-  maxSpawnWaitTime: 5
+  minSpawnWaitTime: 4
+  maxSpawnWaitTime: 6
   deskPool: []
   chairPool: []
   lecternPool: []
@@ -1323,6 +1345,7 @@ GameObject:
   - component: {fileID: 824526086}
   - component: {fileID: 824526091}
   - component: {fileID: 824526094}
+  - component: {fileID: 824526096}
   - component: {fileID: 824526093}
   - component: {fileID: 824526092}
   - component: {fileID: 824526095}
@@ -1498,6 +1521,20 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 4.514793, y: 4.2084436}
   m_EdgeRadius: 0
+--- !u!114 &824526096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 824526085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1263086c68dbe5f43bcf88ae70217a91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  countdownMinutes: 3
+  timeText: {fileID: 572260860}
 --- !u!1 &926957522
 GameObject:
   m_ObjectHideFlags: 0
@@ -1704,7 +1741,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1007429167}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.45, y: 0.6, z: 0}
+  m_LocalPosition: {x: -3.45, y: -1.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2703,6 +2740,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 042d7887566d8894abbf3cbbfc9d6ded, type: 3}
+    - target: {fileID: 2588791315876474717, guid: 71e63121e5dc55047a80bb3e1b19c0d4, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 71e63121e5dc55047a80bb3e1b19c0d4, type: 3}
 --- !u!1001 &2685331780031666088
