@@ -7,17 +7,18 @@ namespace Hanako
     public class BackgroundGenerator : MonoBehaviour
     {
         // Start is called before the first frame update
-        [SerializeField] private GameObject backGroundPrefab;
+        [SerializeField] private GameObject backGroundPrefab, groundPrefab;
 
-        [SerializeField] private float backGroundToSpawn = 10;
+        [SerializeField] private float backGroundToSpawn = 10, groundToSpawn = 10;
 
         private List<GameObject> backGroundPool = new List<GameObject>();
+        private List<GameObject> groundPool = new List<GameObject>();
 
-        [SerializeField] private float backGround_Y_Pos = 0f;
+        [SerializeField] private float backGround_Y_Pos = 0f, ground_Y_Pos = 0f;
 
-        [SerializeField] private float backGround_X_Distance = 18f;
+        [SerializeField] private float backGround_X_Distance = 18f, ground_X_Distance = 17.98f;
 
-        private float nextBackGroundXPos;
+        private float nextBackGroundXPos, nextGroundXPos;
 
         [SerializeField] private float generateLevelWaitTime = 11f;
 
@@ -53,15 +54,51 @@ namespace Hanako
 
                 nextBackGroundXPos += backGround_X_Distance;
             }
+
+            Vector3 groundPosition = Vector3.zero;
+
+            GameObject newGround;
+
+            for (int i = 0; i < groundToSpawn; i++)
+            {
+                groundPosition = new Vector3(nextGroundXPos, ground_Y_Pos, 0f);
+
+                newGround = Instantiate(groundPrefab, groundPosition, Quaternion.identity);
+
+                newGround.transform.SetParent(transform);
+
+                groundPool.Add(newGround);
+
+                nextGroundXPos += ground_X_Distance;
+
+            }
         }
 
         void CheckForBackGround()
         {
             if(Time.time > waitTime)
             {
+                SetNewGround();
                 SetNewBackGround();
 
                 waitTime = Time.time + generateLevelWaitTime;
+            }
+        }
+
+        void SetNewGround()
+        {
+            Vector3 groundPosition = Vector3.zero;
+
+            foreach (GameObject obj in groundPool)
+            {
+                if (!obj.activeInHierarchy)
+                {
+                    groundPosition = new Vector3(nextGroundXPos, ground_Y_Pos, 0);
+                    obj.transform.position = groundPosition;
+                    obj.SetActive(true);
+
+                    nextGroundXPos += ground_X_Distance;
+                }
             }
         }
 

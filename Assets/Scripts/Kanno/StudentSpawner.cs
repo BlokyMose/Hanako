@@ -8,16 +8,16 @@ namespace Hanako
     {
         [SerializeField] private GameObject deskPrefab;
 
-        [SerializeField] private float deskYPos1 = 0.6f;
+       // [SerializeField] private float deskYPos1 = 0.6f;
         [SerializeField] private float deskYPos2 = -0.6f;
-        [SerializeField] private float deskYPos3 = -2.3f;
+        //[SerializeField] private float deskYPos3 = -2.3f;
 
 
         [SerializeField] private float minSpawnWaitTime = 2f, maxSpawnWaitTime = 3.5f;
 
         private float spawnWaitTime;
 
-        private int obstacleTypesCount = 3;
+        private int obstacleTypesCount = 1;
         private int obstacleToSpawn;
 
         private Camera mainCamera;
@@ -109,25 +109,6 @@ namespace Hanako
                         {
                             deskPool[i].SetActive(true);
 
-                            obstacleSpawnPos.y = deskYPos1;
-
-                            newObstacle = deskPool[i];
-
-                            break;
-                        }
-
-                    }
-
-                    break;
-
-                case 1:
-
-                    for (int i = 0; i < deskPool.Count; i++)
-                    {
-                        if (!deskPool[i].activeInHierarchy)
-                        {
-                            deskPool[i].SetActive(true);
-
                             obstacleSpawnPos.y = deskYPos2;
 
                             newObstacle = deskPool[i];
@@ -139,24 +120,7 @@ namespace Hanako
 
                     break;
 
-                case 2:
-
-                    for (int i = 0; i < deskPool.Count; i++)
-                    {
-                        if (!deskPool[i].activeInHierarchy)
-                        {
-                            deskPool[i].SetActive(true);
-
-                            obstacleSpawnPos.y = deskYPos3;
-
-                            newObstacle = deskPool[i];
-
-                            break;
-                        }
-
-                    }
-
-                    break;
+                
 
                 
             }

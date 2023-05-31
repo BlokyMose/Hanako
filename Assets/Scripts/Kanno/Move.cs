@@ -7,8 +7,12 @@ namespace Hanako
     public class Move : MonoBehaviour
     {
 
-        [SerializeField] private float moveSpeed = 8f;
+        [SerializeField] private float moveSpeed = 0.5f;
         private float startSpeed;
+        [SerializeField]  private float changeSpeed = 0.1f;
+
+        public float span = 3f;
+        private float currentTime = 0f;
 
         // Start is called before the first frame update
         void Start()
@@ -20,6 +24,17 @@ namespace Hanako
         void Update()
         {
             transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
+
+            currentTime += Time.deltaTime;
+            if(moveSpeed <= 1 )
+            {
+                if (currentTime > span)
+                {
+                    moveSpeed += changeSpeed;
+                    currentTime = 0f;
+                }
+            }
+            
         }
 
         private void FixedUpdate()
