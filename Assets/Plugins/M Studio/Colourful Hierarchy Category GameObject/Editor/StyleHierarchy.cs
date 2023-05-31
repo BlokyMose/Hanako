@@ -36,7 +36,7 @@ namespace MStudio
                     var design = colorPalette.colorDesigns[i];
 
                     //Check if the name of each gameObject is begin with keyChar in colorDesigns list.
-                    if (instance.name == design.token)
+                    if (instance.name.StartsWith(design.token))
                     {
                         //Draw a rectangle as a background, and set the color.
                         Rect overlayRect = new Rect(
