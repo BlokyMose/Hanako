@@ -1,7 +1,10 @@
+using Encore.Utility;
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityUtility;
 
 namespace Tsutaeru
 {
@@ -30,8 +33,33 @@ namespace Tsutaeru
             }
         }
 
+        [SerializeField, HorizontalGroup("Auto")]
+        bool isAutoInvoke = true;
+
+        [SerializeField,ShowIf(nameof(isAutoInvoke)), HorizontalGroup("Auto"), LabelWidth(0.1f)]
+        UnityInitialMethod invokeOn = UnityInitialMethod.Awake;
+
+
         [SerializeField]
         List<DelayedEvent> events = new();
+
+        private void Awake()
+        {
+            if (isAutoInvoke && invokeOn == UnityInitialMethod.Awake)
+                InvokeAll();
+        }
+
+        private void OnEnable()
+        {
+            if (isAutoInvoke && invokeOn == UnityInitialMethod.OnEnable)
+                InvokeAll();
+        }
+
+        private void Start()
+        {
+            if (isAutoInvoke && invokeOn == UnityInitialMethod.Start)
+                InvokeAll();
+        }
 
         public void Invoke(string eventName)
         {
