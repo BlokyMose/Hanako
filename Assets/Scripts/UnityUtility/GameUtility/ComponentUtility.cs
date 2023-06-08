@@ -60,5 +60,11 @@ namespace UnityUtility
                  Object.Destroy(parent.GetChild(i).gameObject);
         }
 
+        public static void DestroyImmediateChildren(this Transform parent)
+        {
+            for (int i = parent.childCount - 1; i >= 0; i--)
+                Object.DestroyImmediate(parent.GetChild(i).gameObject);
+        }
+
     }
 }
