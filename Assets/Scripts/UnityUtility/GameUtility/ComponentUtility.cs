@@ -24,8 +24,10 @@ namespace UnityUtility
         public static T GetComponentInFamily<T>(this GameObject thisComponent) where T : Component
         {
             var targetComponent = thisComponent.GetComponent<T>();
-            targetComponent ??= thisComponent.GetComponentInParent<T>();
-            targetComponent ??= thisComponent.GetComponentInChildren<T>();
+            if(targetComponent == null)
+                targetComponent = thisComponent.GetComponentInParent<T>();
+            if(targetComponent == null)
+                targetComponent = thisComponent.GetComponentInChildren<T>();
 
             return targetComponent;
         }

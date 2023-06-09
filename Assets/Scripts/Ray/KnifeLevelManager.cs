@@ -94,8 +94,13 @@ namespace Hanako.Knife
                     tileGO.transform.parent = levelPos;
                     tileGO.transform.localPosition = new((col * tileSize.x / 2) - (row * tileSize.x / 2), (row * tileSize.y / 2) + (col * tileSize.y / 2));
                     tileGO.transform.localPosition += (Vector3) offset;
+                    
                     var sr = tileGO.GetComponentInFamily<SpriteRenderer>();
                     sr.sortingOrder = -row - col;
+
+                    var tileComponent = tileGO.GetComponent<KnifeTile>();
+                    if (tileComponent == null)
+                        tileComponent = tileGO.AddComponent<KnifeTile>();
 
                     tiles.Add(new TileCache(new(col, row), tileGO, sr));
                 }
