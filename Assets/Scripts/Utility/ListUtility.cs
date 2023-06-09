@@ -67,6 +67,11 @@ namespace Encore.Utility
             return list[new Random().Next(0, list.Count)];
         }
 
+        public static T GetRandomStruct<T>(this IList<T> list) where T : struct
+        {
+            return list[new Random().Next(0, list.Count)];
+        }
+
         public static void RemoveIfHas<T>(this IList<T> list, T addValue)
         {
             if (!list.Contains(addValue)) list.Remove(addValue);
