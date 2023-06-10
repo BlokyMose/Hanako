@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,12 @@ namespace Hanako.Knife
         SpriteRenderer sr;
 
         [SerializeField]
+        bool useSRAsPieceParent = true;
+
+        [SerializeField, ShowIf(nameof(useSRAsPieceParent))]
+        Transform pieceParent;
+
+        [SerializeField]
         SortingGroup sortingGroup;
 
         [SerializeField]
@@ -24,12 +31,19 @@ namespace Hanako.Knife
         TileAnimationMode animationMode = TileAnimationMode.Idle;
 
         public SortingGroup SortingGroup { get => sortingGroup; }
+
         public SpriteRenderer SR { get => sr;  }
+        public Transform PieceParent { get => pieceParent; }
 
         private void Awake()
         {
             animator = GetComponent<Animator>();
             int_mode = Animator.StringToHash(nameof(int_mode));
+
+            if (useSRAsPieceParent || (!useSRAsPieceParent && pieceParent == null))
+            {
+                pieceParent = sr.transform;
+            }
 
             if (sr == null)
             {
@@ -46,30 +60,31 @@ namespace Hanako.Knife
             col.isTrigger = true;
         }
 
-        public void Hovered()
+
+        public void Hovered(Color tileColor)
         {
-            sr.color = Color.red;
+            sr.color = tileColor;
             animationMode = TileAnimationMode.Hovered;
             animator.SetInteger(int_mode, (int)animationMode);
         }
 
-        public void Unhovered()
+        public void Unhovered(Color? tileColor = null)
         {
-            sr.color = Color.white;
+            sr.color = tileColor == null ? Color.white : (Color) tileColor;
             animationMode = TileAnimationMode.Idle;
             animator.SetInteger(int_mode, (int)animationMode);
         }
 
-        public void Clicked()
+        public void Clicked(Color tileColor)
         {
-            sr.color = Color.yellow;
+            sr.color = tileColor;
             animationMode = TileAnimationMode.Clicked;
             animator.SetInteger(int_mode, (int)animationMode);
         }
 
         public void SetAsParentOf(GameObject child)
         {
-            child.transform.parent = sr.transform;
+            child.transform.parent = pieceParent;
         }
     }
 }

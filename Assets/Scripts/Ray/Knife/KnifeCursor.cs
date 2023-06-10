@@ -1,11 +1,13 @@
 using Hanako.Knife;
 using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.VFX;
 using UnityUtility;
+using static Hanako.Knife.KnifeLevelManager;
 
 namespace Hanako.Knife
 {
@@ -25,6 +27,11 @@ namespace Hanako.Knife
         [SerializeField, ShowIf(nameof(cursorInputMode))]
         bool isFollowingMouse = true;
 
+        [Header("Customizations")]
+
+        [SerializeField]
+        KnifeColors colors;
+
         [SerializeField]
         VisualEffect bloodBurst;
 
@@ -32,8 +39,13 @@ namespace Hanako.Knife
         Rigidbody2D rb;
         Collider2D col;
         int boo_isClick, flo_moveByX;
-        KnifeTile hoveredTile;
+        KnifeTile hoveredTile, hoveredValidTile;
         bool isClicking;
+        KnifeLevelManager levelManager;
+        int controllerID;
+        LivingPieceCache myPiece;
+        bool isMyTurn = false;
+        Action<KnifeTile> onPleaseClick;
 
         private void Awake()
         {
@@ -44,6 +56,13 @@ namespace Hanako.Knife
 
             boo_isClick = Animator.StringToHash(nameof(boo_isClick));
             flo_moveByX = Animator.StringToHash(nameof(flo_moveByX));
+        }
+
+        public void Init(KnifeLevelManager levelManager, int controllerID)
+        {
+            this.levelManager = levelManager;
+            this.colors = levelManager.Colors;
+            this.controllerID = controllerID;
         }
 
         private void OnEnable()
@@ -109,6 +128,74 @@ namespace Hanako.Knife
             }
         }
 
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (isClicking) return;
+
+            if (collision.TryGetComponentInFamily<KnifeTile>(out var tile))
+            {
+                Hover(tile);
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D collision)
+        {
+            if (collision.TryGetComponentInFamily<KnifeTile>(out var tile) && hoveredTile == tile)
+            {
+                Unhover(tile);
+            }
+        }
+
+        void Hover(KnifeTile tile)
+        {
+            if (hoveredTile != null)
+                Unhover(hoveredTile);
+
+            hoveredTile = tile;
+
+            if (isMyTurn)
+            {
+                if(myPiece.LivingPiece.MoveRule.IsValidTile(myPiece, levelManager.Pieces, levelManager.LevelProperties, levelManager.Tiles, hoveredTile))
+                {
+                    hoveredTile.Hovered(colors.TileValidMoveColor);
+                    hoveredValidTile = hoveredTile;
+                }
+                else
+                {
+                    hoveredTile.Hovered(colors.TileInvalidMoveColor);
+                    hoveredValidTile = null;
+                }
+            }
+            else
+            {
+                hoveredTile.Hovered(colors.TileNotMyTurnColor);
+                hoveredValidTile = null;
+            }
+        }
+
+        void Unhover(KnifeTile tile)
+        {
+            tile.Unhovered();
+            hoveredTile = null;
+        }
+
+        public void PleaseClick(Action<KnifeTile> onClick)
+        {
+            myPiece = levelManager.GetLivingPiece(controllerID);
+            if (myPiece == null)
+            {
+                Debug.LogWarning("Cannot find piece with controller ID: "+controllerID);
+                onClick(null);
+            }
+
+            isMyTurn = true;
+            onPleaseClick = (clickedTile) =>
+            {
+                isMyTurn = false;
+                onClick(clickedTile);
+            };
+        }
+
         public void Move(Vector2 moveBy)
         {
             transform.position += (Vector3) moveBy;
@@ -128,35 +215,22 @@ namespace Hanako.Knife
             if (hoveredTile != null)
             {
                 if (isClicking)
-                    hoveredTile.Clicked();
+                {
+                    if (isMyTurn && hoveredValidTile != null)
+                    {
+                        hoveredValidTile.Clicked(colors.TileClickColor);
+                        onPleaseClick?.Invoke(hoveredValidTile);
+                        //Unhover(hoveredValidTile);
+                    }
+                }
                 else
-                    hoveredTile.Unhovered();
+                {
+                    Unhover(hoveredTile);
+                }
             }
         }
 
 
-        private void OnTriggerEnter2D(Collider2D collision)
-        {
-            if (isClicking) return;
-
-            if (collision.TryGetComponentInFamily<KnifeTile>(out var tile))
-            {
-                if (hoveredTile != null)
-                    hoveredTile.Unhovered();
-
-                hoveredTile = tile;
-                hoveredTile.Hovered();
-            }
-        }
-
-        private void OnTriggerExit2D(Collider2D collision)
-        {
-            if (collision.TryGetComponentInFamily<KnifeTile>(out var tile) && hoveredTile == tile)
-            {
-                hoveredTile.Unhovered();
-                hoveredTile = null;
-            }
-        }
 
     }
 }

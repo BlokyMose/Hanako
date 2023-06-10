@@ -63,5 +63,6 @@ namespace Hanako.Knife
         public Vector2 TileSize { get => tileSize; }
         public Vector2 OriginOffset { get => originOffset; }
         public KnifePiecesPattern PiecesPattern { get => piecesPattern; }
+        public int RoundCount { get => roundCount;  }
     }
 }

@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using static Hanako.Knife.KnifeLevel;
 
 namespace Hanako.Knife
 {
+    [InlineEditor]
     [CreateAssetMenu(fileName ="KnifePieces_", menuName ="SO/Knife/Pieces Pattern")]
 
     public class KnifePiecesPattern : ScriptableObject

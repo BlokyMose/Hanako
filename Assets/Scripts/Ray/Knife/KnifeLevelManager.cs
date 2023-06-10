@@ -13,6 +13,8 @@ namespace Hanako.Knife
 {
     public class KnifeLevelManager : MonoBehaviour
     {
+        #region [Class]
+        
         public class TileCache
         {
             ColRow colRow;
@@ -54,12 +56,14 @@ namespace Hanako.Knife
 
         public class PieceCache
         {
-            GameObject go;
-            ColRow colRow;
-            KnifePiece piece;
+            protected int controllerID;
+            protected GameObject go;
+            protected ColRow colRow;
+            protected KnifePiece piece;
 
-            public PieceCache(GameObject go, ColRow colRow, KnifePiece piece)
+            public PieceCache(int controllerID, GameObject go, ColRow colRow, KnifePiece piece)
             {
+                this.controllerID = controllerID;
                 this.go = go;
                 this.colRow = colRow;
                 this.piece = piece;
@@ -68,14 +72,34 @@ namespace Hanako.Knife
             public GameObject GO { get => go; }
             public ColRow ColRow { get => colRow; }
             public KnifePiece Piece { get => piece; }
+            public int ControllerID { get => controllerID; }
+
+            public void SetColRow(ColRow colRow) => this.colRow = colRow;
         }
+
+        public class LivingPieceCache : PieceCache
+        {
+            public LivingPieceCache(int controllerID, GameObject go, ColRow colRow, KnifePiece piece) : base(controllerID, go, colRow, piece)
+            {
+            }
+
+            public KnifePiece_Living LivingPiece => piece as KnifePiece_Living;
+        }
+
+        #endregion
 
         [SerializeField]
         KnifeLevel levelProperties;
 
+        [SerializeField]
+        KnifeColors colors;
+
         [Header("Components")]
         [SerializeField]
         Transform levelPos;
+
+        [SerializeField]
+        KnifeCursor playerCursor;
 
         [SerializeField]
         GameObject playerPrefab;
@@ -84,14 +108,28 @@ namespace Hanako.Knife
         [SerializeField]
         GameObject TileColRowCanvas;
 
-        List<TileCache> tiles = new();
         List<WallCache> leftWalls = new();
         List<WallCache> rightWalls = new();
+        List<TileCache> tiles = new();
         List<PieceCache> pieces = new();
-        List<PieceCache> livingPieces = new();
+        List<LivingPieceCache> livingPieces = new();
         GameObject player;
         int currentMovingPieceIndex;
+        int playerControllerID = 0;
+
         KnifePiece_Living currentMovingPiece => livingPieces[currentMovingPieceIndex].Piece as KnifePiece_Living;
+        LivingPieceCache currentMovingPieceCache => livingPieces[currentMovingPieceIndex];
+
+        public KnifeLevel LevelProperties { get => levelProperties; }
+        public KnifeColors Colors { get => colors;  }
+        public List<TileCache> Tiles { get => tiles; }
+        public List<PieceCache> Pieces { get => pieces; }
+        public List<LivingPieceCache> LivingPieces { get => livingPieces; }
+
+        private void Awake()
+        {
+            playerCursor.Init(this, playerControllerID);
+        }
 
         private void Start()
         {
@@ -222,12 +260,13 @@ namespace Hanako.Knife
             player.transform.localScale = Vector2.one;
             player.transform.localPosition = new(0, 0);
             var playerPieceComponent = player.GetComponent<KnifePiece>();
-            pieces.Add(new(player, playerTile.ColRow, playerPieceComponent));
+            pieces.Add(new(playerControllerID, player, playerTile.ColRow, playerPieceComponent));
             playerPieceComponent.Init(this);
 
             var playerPieceLivingComponent = player.GetComponent<KnifePiece_Living>();
-            livingPieces.Add(new(player, playerTile.ColRow, playerPieceLivingComponent));
+            livingPieces.Add(new(playerControllerID, player, playerTile.ColRow, playerPieceLivingComponent));
 
+            int pieceControllerID = 1;
             foreach (var piece in levelProperties.PiecesPattern.Pieces)
             {
                 if(TryGetTile(piece.ColRow, out var pieceTile))
@@ -237,11 +276,13 @@ namespace Hanako.Knife
                     pieceGO.transform.localScale = Vector2.one;
                     pieceGO.transform.localPosition = new(0, 0);
                     var pieceComponent = pieceGO.GetComponent<KnifePiece>();
-                    pieces.Add(new(pieceGO, piece.ColRow, pieceComponent));
+                    pieces.Add(new(pieceControllerID, pieceGO, piece.ColRow, pieceComponent));
                     pieceComponent.Init(this);
 
                     if(pieceGO.TryGetComponent<KnifePiece_Living>(out var pieceLivingComponent))
-                        livingPieces.Add(new(pieceGO, piece.ColRow, pieceLivingComponent));
+                        livingPieces.Add(new(pieceControllerID, pieceGO, piece.ColRow, pieceLivingComponent));
+
+                    pieceControllerID++;
                 }
                 else
                 {
@@ -252,13 +293,58 @@ namespace Hanako.Knife
 
         public void StartGame()
         {
-            currentMovingPiece.PleaseMove(OnMoveDone);
+            int round = -1;
+            currentMovingPieceIndex = -1;
+            GoToNextMovingPiece();
 
-            void OnMoveDone()
+            void GoToNextMovingPiece()
             {
-                currentMovingPieceIndex = (currentMovingPieceIndex + 1) % pieces.Count;
-                currentMovingPiece.PleaseMove(OnMoveDone);
+                UpdateCache();
+                IncrementMovingPieceIndex();
+                round++;
+                if (round < levelProperties.RoundCount - 1)
+                {
+                    if (currentMovingPieceCache.ControllerID == 0)
+                    {
+                        playerCursor.PleaseClick(OnClickDone);
+                        void OnClickDone(KnifeTile tile)
+                        {
+                            currentMovingPiece.MoveToTile(tile);
+                        }
+                    }
+                    currentMovingPiece.PleaseMove(GoToNextMovingPiece);
+                }
+                else
+                {
+
+                }
+
+                
             }
+        }
+
+        void UpdateCache()
+        {
+            foreach (var piece in pieces)
+            {
+                foreach (var tile in tiles)
+                {
+                    if (tile.Tile.PieceParent.TryGetComponentInFamily<KnifePiece>(out var foundPiece) &&
+                        foundPiece == piece.Piece)
+                    {
+                        piece.SetColRow(tile.ColRow);
+                        var livingPiece = GetLivingPiece(piece.ControllerID);
+                        if (livingPiece != null)
+                            livingPiece.SetColRow(tile.ColRow);
+                        break;
+                    }
+                }
+            }
+        }
+
+        void IncrementMovingPieceIndex()
+        {
+            currentMovingPieceIndex = (currentMovingPieceIndex + 1) % livingPieces.Count;
         }
 
         bool TryGetTile(ColRow colRow, out TileCache foundTile)
@@ -276,6 +362,27 @@ namespace Hanako.Knife
                     return tile;
                 }
             }
+            return null;
+        }
+
+        public PieceCache GetPiece(int controllerID)
+        {
+            foreach (var piece in pieces)
+                if (piece.ControllerID == controllerID) return piece;
+            return null;
+        }
+
+        public PieceCache GetPiece(KnifePiece knifePiece)
+        {
+            foreach (var piece in pieces)
+                if (piece.Piece == knifePiece) return piece;
+            return null;
+        }
+
+        public LivingPieceCache GetLivingPiece(int controllerID)
+        {
+            foreach (var piece in livingPieces)
+                if (piece.ControllerID == controllerID) return piece;
             return null;
         }
     }

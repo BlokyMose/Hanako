@@ -7,8 +7,6 @@ namespace Hanako.Knife
 {
     public class KnifePiece_Player : KnifePiece_Living
     {
-        public override void PleaseMove(Action onMoveDone)
-        {
-        }
+       
     }
 }

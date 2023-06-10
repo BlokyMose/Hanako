@@ -17,5 +17,22 @@ namespace Hanako.Knife
             List<PieceCache> allPieces,
             KnifeLevel levelProperties
             );
+
+        public virtual KnifeTile GetPrefferedTile(
+            List<ColRow> validMoves,
+            PieceCache thisPiece,
+            List<PieceCache> allPieces,
+            KnifeLevel levelProperties,
+            List<TileCache> allTiles
+            )
+        {
+            var prefferedMove = GetPrefferedMove(validMoves, thisPiece, allPieces, levelProperties);
+            foreach (var tile in allTiles)
+            {
+                if (tile.ColRow.IsEqual(prefferedMove))
+                    return tile.Tile;
+            }
+            return null;
+        }
     }
 }
