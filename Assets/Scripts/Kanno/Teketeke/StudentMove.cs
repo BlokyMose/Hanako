@@ -8,12 +8,12 @@ namespace Hanako
     {
         [SerializeField] private float moveSpeed = 8f;
 
-        ScoreManager sManager;
+        GameManager sManager;
 
         // Start is called before the first frame update
         void Start()
         {
-            sManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
+            sManager = GameObject.Find("TekeTeke").GetComponent<GameManager>();
         }
 
         // Update is called once per frame

@@ -16,6 +16,9 @@ namespace Hanako
 
         public TextMeshProUGUI timeText;
 
+        public TextMeshProUGUI txtScore;
+        int iScore = 0;
+
         // Start is called before the first frame update
         void Start()
         {        
@@ -32,7 +35,29 @@ namespace Hanako
             if (countdownSeconds <= 0)
             {
                 Time.timeScale = 0;
+                if(iScore < 10)
+                {
+                    GameEnd1.GameEndShowPanel1();
+                }
+
+                if (10 <= iScore)
+                {
+                    GameEnd2.GameEndShowPanel2();
+                }
+
+                if (50 <= iScore)
+                {
+                    GameEnd3.GameEndShowPanel3();
+                }
+
+
             }
+        }
+
+        public void SetScore()
+        {
+            iScore += 1;
+            txtScore.text = "スコア：" + iScore.ToString();
         }
 
         private void OnTriggerEnter2D(Collider2D other)
