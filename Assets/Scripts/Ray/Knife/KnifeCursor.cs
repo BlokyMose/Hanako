@@ -146,6 +146,14 @@ namespace Hanako.Knife
             }
         }
 
+        public void Refresh()
+        {
+            if (hoveredTile != null)
+            {
+                Hover(hoveredTile);
+            }
+        }
+
         void Hover(KnifeTile tile)
         {
             if (hoveredTile != null)
@@ -155,17 +163,34 @@ namespace Hanako.Knife
 
             if (isMyTurn)
             {
-                if(myPiece.LivingPiece.MoveRule.IsValidTile(myPiece, levelManager.Pieces, levelManager.LevelProperties, levelManager.Tiles, hoveredTile))
+                //if(myPiece.LivingPiece.MoveRule.IsValidTile(myPiece, levelManager.Pieces, levelManager.LevelProperties, levelManager.Tiles, hoveredTile))
+                var tileCheckResult = myPiece.CheckTile(hoveredTile);
+                if (tileCheckResult.IsValid)
                 {
-                    hoveredTile.Hovered(colors.TileValidMoveColor);
                     hoveredValidTile = hoveredTile;
+
+                    // Hovering a tile with a piece
+                    if (tileCheckResult.IsInteractable)
+                    {
+                        hoveredTile.Hovered(colors.TileActionColor);
+                    }
+
+                    // Hovering a tile with no piece, but can be moved into
+                    else
+                    {
+                        hoveredTile.Hovered(colors.TileValidMoveColor);
+                    }
                 }
+
+                // Hovering a tile that cannot be reached
                 else
                 {
                     hoveredTile.Hovered(colors.TileInvalidMoveColor);
                     hoveredValidTile = null;
                 }
             }
+
+            // Hovering a tile when not my turn
             else
             {
                 hoveredTile.Hovered(colors.TileNotMyTurnColor);
@@ -194,6 +219,8 @@ namespace Hanako.Knife
                 isMyTurn = false;
                 onClick(clickedTile);
             };
+            Refresh();
+
         }
 
         public void Move(Vector2 moveBy)
@@ -220,7 +247,6 @@ namespace Hanako.Knife
                     {
                         hoveredValidTile.Clicked(colors.TileClickColor);
                         onPleaseClick?.Invoke(hoveredValidTile);
-                        //Unhover(hoveredValidTile);
                     }
                 }
                 else

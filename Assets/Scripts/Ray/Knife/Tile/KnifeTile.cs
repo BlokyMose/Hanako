@@ -60,7 +60,6 @@ namespace Hanako.Knife
             col.isTrigger = true;
         }
 
-
         public void Hovered(Color tileColor)
         {
             sr.color = tileColor;
@@ -86,5 +85,13 @@ namespace Hanako.Knife
         {
             child.transform.parent = pieceParent;
         }
+
+        public bool TryGetPiece(out KnifePiece piece)
+        {
+            piece = pieceParent.GetComponentInChildren<KnifePiece>();
+            return piece != null;
+        }
+
+
     }
 }

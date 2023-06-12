@@ -2,7 +2,9 @@ using Encore.Utility;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityUtility;
@@ -60,13 +62,15 @@ namespace Hanako.Knife
             protected GameObject go;
             protected ColRow colRow;
             protected KnifePiece piece;
+            protected KnifeLevelManager levelManager;
 
-            public PieceCache(int controllerID, GameObject go, ColRow colRow, KnifePiece piece)
+            public PieceCache(int controllerID, GameObject go, ColRow colRow, KnifePiece piece, KnifeLevelManager levelManager)
             {
                 this.controllerID = controllerID;
                 this.go = go;
                 this.colRow = colRow;
                 this.piece = piece;
+                this.levelManager = levelManager;
             }
 
             public GameObject GO { get => go; }
@@ -75,15 +79,62 @@ namespace Hanako.Knife
             public int ControllerID { get => controllerID; }
 
             public void SetColRow(ColRow colRow) => this.colRow = colRow;
+
         }
 
         public class LivingPieceCache : PieceCache
         {
-            public LivingPieceCache(int controllerID, GameObject go, ColRow colRow, KnifePiece piece) : base(controllerID, go, colRow, piece)
+            public class TileCheckResult
+            {
+                bool isValid;
+                bool isInteractable;
+
+                public TileCheckResult(bool isValid, bool isInteractable)
+                {
+                    this.isValid = isValid;
+                    this.isInteractable = isInteractable;
+                }
+
+                public bool IsValid { get => isValid; }
+                public bool IsInteractable { get => isInteractable;  }
+            }
+
+            private List<TileCache> validTilesByMoveRule = new();
+            public KnifePiece_Living LivingPiece => piece as KnifePiece_Living;
+
+            public List<TileCache> ValidTilesByMoveRule { get => validTilesByMoveRule; }
+
+            public LivingPieceCache(int controllerID, GameObject go, ColRow colRow, KnifePiece piece, KnifeLevelManager levelManager) : base(controllerID, go, colRow, piece, levelManager)
             {
             }
 
-            public KnifePiece_Living LivingPiece => piece as KnifePiece_Living;
+
+            public void UpdateCache(ColRow colRow)
+            {
+                this.colRow = colRow;
+                validTilesByMoveRule = LivingPiece.MoveRule.GetValidTiles(this, levelManager.Pieces, levelManager.LevelProperties, levelManager.Tiles);
+            }
+
+            public TileCheckResult CheckTile(KnifeTile tile)
+            {
+                foreach (var validTile in validTilesByMoveRule)
+                {
+                    if (validTile.Tile == tile)
+                    {
+                        if (tile.TryGetPiece(out var piece) && piece.IsInteractable)
+                        {
+                            var isValid = piece.CheckValidityAgainst(this, levelManager.GetTile(tile));
+                            var isInteratable = piece.CheckInteractabilityAgainst(this, levelManager.GetTile(tile));
+                            return new TileCheckResult(isValid, isInteratable);
+                        }
+                        else
+                        {
+                            return new TileCheckResult(true, false);
+                        }
+                    }
+                }
+                return new TileCheckResult(false, false);
+            }
         }
 
         #endregion
@@ -104,6 +155,13 @@ namespace Hanako.Knife
         [SerializeField]
         GameObject playerPrefab;
 
+        [Header("Game")]
+        [SerializeField]
+        float moveDuration = 1f;
+
+        [SerializeField]
+        AnimationCurve moveAnimationCurve;
+
         [Header("Debug")]
         [SerializeField]
         GameObject TileColRowCanvas;
@@ -115,6 +173,7 @@ namespace Hanako.Knife
         List<LivingPieceCache> livingPieces = new();
         GameObject player;
         int currentMovingPieceIndex;
+        int currentRound;
         int playerControllerID = 0;
 
         KnifePiece_Living currentMovingPiece => livingPieces[currentMovingPieceIndex].Piece as KnifePiece_Living;
@@ -125,6 +184,7 @@ namespace Hanako.Knife
         public List<TileCache> Tiles { get => tiles; }
         public List<PieceCache> Pieces { get => pieces; }
         public List<LivingPieceCache> LivingPieces { get => livingPieces; }
+        public float MoveDuration { get => moveDuration; }
 
         private void Awake()
         {
@@ -260,11 +320,12 @@ namespace Hanako.Knife
             player.transform.localScale = Vector2.one;
             player.transform.localPosition = new(0, 0);
             var playerPieceComponent = player.GetComponent<KnifePiece>();
-            pieces.Add(new(playerControllerID, player, playerTile.ColRow, playerPieceComponent));
+            pieces.Add(new(playerControllerID, player, playerTile.ColRow, playerPieceComponent, this));
             playerPieceComponent.Init(this);
 
             var playerPieceLivingComponent = player.GetComponent<KnifePiece_Living>();
-            livingPieces.Add(new(playerControllerID, player, playerTile.ColRow, playerPieceLivingComponent));
+            playerPieceLivingComponent.Init(moveDuration, moveAnimationCurve);
+            livingPieces.Add(new(playerControllerID, player, playerTile.ColRow, playerPieceLivingComponent, this));
 
             int pieceControllerID = 1;
             foreach (var piece in levelProperties.PiecesPattern.Pieces)
@@ -276,11 +337,14 @@ namespace Hanako.Knife
                     pieceGO.transform.localScale = Vector2.one;
                     pieceGO.transform.localPosition = new(0, 0);
                     var pieceComponent = pieceGO.GetComponent<KnifePiece>();
-                    pieces.Add(new(pieceControllerID, pieceGO, piece.ColRow, pieceComponent));
+                    pieces.Add(new(pieceControllerID, pieceGO, piece.ColRow, pieceComponent, this));
                     pieceComponent.Init(this);
 
                     if(pieceGO.TryGetComponent<KnifePiece_Living>(out var pieceLivingComponent))
-                        livingPieces.Add(new(pieceControllerID, pieceGO, piece.ColRow, pieceLivingComponent));
+                    {
+                        pieceLivingComponent.Init(moveDuration, moveAnimationCurve);
+                        livingPieces.Add(new(pieceControllerID, pieceGO, piece.ColRow, pieceLivingComponent, this));
+                    }
 
                     pieceControllerID++;
                 }
@@ -293,34 +357,69 @@ namespace Hanako.Knife
 
         public void StartGame()
         {
-            int round = -1;
-            currentMovingPieceIndex = -1;
-            GoToNextMovingPiece();
+            currentRound = -1;
+            GoToNextRound();
+
+            void GoToNextRound()
+            {
+                currentRound++;
+                if (currentRound < levelProperties.RoundCount)
+                {
+                    currentMovingPieceIndex = -1;
+                    GoToNextMovingPiece();
+                }
+                else
+                {
+                    EndGame();
+                }
+            }
 
             void GoToNextMovingPiece()
             {
+                currentMovingPieceIndex++;
                 UpdateCache();
-                IncrementMovingPieceIndex();
-                round++;
-                if (round < levelProperties.RoundCount - 1)
+                if (currentMovingPieceIndex < livingPieces.Count)
                 {
+                    // Player's turn
                     if (currentMovingPieceCache.ControllerID == 0)
                     {
                         playerCursor.PleaseClick(OnClickDone);
                         void OnClickDone(KnifeTile tile)
                         {
-                            currentMovingPiece.MoveToTile(tile);
+                            var tileCheckResult = currentMovingPieceCache.CheckTile(tile);
+                            if (tileCheckResult.IsValid)
+                            {
+                                if (tileCheckResult.IsValid && tileCheckResult.IsInteractable)
+                                {
+                                    if (tile.TryGetPiece(out var occupantPiece))
+                                    {
+                                        occupantPiece.Interacted(currentMovingPieceCache, GetTile(tile));
+                                    }
+                                    else
+                                    {
+                                        Debug.LogWarning("Tile has lost its piece, so the interaction cannot be done");
+                                    }
+                                }
+                                else
+                                {
+                                    currentMovingPiece.MoveToTile(tile);
+                                }
+                            }
                         }
                     }
-                    currentMovingPiece.PleaseMove(GoToNextMovingPiece);
+                    currentMovingPiece.PlaseAct(GoToNextMovingPiece);
                 }
                 else
                 {
-
+                    GoToNextRound();
                 }
-
-                
             }
+        }
+
+        public void EndGame()
+        {
+
+            Debug.Log("End Game");
         }
 
         void UpdateCache()
@@ -335,29 +434,40 @@ namespace Hanako.Knife
                         piece.SetColRow(tile.ColRow);
                         var livingPiece = GetLivingPiece(piece.ControllerID);
                         if (livingPiece != null)
-                            livingPiece.SetColRow(tile.ColRow);
+                        {
+                            livingPiece.UpdateCache(tile.ColRow);
+                        }
                         break;
                     }
                 }
             }
+
+            playerCursor.Refresh();
         }
 
-        void IncrementMovingPieceIndex()
-        {
-            currentMovingPieceIndex = (currentMovingPieceIndex + 1) % livingPieces.Count;
-        }
-
-        bool TryGetTile(ColRow colRow, out TileCache foundTile)
+        public bool TryGetTile(ColRow colRow, out TileCache foundTile)
         {
             foundTile = GetTile(colRow);
             return foundTile != null;
         }
 
-        TileCache GetTile(ColRow colRow)
+        public TileCache GetTile(ColRow colRow)
         {
             foreach (var tile in tiles)
             {
                 if (tile.ColRow.IsEqual(colRow))
+                {
+                    return tile;
+                }
+            }
+            return null;
+        }        
+        
+        public TileCache GetTile(KnifeTile knifeTile)
+        {
+            foreach (var tile in tiles)
+            {
+                if (tile.Tile == knifeTile)
                 {
                     return tile;
                 }

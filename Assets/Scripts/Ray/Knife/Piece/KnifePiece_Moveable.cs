@@ -1,30 +1,26 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Hanako.Knife.KnifePiece_Living;
 using UnityUtility;
+using static Hanako.Knife.KnifeLevel;
+using static Hanako.Knife.KnifeLevelManager;
 
 namespace Hanako.Knife
 {
-    public abstract class KnifePiece_Living : KnifePiece
+    public class KnifePiece_Moveable : KnifePiece_NonLiving
     {
-        public enum PieceActingState { Idling, PreActing, Acting, PostActing }
-
-        public enum PieceAnimationState { Idle, Run, Attack }
-
-        [SerializeField]
-        protected KnifeMoveRule moveRule;
-        public KnifeMoveRule MoveRule { get => moveRule; }
-
         [SerializeField]
         Animator animator;
 
-        protected float moveDuration = 1f;
-        protected Coroutine corMyTurn, corMoving, corSetParent;
-        protected KnifeTile destinationTile = null;
-        protected PieceActingState actState = PieceActingState.Idling;
+        [SerializeField]
+        float distanceToStartMoveAnimation = 1f;
+
         protected int int_motion;
         protected AnimationCurve moveAnimationCurve;
+        protected Coroutine corMoving, corSetParent;
+        protected KnifeTile destinationTile = null;
+        protected float moveDuration = 1f;
 
         private void Awake()
         {
@@ -32,43 +28,67 @@ namespace Hanako.Knife
             if (animator == null)
             {
                 animator = gameObject.GetComponentInFamily<Animator>();
-                if(animator == null)
+                if (animator == null)
                     Debug.LogWarning($"{gameObject.name} has no Animator");
             }
         }
 
-        public virtual void Init(float moveDuration, AnimationCurve moveAnimationCurve)
+        public override void Init(KnifeLevelManager levelManager)
         {
-            this.moveDuration = moveDuration;
-            this.moveAnimationCurve = moveAnimationCurve;
+            base.Init(levelManager);
+            this.moveDuration = levelManager.MoveDuration;
         }
 
-        public virtual void PlaseAct(Action onActDone)
+        public override bool CheckInteractabilityAgainst(LivingPieceCache otherPiece, TileCache myTile)
         {
-            corMyTurn = this.RestartCoroutine(WaitingForDestinationTile(), corMyTurn);
-
-            IEnumerator WaitingForDestinationTile()
+            var moveColRow = ColRow.SubstractBetween(myTile.ColRow, otherPiece.ColRow);
+            var targetColRow = ColRow.AddBetween(myTile.ColRow, moveColRow);
+            if (levelManager.TryGetTile(targetColRow, out var foundTile))
             {
-                actState = PieceActingState.PreActing;
-                WhenWaitingForAct();
-                while (true)
+                if (foundTile.Tile.TryGetPiece(out var occupantPiece))
                 {
-                    if (actState == PieceActingState.PostActing)
-                        break;
-
-                    yield return null;
+                    return false;
                 }
-                actState = PieceActingState.Idling;
-
-                onActDone();
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public virtual void WhenWaitingForAct()
+        public override bool CheckValidityAgainst(LivingPieceCache otherPiece, TileCache myTile)
         {
+            return CheckInteractabilityAgainst(otherPiece, myTile);
         }
 
-        public virtual void MoveToTile(KnifeTile tile, bool autoSetAct = true)
+        public override void Interacted(LivingPieceCache otherPiece, TileCache tile)
+        {
+            otherPiece.LivingPiece.MoveToTile(tile.Tile);
+
+
+            StartCoroutine(MovingMyselfWhenOtherPieceIsClose());
+            IEnumerator MovingMyselfWhenOtherPieceIsClose()
+            {
+                while (true)
+                {
+                    if (Vector2.Distance(otherPiece.LivingPiece.transform.position, transform.position) < distanceToStartMoveAnimation)
+                        break;
+                    yield return null;
+                }
+
+                var moveColRow = ColRow.SubstractBetween(tile.ColRow, otherPiece.ColRow);
+                var targetColRow = ColRow.AddBetween(tile.ColRow, moveColRow);
+                var targetTile = levelManager.GetTile(targetColRow);
+                MoveToTile(targetTile.Tile);
+            }
+
+        }
+
+        public virtual void MoveToTile(KnifeTile tile)
         {
             corMoving = this.RestartCoroutine(Moving(), corMoving);
             corSetParent = this.RestartCoroutine(SettingParent(moveDuration), corSetParent);
@@ -91,11 +111,9 @@ namespace Hanako.Knife
             IEnumerator Moving()
             {
                 destinationTile = tile;
-                if (autoSetAct)
-                    actState = PieceActingState.Acting;
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
                 yield return new WaitForSeconds(0.1f);
-                
+
                 if (destinationTile.transform.position.x > transform.position.x)
                 {
                     transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 0f, transform.localEulerAngles.z);
@@ -114,9 +132,9 @@ namespace Hanako.Knife
                     tScale = curve.Evaluate(tScale);
                     transform.position = Vector2.Lerp(originPos, tile.PieceParent.position, tScale);
 
-                    if (time > moveDuration-0.1f)
+                    if (time > moveDuration - 0.1f)
                         animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
-                    
+
                     if (time >= moveDuration)
                     {
                         break;
@@ -128,8 +146,6 @@ namespace Hanako.Knife
 
                 transform.localPosition = Vector2.zero;
                 destinationTile = null;
-                if (autoSetAct)
-                    actState = PieceActingState.PostActing;
             }
         }
     }

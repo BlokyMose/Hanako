@@ -28,6 +28,22 @@ namespace Hanako.Knife
             {
                 return this.col == otherColRow.col && this.row == otherColRow.row;
             }
+
+            public void Add(ColRow colRow)
+            {
+                col += colRow.col;
+                row += colRow.row;
+            }
+
+            public static ColRow AddBetween(ColRow a, ColRow b)
+            {
+                return new ColRow(a.col + b.col, a.row + b.row);
+            }
+
+            public static ColRow SubstractBetween(ColRow a, ColRow b)
+            {
+                return new ColRow(a.col - b.col, a.row - b.row);
+            }
         }
 
 

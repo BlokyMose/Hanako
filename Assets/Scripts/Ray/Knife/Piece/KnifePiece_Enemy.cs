@@ -11,9 +11,9 @@ namespace Hanako.Knife
         [SerializeField]
         KnifeMovePreference movePreference;
 
-        public override void WhenWaitingForDestinationTile()
+        public override void WhenWaitingForAct()
         {
-            base.WhenWaitingForDestinationTile();
+            base.WhenWaitingForAct();
             var pieceCache = levelManager.GetPiece(this);
             var validMoves = moveRule.GetValidMoves(pieceCache, levelManager.Pieces, levelManager.LevelProperties);
             if (validMoves != null)
