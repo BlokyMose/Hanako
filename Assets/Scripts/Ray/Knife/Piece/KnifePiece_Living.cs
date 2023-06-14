@@ -1,28 +1,68 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 using UnityUtility;
+using static Hanako.Knife.KnifeLevelManager;
 
 namespace Hanako.Knife
 {
     public abstract class KnifePiece_Living : KnifePiece
     {
+        #region [Classes]
+
         public enum PieceActingState { Idling, PreActing, Acting, PostActing }
 
-        public enum PieceAnimationState { Idle, Run, Attack }
+        public enum PieceAnimationState { Die = -1, Idle, Run, Attack }
+
+        [System.Serializable]
+        public class VFXProperties
+        {
+            [SerializeField]
+            VisualEffect vfx;
+
+            [SerializeField]
+            float duration = 1f;
+
+            [SerializeField]
+            float delay = 0f;
+
+            public VisualEffect VFX { get => vfx; }
+            public float Duration { get => duration; }
+            public float Delay { get => delay; }
+
+            public IEnumerator Play()
+            {
+                yield return new WaitForSeconds(delay);
+                vfx.SetBool("isPlaying", true);
+                yield return new WaitForSeconds(duration);
+                vfx.SetBool("isPlaying", false);
+            }
+        }
+
+        #endregion
 
         [SerializeField]
         protected KnifeMoveRule moveRule;
         public KnifeMoveRule MoveRule { get => moveRule; }
 
         [SerializeField]
-        Animator animator;
+        protected Animator animator;
+
+        [Header("VFXs")]
+        [SerializeField]
+        VFXProperties vfxDie;
+
+        protected bool isAlive = true;
+        protected bool IsAlive { get => isAlive;  }
 
         protected float moveDuration = 1f;
         protected Coroutine corMyTurn, corMoving, corSetParent;
         protected KnifeTile destinationTile = null;
         protected PieceActingState actState = PieceActingState.Idling;
+        public void SetActState(PieceActingState actState) => this.actState = actState;
         protected int int_motion;
         protected AnimationCurve moveAnimationCurve;
 
@@ -45,6 +85,9 @@ namespace Hanako.Knife
 
         public virtual void PlaseAct(Action onActDone)
         {
+            if (!isAlive)
+                onActDone();
+
             corMyTurn = this.RestartCoroutine(WaitingForDestinationTile(), corMyTurn);
 
             IEnumerator WaitingForDestinationTile()
@@ -130,7 +173,31 @@ namespace Hanako.Knife
                 destinationTile = null;
                 if (autoSetAct)
                     actState = PieceActingState.PostActing;
+
             }
+        }
+
+        public virtual void Die(LivingPieceCache otherPiece)
+        {
+            isAlive = false;
+            levelManager.RemoveLivingPiece(this);
+            
+            if (otherPiece.Piece.transform.position.x > transform.position.x)
+                transform.localEulerAngles = new(transform.localEulerAngles.x, 0, transform.localEulerAngles.z);
+            else if (otherPiece.Piece.transform.position.x < transform.position.x)
+                transform.localEulerAngles = new(transform.localEulerAngles.x, 180, transform.localEulerAngles.z);
+
+            animator.SetInteger(int_motion, (int) PieceAnimationState.Die);
+
+            if (vfxDie.VFX != null)
+                StartCoroutine(vfxDie.Play());
+        }
+
+        public virtual void Resurrect(TileCache targetTile)
+        {
+            isAlive = true;
+            animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+            levelManager.ResurrectLivingPiece(this);
         }
     }
 }

@@ -67,8 +67,7 @@ namespace Hanako.Knife
 
         public override void Interacted(LivingPieceCache otherPiece, TileCache tile)
         {
-            otherPiece.LivingPiece.MoveToTile(tile.Tile);
-
+            otherPiece.LivingPiece.MoveToTile(tile.Tile, autoSetAct: false);
 
             StartCoroutine(MovingMyselfWhenOtherPieceIsClose());
             IEnumerator MovingMyselfWhenOtherPieceIsClose()
@@ -80,10 +79,14 @@ namespace Hanako.Knife
                     yield return null;
                 }
 
+
+
                 var moveColRow = ColRow.SubstractBetween(tile.ColRow, otherPiece.ColRow);
                 var targetColRow = ColRow.AddBetween(tile.ColRow, moveColRow);
                 var targetTile = levelManager.GetTile(targetColRow);
                 MoveToTile(targetTile.Tile);
+                yield return new WaitForSeconds(moveDuration);
+                otherPiece.LivingPiece.SetActState(PieceActingState.PostActing);
             }
 
         }

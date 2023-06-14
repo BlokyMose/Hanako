@@ -18,7 +18,7 @@ namespace Hanako.Knife
             var validMoves = moveRule.GetValidMoves(pieceCache, levelManager.Pieces, levelManager.LevelProperties);
             if (validMoves != null)
             {
-                var preferredTile = movePreference.GetPrefferedTile(validMoves, pieceCache,levelManager.Pieces,levelManager.LevelProperties,levelManager.Tiles);
+                var preferredTile = movePreference.GetPrefferedTile(validMoves, pieceCache, levelManager.Pieces, levelManager.LevelProperties, levelManager.Tiles);
                 if (preferredTile != null)
                 {
                     destinationTile = preferredTile;

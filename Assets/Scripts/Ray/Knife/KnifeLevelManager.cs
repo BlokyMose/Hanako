@@ -171,6 +171,7 @@ namespace Hanako.Knife
         List<TileCache> tiles = new();
         List<PieceCache> pieces = new();
         List<LivingPieceCache> livingPieces = new();
+        List<LivingPieceCache> diedPieces = new();
         GameObject player;
         int currentMovingPieceIndex;
         int currentRound;
@@ -377,9 +378,9 @@ namespace Hanako.Knife
             void GoToNextMovingPiece()
             {
                 currentMovingPieceIndex++;
-                UpdateCache();
                 if (currentMovingPieceIndex < livingPieces.Count)
                 {
+                    UpdateCache();
                     // Player's turn
                     if (currentMovingPieceCache.ControllerID == 0)
                     {
@@ -418,7 +419,6 @@ namespace Hanako.Knife
 
         public void EndGame()
         {
-
             Debug.Log("End Game");
         }
 
@@ -428,7 +428,7 @@ namespace Hanako.Knife
             {
                 foreach (var tile in tiles)
                 {
-                    if (tile.Tile.PieceParent.TryGetComponentInFamily<KnifePiece>(out var foundPiece) &&
+                    if (tile.Tile.TryGetPiece(out var foundPiece) &&
                         foundPiece == piece.Piece)
                     {
                         piece.SetColRow(tile.ColRow);
@@ -494,6 +494,46 @@ namespace Hanako.Knife
             foreach (var piece in livingPieces)
                 if (piece.ControllerID == controllerID) return piece;
             return null;
+        }
+
+        public void RemoveLivingPiece(KnifePiece_Living targetPiece)
+        {
+            LivingPieceCache foundPiece = null;
+            for (int i = livingPieces.Count - 1; i >= 0; i--)
+            {
+                var piece = livingPieces[i];
+                if (piece.LivingPiece == targetPiece)
+                {
+                    foundPiece = piece;
+                    livingPieces.Remove(piece);
+                    pieces.Remove(piece);
+                    break;
+                }
+            }
+
+            if (foundPiece == null) return;
+            diedPieces.Add(foundPiece);
+            targetPiece.transform.parent = null;
+        }
+
+        public void ResurrectLivingPiece(KnifePiece_Living targetPiece)
+        {
+            LivingPieceCache foundPiece = null;
+            for (int i = diedPieces.Count - 1; i >= 0; i--)
+            {
+                var piece = diedPieces[i];
+                if (piece.LivingPiece == targetPiece)
+                {
+                    foundPiece = piece;
+                    diedPieces.Remove(piece);
+                    break;
+                }
+            }
+
+            if (foundPiece == null) return;
+            diedPieces.Remove(foundPiece);
+            livingPieces.Add(foundPiece);
+            pieces.Add(foundPiece);
         }
     }
 }
