@@ -223,7 +223,11 @@ MonoBehaviour:
     vfx: {fileID: 4477243393230952010}
     duration: 0.3
     delay: 0
-  movePreference: {fileID: 11400000, guid: 4888f5f73d2ea4f4a962433732bbb109, type: 2}
+  movePreferences:
+  - movePreference: {fileID: 11400000, guid: c6bcdf87c4f38d348ada39a9191bd618, type: 2}
+    influence: 1
+  - movePreference: {fileID: 11400000, guid: 7e5223893e5c8c348aed6fef35f71ddd, type: 2}
+    influence: -2
 --- !u!1001 &239082004158952094
 PrefabInstance:
   m_ObjectHideFlags: 0

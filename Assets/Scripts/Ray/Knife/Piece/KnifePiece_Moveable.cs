@@ -79,8 +79,6 @@ namespace Hanako.Knife
                     yield return null;
                 }
 
-
-
                 var moveColRow = ColRow.SubstractBetween(tile.ColRow, otherPiece.ColRow);
                 var targetColRow = ColRow.AddBetween(tile.ColRow, moveColRow);
                 var targetTile = levelManager.GetTile(targetColRow);

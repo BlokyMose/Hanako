@@ -44,6 +44,11 @@ namespace Hanako.Knife
             {
                 return new ColRow(a.col - b.col, a.row - b.row);
             }
+
+            public static int DistanceBetween(ColRow a, ColRow b)
+            {
+                return Mathf.Abs(a.col - b.col) + Mathf.Abs(a.row - b.row);
+            }
         }
 
 

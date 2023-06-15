@@ -9,9 +9,12 @@ namespace Hanako.Knife
 
     public class KnifeMovePreference_Random : KnifeMovePreference
     {
-        public override KnifeLevel.ColRow GetPrefferedMove(List<KnifeLevel.ColRow> validMoves, KnifeLevelManager.PieceCache thisPiece, List<KnifeLevelManager.PieceCache> allPieces, KnifeLevel levelProperties)
+
+        public override void Evaluate(List<KnifePiece_Enemy.PrefferedTile> tiles, int influence, KnifeLevelManager.PieceCache thisPiece, List<KnifeLevelManager.PieceCache> allPieces, KnifeLevel levelProperties)
         {
-            return validMoves.GetRandomStruct();
+            foreach (var tile in tiles)
+                tile.AddInfluence(influence);
         }
+
     }
 }

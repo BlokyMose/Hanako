@@ -58,8 +58,9 @@ namespace Hanako.Knife
         protected bool isAlive = true;
         protected bool IsAlive { get => isAlive;  }
 
-        protected float moveDuration = 1f;
-        protected Coroutine corMyTurn, corMoving, corSetParent;
+        private float moveDuration = 1f;
+        public float MoveDuration { get => moveDuration;}
+        protected Coroutine corMyTurn, corMoving, corSetParent, corSettingPostActing;
         protected KnifeTile destinationTile = null;
         protected PieceActingState actState = PieceActingState.Idling;
         public void SetActState(PieceActingState actState) => this.actState = actState;
@@ -113,8 +114,24 @@ namespace Hanako.Knife
 
         public virtual void MoveToTile(KnifeTile tile, bool autoSetAct = true)
         {
-            corMoving = this.RestartCoroutine(Moving(), corMoving);
+            corMoving = this.RestartCoroutine(Moving(tile.transform.position), corMoving);
             corSetParent = this.RestartCoroutine(SettingParent(moveDuration), corSetParent);
+            corSettingPostActing = this.RestartCoroutine(SettingPostActing(moveDuration), corSettingPostActing);
+
+            IEnumerator SettingPostActing(float delay)
+            {
+                destinationTile = tile;
+                if (autoSetAct)
+                    actState = PieceActingState.Acting;
+
+                yield return new WaitForSeconds(delay);
+
+                transform.localPosition = Vector2.zero;
+                destinationTile = null;
+                if (autoSetAct)
+                    actState = PieceActingState.PostActing;
+            }
+
 
             IEnumerator SettingParent(float delay)
             {
@@ -131,49 +148,41 @@ namespace Hanako.Knife
                 }
             }
 
-            IEnumerator Moving()
-            {
-                destinationTile = tile;
-                if (autoSetAct)
-                    actState = PieceActingState.Acting;
-                animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
-                yield return new WaitForSeconds(0.1f);
+        }
+
+        IEnumerator Moving(Vector2 destination)
+        {
+            animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
+            yield return new WaitForSeconds(0.1f);
                 
-                if (destinationTile.transform.position.x > transform.position.x)
-                {
-                    transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 0f, transform.localEulerAngles.z);
-                }
-                else if (destinationTile.transform.position.x < transform.position.x)
-                {
-                    transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 180f, transform.localEulerAngles.z);
-                }
+            if (destination.x > transform.position.x)
+            {
+                transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 0f, transform.localEulerAngles.z);
+            }
+            else if (destination.x < transform.position.x)
+            {
+                transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, 180f, transform.localEulerAngles.z);
+            }
 
-                var time = 0f;
-                var originPos = transform.position;
-                var curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
-                while (true)
-                {
-                    var tScale = time / moveDuration;
-                    tScale = curve.Evaluate(tScale);
-                    transform.position = Vector2.Lerp(originPos, tile.PieceParent.position, tScale);
+            var time = 0f;
+            var originPos = transform.position;
+            var curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+            while (true)
+            {
+                var tScale = time / moveDuration;
+                tScale = curve.Evaluate(tScale);
+                transform.position = Vector2.Lerp(originPos, destination, tScale);
 
-                    if (time > moveDuration-0.1f)
-                        animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+                if (time > moveDuration-0.1f)
+                    animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
                     
-                    if (time >= moveDuration)
-                    {
-                        break;
-                    }
-
-                    time += Time.deltaTime;
-                    yield return null;
+                if (time >= moveDuration)
+                {
+                    break;
                 }
 
-                transform.localPosition = Vector2.zero;
-                destinationTile = null;
-                if (autoSetAct)
-                    actState = PieceActingState.PostActing;
-
+                time += Time.deltaTime;
+                yield return null;
             }
         }
 
@@ -198,6 +207,20 @@ namespace Hanako.Knife
             isAlive = true;
             animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
             levelManager.ResurrectLivingPiece(this);
+        }
+
+        public virtual void Escape(Vector2 doorPos)
+        {
+            corMoving = this.RestartCoroutine(Moving(doorPos), corMoving);
+            if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
+            {
+                StartCoroutine(Delay());
+                IEnumerator Delay()
+                {
+                    yield return new WaitForSeconds(moveDuration / 2f);
+                    srEditor.BeTransparent(moveDuration / 1.5f);
+                }
+            }
         }
     }
 }

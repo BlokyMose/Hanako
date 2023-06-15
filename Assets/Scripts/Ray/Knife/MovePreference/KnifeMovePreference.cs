@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Hanako.Knife.KnifeLevel;
 using static Hanako.Knife.KnifeLevelManager;
+using static Hanako.Knife.KnifePiece_Enemy;
 
 namespace Hanako.Knife
 {
@@ -11,36 +12,6 @@ namespace Hanako.Knife
         [SerializeField]
         string preferenceName;
 
-        public abstract ColRow GetPrefferedMove(
-            List<ColRow> validMoves, 
-            PieceCache thisPiece,
-            List<PieceCache> allPieces,
-            KnifeLevel levelProperties
-            );
-
-        public virtual KnifeTile GetPrefferedTile(
-            List<ColRow> validMoves,
-            PieceCache thisPiece,
-            List<PieceCache> allPieces,
-            KnifeLevel levelProperties,
-            List<TileCache> allTiles
-            )
-        {
-            if (validMoves.Count == 0)
-            {
-                Debug.Log("No valid moves");
-                foreach (var tile in allTiles)
-                    if (tile.ColRow.IsEqual(thisPiece.ColRow))
-                        return tile.Tile;
-            }
-            
-            var prefferedMove = GetPrefferedMove(validMoves, thisPiece, allPieces, levelProperties);
-            foreach (var tile in allTiles)
-            {
-                if (tile.ColRow.IsEqual(prefferedMove))
-                    return tile.Tile;
-            }
-            return null;
-        }
+        public abstract void Evaluate(List<PrefferedTile> tiles, int influence, PieceCache thisPiece, List<PieceCache> allPieces, KnifeLevel levelProperties);
     }
 }

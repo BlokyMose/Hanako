@@ -172,6 +172,7 @@ namespace Hanako.Knife
         List<PieceCache> pieces = new();
         List<LivingPieceCache> livingPieces = new();
         List<LivingPieceCache> diedPieces = new();
+        List<LivingPieceCache> escapedPieces = new();
         GameObject player;
         int currentMovingPieceIndex;
         int currentRound;
@@ -218,7 +219,7 @@ namespace Hanako.Knife
                 for (int col = 0; col < levelProperties.LevelSize.col; col++)
                 {
                     var tileGO = Instantiate(levelProperties.TilesPattern.GetTile(new(col,row), levelProperties));
-                    tileGO.name = $"{row}, c{col}";
+                    tileGO.name = $"{col}, r{row}";
                     tileGO.transform.parent = levelPos;
                     tileGO.transform.localPosition = new((col * tileSize.x / 2) - (row * tileSize.x / 2), (row * tileSize.y / 2) + (col * tileSize.y / 2));
                     tileGO.transform.localPosition += (Vector3) offset;
@@ -296,7 +297,7 @@ namespace Hanako.Knife
                 var canvas = Instantiate(TileColRowCanvas, cell.GO.transform);
                 canvas.name = DEBUG_TEXT;
                 var textComponent = canvas.GetComponentInFamily<TextMeshProUGUI>();
-                textComponent.text = $"{cell.ColRow.row}, c{cell.ColRow.col}";
+                textComponent.text = $"{cell.ColRow.col}, r{cell.ColRow.row}";
                 if (cell.ColRow.row % 2 == 0)
                     textComponent.color = Color.yellow;
             }
@@ -371,12 +372,13 @@ namespace Hanako.Knife
                 }
                 else
                 {
-                    EndGame();
+                    Lost();
                 }
             }
 
             void GoToNextMovingPiece()
             {
+
                 currentMovingPieceIndex++;
                 if (currentMovingPieceIndex < livingPieces.Count)
                 {
@@ -387,25 +389,7 @@ namespace Hanako.Knife
                         playerCursor.PleaseClick(OnClickDone);
                         void OnClickDone(KnifeTile tile)
                         {
-                            var tileCheckResult = currentMovingPieceCache.CheckTile(tile);
-                            if (tileCheckResult.IsValid)
-                            {
-                                if (tileCheckResult.IsValid && tileCheckResult.IsInteractable)
-                                {
-                                    if (tile.TryGetPiece(out var occupantPiece))
-                                    {
-                                        occupantPiece.Interacted(currentMovingPieceCache, GetTile(tile));
-                                    }
-                                    else
-                                    {
-                                        Debug.LogWarning("Tile has lost its piece, so the interaction cannot be done");
-                                    }
-                                }
-                                else
-                                {
-                                    currentMovingPiece.MoveToTile(tile);
-                                }
-                            }
+                            TryMovePieceToTile(currentMovingPiece, tile);
                         }
                     }
                     currentMovingPiece.PlaseAct(GoToNextMovingPiece);
@@ -417,13 +401,56 @@ namespace Hanako.Knife
             }
         }
 
-        public void EndGame()
+        public bool TryMovePieceToTile(KnifePiece_Living piece, KnifeTile tile)
         {
-            Debug.Log("End Game");
+            var foundPieceCache = GetLivingPiece(piece);
+            if (foundPieceCache != null)
+            {
+                var tileCheckResult = foundPieceCache.CheckTile(tile);
+                if (tileCheckResult.IsValid)
+                {
+                    if (tileCheckResult.IsInteractable)
+                    {
+                        if (tile.TryGetPiece(out var occupantPiece))
+                        {
+                            occupantPiece.Interacted(foundPieceCache, GetTile(tile));
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        foundPieceCache.LivingPiece.MoveToTile(tile);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public void Lost()
+        {
+            Debug.Log("Game lost");
+        }
+
+        public void Won()
+        {
+            Debug.Log("Game won");
         }
 
         void UpdateCache()
         {
+            if (livingPieces.Count == 1)
+            {
+                if (diedPieces.Count > 0)
+                {
+                    Won();
+                }
+                else
+                {
+                    Lost();
+                }
+            }
+
             foreach (var piece in pieces)
             {
                 foreach (var tile in tiles)
@@ -496,24 +523,48 @@ namespace Hanako.Knife
             return null;
         }
 
-        public void RemoveLivingPiece(KnifePiece_Living targetPiece)
+        public LivingPieceCache GetLivingPiece(KnifePiece_Living targetPiece)
         {
-            LivingPieceCache foundPiece = null;
-            for (int i = livingPieces.Count - 1; i >= 0; i--)
+            foreach (var piece in livingPieces)
+                if (piece.LivingPiece == targetPiece) return piece;
+            return null;
+        }
+
+        /// <summary>
+        /// Remove the piece from both pieces and livingPieces list
+        /// </summary>
+        public void RemovePiece(KnifePiece targetPiece)
+        {
+            PieceCache foundPiece = null;
+            for (int i = pieces.Count - 1; i >= 0; i--)
             {
-                var piece = livingPieces[i];
-                if (piece.LivingPiece == targetPiece)
+                var pieceCache = pieces[i];
+                if (pieceCache.Piece == targetPiece)
                 {
-                    foundPiece = piece;
-                    livingPieces.Remove(piece);
-                    pieces.Remove(piece);
-                    break;
+                    foundPiece = pieceCache;
+                    pieces.Remove(pieceCache);
+                    for (int livingPieceIndex = livingPieces.Count - 1; livingPieceIndex >= 0; livingPieceIndex--)
+                    {
+                        if (livingPieces[livingPieceIndex] == pieceCache)
+                        {
+                            livingPieces.RemoveAt(livingPieceIndex);
+                            break;
+                        }
+                    }
                 }
             }
+        }
 
-            if (foundPiece == null) return;
-            diedPieces.Add(foundPiece);
-            targetPiece.transform.parent = null;
+        /// <summary>
+        /// Remove living piece from the livingPieces list, and add it to diedPieces list
+        /// </summary>
+        public void RemoveLivingPiece(KnifePiece_Living targetPiece)
+        {
+            if (TryRemovePieceFromLivingAndNonLivingList(targetPiece, out var foundPiece))
+            {
+                diedPieces.Add(foundPiece);
+                targetPiece.transform.parent = null;
+            }
         }
 
         public void ResurrectLivingPiece(KnifePiece_Living targetPiece)
@@ -534,6 +585,32 @@ namespace Hanako.Knife
             diedPieces.Remove(foundPiece);
             livingPieces.Add(foundPiece);
             pieces.Add(foundPiece);
+        }
+
+        public void MoveLivingPieceToEscapeList(KnifePiece_Living targetPiece)
+        {
+            if(TryRemovePieceFromLivingAndNonLivingList(targetPiece, out var foundPiece))
+            {
+                escapedPieces.Add(foundPiece);
+                targetPiece.transform.parent = null;
+            }
+        }
+
+        bool TryRemovePieceFromLivingAndNonLivingList(KnifePiece_Living targetPiece, out LivingPieceCache foundPiece)
+        {
+            foundPiece = null;
+            for (int i = livingPieces.Count - 1; i >= 0; i--)
+            {
+                if (livingPieces[i].LivingPiece == targetPiece)
+                {
+                    foundPiece = livingPieces[i];
+                    livingPieces.RemoveAt(i);
+                    pieces.RemoveAt(i);
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
