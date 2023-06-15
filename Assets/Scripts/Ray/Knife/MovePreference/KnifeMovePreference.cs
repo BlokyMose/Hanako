@@ -26,6 +26,14 @@ namespace Hanako.Knife
             List<TileCache> allTiles
             )
         {
+            if (validMoves.Count == 0)
+            {
+                Debug.Log("No valid moves");
+                foreach (var tile in allTiles)
+                    if (tile.ColRow.IsEqual(thisPiece.ColRow))
+                        return tile.Tile;
+            }
+            
             var prefferedMove = GetPrefferedMove(validMoves, thisPiece, allPieces, levelProperties);
             foreach (var tile in allTiles)
             {

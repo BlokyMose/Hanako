@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f5551e96b5be2940bc23d167c4c8e9c, type: 3}
-  m_Name: KnifeMoveRule_Default
+  m_Script: {fileID: 11500000, guid: 18afc7c869444e74da4a56bc7d6f4b75, type: 3}
+  m_Name: KnifeAbility_ToEnemyMoveRule
   m_EditorClassIdentifier: 
-  ruleName: 
+  moveRule: {fileID: 11400000, guid: d313773fded261b49a6a3b4b5d9921ee, type: 2}

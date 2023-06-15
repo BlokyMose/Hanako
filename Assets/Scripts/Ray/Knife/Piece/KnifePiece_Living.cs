@@ -46,7 +46,7 @@ namespace Hanako.Knife
 
         [SerializeField]
         protected KnifeMoveRule moveRule;
-        public KnifeMoveRule MoveRule { get => moveRule; }
+        public KnifeMoveRule MoveRule { get => moveRule; set => this.moveRule = value; }
 
         [SerializeField]
         protected Animator animator;

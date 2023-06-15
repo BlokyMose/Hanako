@@ -9,7 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81eee1e2dabda634188cfc541390a897, type: 3}
-  m_Name: KnifeMoveRule_Interactor
+  m_Script: {fileID: 11500000, guid: 2997d63654d3b9041a3c97ad26b5d516, type: 3}
+  m_Name: KnifeMoveRule_Enemy_Basic
   m_EditorClassIdentifier: 
   ruleName: 
+  validMoves:
+  - col: 1
+    row: 0
+  - col: -1
+    row: 0
+  - col: 0
+    row: 1
+  - col: 0
+    row: -1
+  validators:
+  - {fileID: 11400000, guid: 09967a6fbb78c4e409268fd64d08e960, type: 2}
