@@ -10,12 +10,15 @@ namespace Hanako.Knife
 
     public class KnifeMovePreference_ToExitDoor : KnifeMovePreference
     {
+        [SerializeField]
+        KnifeInteraction targetInteraction;
+
         public override void Evaluate(List<KnifePiece_Enemy.PrefferedTile> tiles, int influence, KnifeLevelManager.PieceCache thisPiece, List<KnifeLevelManager.PieceCache> allPieces, KnifeLevel levelProperties)
         {
             var doorColRow = new ColRow(0, 0);
             foreach (var piece in allPieces)
             {
-                if (piece.Piece is KnifePiece_ExitDoor)
+                if (piece.Piece.HasInteraction(targetInteraction))
                 {
                     doorColRow = piece.ColRow;
                     var closestTile = tiles[0];

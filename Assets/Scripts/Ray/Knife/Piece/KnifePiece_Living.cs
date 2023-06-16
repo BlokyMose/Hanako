@@ -51,6 +51,10 @@ namespace Hanako.Knife
         [SerializeField]
         protected Animator animator;
 
+        [Header("Animation Duration")]
+        [SerializeField]
+        float attackDuration = 0.5f;
+
         [Header("VFXs")]
         [SerializeField]
         VFXProperties vfxDie;
@@ -186,6 +190,22 @@ namespace Hanako.Knife
             }
         }
 
+        public virtual void Attack(bool returnToCurrentStateAfterAttack = false)
+        {
+            var currentState = animator.GetInteger(int_motion);
+            animator.SetInteger(int_motion, (int)PieceAnimationState.Attack);
+
+            StartCoroutine(Delay(attackDuration - 0.05f));
+            IEnumerator Delay(float delay)
+            {
+                yield return new WaitForSeconds(delay);
+                if (returnToCurrentStateAfterAttack)
+                    animator.SetInteger(int_motion, currentState);
+                else
+                    animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+            }
+        }
+        
         public virtual void Die(LivingPieceCache otherPiece)
         {
             isAlive = false;

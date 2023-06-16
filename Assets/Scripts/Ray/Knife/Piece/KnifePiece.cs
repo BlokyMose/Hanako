@@ -8,28 +8,110 @@ namespace Hanako.Knife
 {
     public abstract class KnifePiece : MonoBehaviour
     {
+        [Serializable]
+        public class InteractionProperties
+        {
+            [SerializeField]
+            GameObject componentType;
+
+            [SerializeField]
+            bool isInteractable = true;
+
+            [SerializeField]
+            List<KnifeInteraction> interactions = new();
+
+            public GameObject ComponentType { get => componentType; }
+            public bool IsInteractable { get => isInteractable; }
+            public List<KnifeInteraction> Interactions { get => interactions; }
+        }
+
         protected KnifeLevelManager levelManager;
         protected bool isInteractable = true;
         public bool IsInteractable { get => isInteractable; }
+
+        [SerializeField]
+        protected bool isInteractableDefault = true;
+
+        [SerializeField]
+        protected List<InteractionProperties> interactionProperties = new();
+        public List<InteractionProperties> Interactions => interactionProperties;
+
+        public bool HasInteraction(KnifeInteraction targetInteraction)
+        {
+            foreach (var interaction in interactionProperties)
+            {
+                if (interaction.Interactions.Contains(targetInteraction))
+                    return true;
+            }
+
+            return false;
+        }
+
+        protected virtual void Awake()
+        {
+            if (interactionProperties.Count == 0)
+                Debug.LogWarning($"{gameObject.name} has no interaction properties; The game will be stucked because SetActingState is not called via Interacted()");
+        }
 
         public virtual void Init(KnifeLevelManager levelManager)
         {
             this.levelManager = levelManager;
         }
 
-        public virtual bool CheckInteractabilityAgainst(LivingPieceCache otherPiece, TileCache myTile)
+        public virtual bool CheckValidityAgainst(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile)
         {
-            return isInteractable;
+            return CheckInteractabilityAgainst(myPiece, myTile, otherPiece, otherTile);
         }
 
-        public virtual bool CheckValidityAgainst(LivingPieceCache otherPiece, TileCache myTile)
+        public virtual bool CheckInteractabilityAgainst(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile)
         {
-            return isInteractable;
+            if (isInteractable)
+            {
+                foreach (var ip in interactionProperties)
+                {
+                    if (ip.ComponentType == null ||
+                        (ip.ComponentType != null && ip.ComponentType.TryGetComponent(otherPiece.Piece.GetType(), out var piece)))
+                    {
+                        if (ip.IsInteractable)
+                        {
+                            foreach (var interaction in ip.Interactions)
+                            {
+                                if (!interaction.CheckInteractabilityAgainst(myPiece, myTile, otherPiece, otherTile, levelManager))
+                                {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return isInteractableDefault;
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        public virtual void Interacted(LivingPieceCache otherPiece, TileCache myTile)
+        public virtual void Interacted(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile)
         {
-            otherPiece.LivingPiece.MoveToTile(myTile.Tile);
+            foreach (var ip in interactionProperties)
+            {
+                if (ip.ComponentType == null ||
+                    (ip.ComponentType != null && ip.ComponentType.TryGetComponent(otherPiece.Piece.GetType(), out var piece)))
+                {
+                    foreach (var _interaction in ip.Interactions)
+                    {
+                        _interaction.Interact(myPiece, myTile, otherPiece, otherTile, levelManager);
+                    }
+                    break;
+                }
+            }
         }
     }
 }

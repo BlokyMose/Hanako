@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3393417637535116995}
-  - component: {fileID: 8128370523978330964}
   - component: {fileID: 8968403188171059170}
+  - component: {fileID: 3411194582848312137}
   m_Layer: 0
   m_Name: Knife_Table
   m_TagString: Untagged
@@ -35,19 +35,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8128370523978330964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1715271952279102497}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c11a962a83c1d5f45b05038118d111bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 0}
 --- !u!210 &8968403188171059170
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -59,6 +46,24 @@ SortingGroup:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &3411194582848312137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1715271952279102497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b552608105a7d0b42b4b615eca520fdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isInteractableDefault: 1
+  interactionProperties:
+  - componentType: {fileID: 0}
+    isInteractable: 1
+    interactions:
+    - {fileID: 11400000, guid: df1ded9012d50ee4dba5996f322ec5e1, type: 2}
 --- !u!1 &2935957607660870465
 GameObject:
   m_ObjectHideFlags: 0

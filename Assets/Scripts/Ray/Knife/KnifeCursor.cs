@@ -188,6 +188,18 @@ namespace Hanako.Knife
                     hoveredTile.Hovered(colors.TileInvalidMoveColor);
                     hoveredValidTile = null;
                 }
+
+                if (hoveredTile.TryGetPiece(out var tilePiece))
+                {
+                    if (tilePiece is KnifePiece_Living)
+                    {
+                        var livingPieceCache = levelManager.GetLivingPiece(tilePiece as KnifePiece_Living);
+                        foreach (var validTile in livingPieceCache.ValidTilesByMoveRule)
+                        {
+                            validTile.Tile.Hovered(colors.TileValidMoveColor);
+                        }
+                    }
+                }
             }
 
             // Hovering a tile when not my turn
@@ -200,8 +212,26 @@ namespace Hanako.Knife
 
         void Unhover(KnifeTile tile)
         {
+            if (hoveredTile.TryGetPiece(out var tilePiece))
+            {
+                if (tilePiece is KnifePiece_Living)
+                {
+                    var livingPieceCache = levelManager.GetLivingPiece(tilePiece as KnifePiece_Living);
+                    foreach (var validTile in livingPieceCache.ValidTilesByMoveRule)
+                    {
+                        validTile.Tile.Unhovered();
+                    }
+                }
+            }
+
             tile.Unhovered();
             hoveredTile = null;
+
+
+            //foreach (var _tile in levelManager.Tiles)
+            //{
+            //    _tile.Tile.Unhovered();
+            //}
         }
 
         public void PleaseClick(Action<KnifeTile> onClick)

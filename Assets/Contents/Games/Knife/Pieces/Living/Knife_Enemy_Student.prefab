@@ -181,7 +181,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3715185771356666091}
-  - component: {fileID: 3123699995249478341}
+  - component: {fileID: 425126838206513139}
   m_Layer: 0
   m_Name: Knife_Enemy_Student
   m_TagString: Untagged
@@ -205,7 +205,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3123699995249478341
+--- !u!114 &425126838206513139
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -214,11 +214,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 3578817977552295564}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31fbb045d931d4848aa52ab22c9e545f, type: 3}
+  m_Script: {fileID: 11500000, guid: 35e0fb363e3e4cd4a9d653613a986326, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isInteractableDefault: 1
+  interactionProperties:
+  - componentType: {fileID: 7314053359128261936, guid: c5ab08977bead534a8d4c63e56401294, type: 3}
+    isInteractable: 1
+    interactions:
+    - {fileID: 11400000, guid: d1a0c199e9846794abcd5dff0d7b1c0b, type: 2}
   moveRule: {fileID: 11400000, guid: d313773fded261b49a6a3b4b5d9921ee, type: 2}
   animator: {fileID: 0}
+  attackDuration: 0.5
   vfxDie:
     vfx: {fileID: 4477243393230952010}
     duration: 0.3

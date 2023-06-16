@@ -121,10 +121,10 @@ namespace Hanako.Knife
                 {
                     if (validTile.Tile == tile)
                     {
-                        if (tile.TryGetPiece(out var piece) && piece.IsInteractable)
+                        if (tile.TryGetPiece(out var tilePiece))
                         {
-                            var isValid = piece.CheckValidityAgainst(this, levelManager.GetTile(tile));
-                            var isInteratable = piece.CheckInteractabilityAgainst(this, levelManager.GetTile(tile));
+                            var isValid = tilePiece.CheckValidityAgainst(levelManager.GetPiece(tilePiece), levelManager.GetTile(tile), this, levelManager.GetTile(colRow));
+                            var isInteratable = tilePiece.CheckInteractabilityAgainst(levelManager.GetPiece(tilePiece), levelManager.GetTile(tile), this, levelManager.GetTile(colRow));
                             return new TileCheckResult(isValid, isInteratable);
                         }
                         else
@@ -411,9 +411,9 @@ namespace Hanako.Knife
                 {
                     if (tileCheckResult.IsInteractable)
                     {
-                        if (tile.TryGetPiece(out var occupantPiece))
+                        if (tile.TryGetPiece(out var tilePiece) && TryGetPiece(tilePiece, out var occupantPiece))
                         {
-                            occupantPiece.Interacted(foundPieceCache, GetTile(tile));
+                            occupantPiece.Piece.Interacted(occupantPiece, GetTile(occupantPiece.ColRow), foundPieceCache, GetTile(foundPieceCache.ColRow));
                             return true;
                         }
                     }
@@ -509,6 +509,12 @@ namespace Hanako.Knife
             return null;
         }
 
+        public bool TryGetPiece(KnifePiece knifePiece, out PieceCache foundPiece)
+        {
+            foundPiece = GetPiece(knifePiece);
+            return foundPiece != null;
+        }
+
         public PieceCache GetPiece(KnifePiece knifePiece)
         {
             foreach (var piece in pieces)
@@ -524,6 +530,13 @@ namespace Hanako.Knife
         }
 
         public LivingPieceCache GetLivingPiece(KnifePiece_Living targetPiece)
+        {
+            foreach (var piece in livingPieces)
+                if (piece.LivingPiece == targetPiece) return piece;
+            return null;
+        }
+
+        public LivingPieceCache GetLivingPiece(KnifePiece targetPiece)
         {
             foreach (var piece in livingPieces)
                 if (piece.LivingPiece == targetPiece) return piece;

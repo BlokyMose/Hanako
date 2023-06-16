@@ -116,7 +116,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1764757431026019014}
-  - component: {fileID: 8028072189775170302}
+  - component: {fileID: 6621460077946305160}
   m_Layer: 0
   m_Name: Knife_Door
   m_TagString: Untagged
@@ -131,9 +131,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2353029738346536996}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.24, y: 3.26, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8172732128370737528}
@@ -142,7 +142,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8028072189775170302
+--- !u!114 &6621460077946305160
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -151,10 +151,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 2353029738346536996}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bafe7b6525d20dd4d91368326c670318, type: 3}
+  m_Script: {fileID: 11500000, guid: b552608105a7d0b42b4b615eca520fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  doorPosition: {fileID: 4317845091125827194}
+  isInteractableDefault: 1
+  interactionProperties:
+  - componentType: {fileID: 0}
+    isInteractable: 1
+    interactions:
+    - {fileID: 11400000, guid: 798fb0f9b563838468e1a90145355879, type: 2}
+  - componentType: {fileID: 7314053359128261936, guid: c5ab08977bead534a8d4c63e56401294, type: 3}
+    isInteractable: 0
+    interactions: []
 --- !u!1 &2942791955674727125
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Hanako.Knife
 {
-    public abstract class KnifePiece_NonLiving : KnifePiece
+    public class KnifePiece_NonLiving : KnifePiece
     {
     }
 }

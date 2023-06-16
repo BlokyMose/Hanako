@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d22827f832ef9f84db246c479a635cab, type: 3}
-  m_Name: KnifeValidator_IsNotOccupiedExceptExitDoor
+  m_Script: {fileID: 11500000, guid: 4c856ab49c08dd44a8638bcac10488c6, type: 3}
+  m_Name: KnifeInteraction_Meat
   m_EditorClassIdentifier: 
-  validatorName: 
-  reverseResult: 1
-  targetInteraction: {fileID: 11400000, guid: 798fb0f9b563838468e1a90145355879, type: 2}
+  interactionName: 
+  abilities:
+  - {fileID: 11400000, guid: 6dd45739830e3974dbebae7c164d6b97, type: 2}
