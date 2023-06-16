@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c73a3c587f1e61d42b8c296d39f9ccf1, type: 3}
-  m_Name: KnifeValidator_IfOccupiedThenInteractable
+  m_Script: {fileID: 11500000, guid: 2f438f3dc5e37184ea0e414f0f600abe, type: 3}
+  m_Name: KnifeValidator_NoInteractionExceptDoor
   m_EditorClassIdentifier: 
   validatorName: 
-  reverseResult: 0
+  reverseResult: 1
+  targetInteraction: {fileID: 11400000, guid: 798fb0f9b563838468e1a90145355879, type: 2}

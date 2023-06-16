@@ -24,7 +24,7 @@ namespace Hanako.Knife
                     levelManager.MoveLivingPieceToEscapeList(otherLivingPiece.LivingPiece);
                     otherLivingPiece.LivingPiece.MoveToTile(myTile.Tile);
                     yield return new WaitForSeconds(otherLivingPiece.LivingPiece.MoveDuration);
-                    otherLivingPiece.LivingPiece.Escape(doorPosition);
+                    otherLivingPiece.LivingPiece.Escape((Vector2)myPiece.Piece.transform.position * myPiece.Piece.transform.localScale + doorPosition);
                     yield return new WaitForSeconds(otherLivingPiece.LivingPiece.MoveDuration);
                     otherLivingPiece.LivingPiece.SetActState(KnifePiece_Living.PieceActingState.PostActing);
                 }
