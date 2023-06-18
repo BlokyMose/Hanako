@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,9 +26,8 @@ namespace Hanako.Knife
             public List<KnifeInteraction> Interactions { get => interactions; }
         }
 
-        protected KnifeLevelManager levelManager;
-        protected bool isInteractable = true;
-        public bool IsInteractable { get => isInteractable; }
+        [SerializeField]
+        KnifePieceInformation information;
 
         [SerializeField]
         protected bool isInteractableDefault = true;
@@ -35,6 +35,21 @@ namespace Hanako.Knife
         [SerializeField]
         protected List<InteractionProperties> interactionProperties = new();
         public List<InteractionProperties> Interactions => interactionProperties;
+
+        [Header("UI")]
+        [SerializeField, LabelText("Head Pos")]
+        Transform headPosForLogo;
+
+        [SerializeField, LabelText("Offset")]
+        Vector3 headPosOffset = new(0, 0.25f, -3f);
+
+        protected KnifeLevelManager levelManager;
+
+        protected bool isInteractable = true;
+        public bool IsInteractable { get => isInteractable; }
+        public KnifePieceInformation Information { get => information; }
+        public Transform HeadPosForLogo { get => headPosForLogo; }
+        public Vector3 HeadPosOffset { get => headPosOffset; }
 
         public bool HasInteraction(KnifeInteraction targetInteraction)
         {

@@ -92,6 +92,10 @@ namespace Hanako.Knife
             return piece != null;
         }
 
+        public KnifePiece GetPiece()
+        {
+            return pieceParent.GetComponentInChildren<KnifePiece>();
+        }
 
     }
 }

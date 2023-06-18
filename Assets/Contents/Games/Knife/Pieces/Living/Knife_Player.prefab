@@ -45,13 +45,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f152ec2c7e6f664f9b37280cf598a66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  information: {fileID: 11400000, guid: 4d25b97a2ae9e0d4e820be94a6f293cc, type: 2}
+  isInteractableDefault: 1
+  interactionProperties: []
+  headPosForLogo: {fileID: 2117787888472415932}
+  headPosOffset: {x: 0.1, y: 0, z: -2.5}
   moveRule: {fileID: 11400000, guid: 8218ce072b8abc641a6f6dd29d85ad97, type: 2}
   animator: {fileID: 0}
+  attackDuration: 0.5
   vfxDie:
     vfx: {fileID: 0}
     duration: 1
     delay: 0
-  attackDuration: 0.5
 --- !u!1001 &2044289612616098978
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -196,5 +201,10 @@ PrefabInstance:
 --- !u!4 &2117787887884189272 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 89265291874720506, guid: f7405268712f1a044b3fb3c14239af41, type: 3}
+  m_PrefabInstance: {fileID: 2044289612616098978}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2117787888472415932 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 89265291925994014, guid: f7405268712f1a044b3fb3c14239af41, type: 3}
   m_PrefabInstance: {fileID: 2044289612616098978}
   m_PrefabAsset: {fileID: 0}

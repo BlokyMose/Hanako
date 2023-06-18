@@ -64,6 +64,7 @@ namespace Hanako.Knife
 
         private float moveDuration = 1f;
         public float MoveDuration { get => moveDuration;}
+
         protected Coroutine corMyTurn, corMoving, corSetParent, corSettingPostActing;
         protected KnifeTile destinationTile = null;
         protected PieceActingState actState = PieceActingState.Idling;

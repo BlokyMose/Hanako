@@ -27,6 +27,9 @@ namespace Hanako.Knife
         [SerializeField, ShowIf(nameof(cursorInputMode))]
         bool isFollowingMouse = true;
 
+        [SerializeField]
+        KnifeInformationCanvas infoCanvas;
+
         [Header("Customizations")]
 
         [SerializeField]
@@ -160,6 +163,7 @@ namespace Hanako.Knife
                 Unhover(hoveredTile);
 
             hoveredTile = tile;
+            var tilePiece = hoveredTile.GetPiece();
 
             if (isMyTurn)
             {
@@ -189,7 +193,7 @@ namespace Hanako.Knife
                     hoveredValidTile = null;
                 }
 
-                if (hoveredTile.TryGetPiece(out var tilePiece))
+                if (tilePiece != null)
                 {
                     if (tilePiece is KnifePiece_Living)
                     {
@@ -207,6 +211,12 @@ namespace Hanako.Knife
             {
                 hoveredTile.Hovered(colors.TileNotMyTurnColor);
                 hoveredValidTile = null;
+            }
+
+            if (infoCanvas != null && tilePiece != null)
+            {
+                var characterIsFlippedX = tilePiece.transform.localEulerAngles.y == 180;
+                infoCanvas.SetInformation(tilePiece, characterIsFlippedX);
             }
         }
 
@@ -226,7 +236,10 @@ namespace Hanako.Knife
 
             tile.Unhovered();
             hoveredTile = null;
-
+            if (infoCanvas != null )
+            {
+                infoCanvas.Clear();
+            }
 
             //foreach (var _tile in levelManager.Tiles)
             //{

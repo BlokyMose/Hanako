@@ -217,12 +217,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35e0fb363e3e4cd4a9d653613a986326, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  information: {fileID: 11400000, guid: cf79f2c139e2b3d41a7cc9d9e25fc192, type: 2}
   isInteractableDefault: 1
   interactionProperties:
   - componentType: {fileID: 7314053359128261936, guid: c5ab08977bead534a8d4c63e56401294, type: 3}
     isInteractable: 1
     interactions:
     - {fileID: 11400000, guid: d1a0c199e9846794abcd5dff0d7b1c0b, type: 2}
+  headPosForLogo: {fileID: 2009598060264782158}
+  headPosOffset: {x: 0.1, y: 0, z: -2.5}
   moveRule: {fileID: 11400000, guid: d313773fded261b49a6a3b4b5d9921ee, type: 2}
   animator: {fileID: 0}
   attackDuration: 0.5
@@ -672,5 +675,10 @@ Transform:
 --- !u!4 &2009598059949038462 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1779736698880960992, guid: 5c0a3871e3a5be0428803aa22473f4af, type: 3}
+  m_PrefabInstance: {fileID: 239082004158952094}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2009598060264782158 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1779736699131153360, guid: 5c0a3871e3a5be0428803aa22473f4af, type: 3}
   m_PrefabInstance: {fileID: 239082004158952094}
   m_PrefabAsset: {fileID: 0}

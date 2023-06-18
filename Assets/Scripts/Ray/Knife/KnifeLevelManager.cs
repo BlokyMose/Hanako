@@ -155,6 +155,9 @@ namespace Hanako.Knife
         [SerializeField]
         GameObject playerPrefab;
 
+        [SerializeField]
+        LayerMask tileLayer;
+
         [Header("Game")]
         [SerializeField]
         float moveDuration = 1f;
@@ -220,6 +223,10 @@ namespace Hanako.Knife
                 {
                     var tileGO = Instantiate(levelProperties.TilesPattern.GetTile(new(col,row), levelProperties));
                     tileGO.name = $"{col}, r{row}";
+                    var layerNumber = tileLayer.GetMemberLayerNumbers()[0];
+                    tileGO.layer = layerNumber;
+                    for (int i = 0; i < tileGO.transform.childCount; i++)
+                        tileGO.transform.GetChild(i).gameObject.layer = layerNumber;
                     tileGO.transform.parent = levelPos;
                     tileGO.transform.localPosition = new((col * tileSize.x / 2) - (row * tileSize.x / 2), (row * tileSize.y / 2) + (col * tileSize.y / 2));
                     tileGO.transform.localPosition += (Vector3) offset;
