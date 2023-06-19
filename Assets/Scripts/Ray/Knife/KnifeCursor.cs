@@ -237,14 +237,7 @@ namespace Hanako.Knife
             tile.Unhovered();
             hoveredTile = null;
             if (infoCanvas != null )
-            {
                 infoCanvas.Clear();
-            }
-
-            //foreach (var _tile in levelManager.Tiles)
-            //{
-            //    _tile.Tile.Unhovered();
-            //}
         }
 
         public void PleaseClick(Action<KnifeTile> onClick)

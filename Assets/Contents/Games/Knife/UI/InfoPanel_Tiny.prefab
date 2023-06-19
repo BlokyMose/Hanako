@@ -38,8 +38,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 142.98996, y: 0}
-  m_SizeDelta: {x: 560.33997, y: 0}
+  m_AnchoredPosition: {x: 142.98999, y: 0}
+  m_SizeDelta: {x: 500.45, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6173002816367783293
 MonoBehaviour:
@@ -56,10 +56,10 @@ MonoBehaviour:
   m_Padding:
     m_Left: 0
     m_Right: 0
-    m_Top: 0
+    m_Top: -10
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 16
+  m_Spacing: 4
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
@@ -216,7 +216,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 560.34, y: 50.72}
+  m_SizeDelta: {x: 499.2, y: 50.72}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6173002817254620413
 CanvasRenderer:
@@ -383,7 +383,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: c18a343f466afd346bdd01525c7a0be8, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -400,10 +400,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6173002817663476721}
-  - component: {fileID: 6173002817663476724}
+  - component: {fileID: 6157864309435994431}
   - component: {fileID: 6173002817663476722}
   - component: {fileID: 861956687401379926}
-  - component: {fileID: 6157864309435994431}
+  - component: {fileID: 6173002817663476724}
   m_Layer: 5
   m_Name: InfoPanel_Tiny
   m_TagString: Untagged
@@ -433,7 +433,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 705.01996, y: 0}
   m_Pivot: {x: 0, y: 1}
---- !u!114 &6173002817663476724
+--- !u!114 &6157864309435994431
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -442,23 +442,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6173002817663476720}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 20
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: 32
-  m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!222 &6173002817663476722
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -483,7 +471,9 @@ MonoBehaviour:
   descTetx: {fileID: 6173002818422753587}
   logoImage: {fileID: 6173002817459805700}
   logoCG: {fileID: 6173002816985883025}
---- !u!114 &6157864309435994431
+  allParent: {fileID: 6173002817663476724}
+  textsParent: {fileID: 6173002816367783293}
+--- !u!114 &6173002817663476724
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -492,11 +482,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 6173002817663476720}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 2
+  m_Padding:
+    m_Left: 20
+    m_Right: 0
+    m_Top: 16
+    m_Bottom: 16
+  m_ChildAlignment: 0
+  m_Spacing: 32
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &6173002818076331816
 GameObject:
   m_ObjectHideFlags: 0
@@ -609,8 +611,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 280.17, y: 0}
-  m_SizeDelta: {x: 560.34, y: 0}
+  m_AnchoredPosition: {x: 249.6, y: 0}
+  m_SizeDelta: {x: 499.2, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6173002818422753588
 CanvasRenderer:
@@ -683,7 +685,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 0
+  m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}

@@ -58,12 +58,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b552608105a7d0b42b4b615eca520fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  information: {fileID: 0}
   isInteractableDefault: 1
   interactionProperties:
   - componentType: {fileID: 0}
     isInteractable: 1
     interactions:
     - {fileID: 11400000, guid: df1ded9012d50ee4dba5996f322ec5e1, type: 2}
+  headPosForLogo: {fileID: 0}
+  headPosOffset: {x: 0, y: 0.25, z: -3}
 --- !u!1 &2935957607660870465
 GameObject:
   m_ObjectHideFlags: 0

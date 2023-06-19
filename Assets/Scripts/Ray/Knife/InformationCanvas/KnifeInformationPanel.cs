@@ -34,6 +34,12 @@ namespace Hanako.Knife
         [SerializeField]
         CanvasGroup logoCG;
 
+        [SerializeField]
+        HorizontalOrVerticalLayoutGroup allParent;
+
+        [SerializeField]
+        HorizontalOrVerticalLayoutGroup textsParent;
+
         private void Awake()
         {
             Clear();
@@ -45,6 +51,12 @@ namespace Hanako.Knife
             descTetx.text = info.desc;
             logoImage.sprite = info.logo;
             logoCG.alpha = 1f;
+
+            Canvas.ForceUpdateCanvases();
+            allParent.enabled = false;
+            allParent.enabled = true;
+            textsParent.enabled = false;
+            textsParent.enabled = true;
         }
 
         public void FlipXLogo(bool isFlippedX)
