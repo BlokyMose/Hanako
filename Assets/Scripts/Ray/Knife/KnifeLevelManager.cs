@@ -1,5 +1,6 @@
 using Encore.Utility;
 using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -137,7 +138,111 @@ namespace Hanako.Knife
             }
         }
 
+        public class TurnManager
+        {
+            public class Round
+            {
+                public List<LivingPieceCache> turns = new();
+
+                public Round(List<LivingPieceCache> turns)
+                {
+                    this.turns = turns;
+                }
+            }
+
+            List<Round> rounds = new();
+
+            int currentRoundIndex = 0;
+            public Round currentRound => rounds[currentRoundIndex];
+            int currentTurnIndex = 0;
+            public LivingPieceCache currentPiece => rounds[currentRoundIndex].turns[currentTurnIndex];
+
+            public int CurrentRoundIndex { get => currentRoundIndex; }
+
+            public Func<bool> OnCheckWinningCondition;
+            public Action OnUpdateCache;
+            public Action OnPlayerTurn;
+
+            public TurnManager(
+                List<LivingPieceCache> pieces, 
+                int roundCount,
+                Action onPlayerTurn,
+                Action onUpdateCache, 
+                Func<bool> onCheckWinningCondition
+                )
+            {
+                OnCheckWinningCondition = onCheckWinningCondition;
+                OnUpdateCache = onUpdateCache;
+                OnPlayerTurn = onPlayerTurn;
+
+                rounds = new();
+                for (int i = 0; i < roundCount; i++)
+                {
+                    rounds.Add(new Round(new List<LivingPieceCache>()));
+                    foreach (var piece in pieces)
+                        rounds.GetLast().turns.Add(piece);
+                }
+
+                currentRoundIndex = -1;
+            }
+
+
+
+            public void GoToNextRound()
+            {
+                currentRoundIndex++;
+                if (currentRoundIndex < rounds.Count)
+                {
+                    currentTurnIndex = -1;
+                    GoToNextMovingPiece();
+                }
+                else
+                {
+                    OnCheckWinningCondition?.Invoke();
+                }
+            }
+
+            public void GoToNextMovingPiece()
+            {
+                currentTurnIndex++;
+                if (currentTurnIndex < currentRound.turns.Count)
+                {
+                    OnUpdateCache?.Invoke();
+
+                    // Player's turn
+                    if (currentPiece.ControllerID == 0)
+                    {
+                        OnPlayerTurn?.Invoke();
+                    }
+                    currentPiece.LivingPiece.PlaseAct(GoToNextMovingPiece);
+
+                }
+                else
+                {
+                    GoToNextRound();
+                }
+            }
+
+            public bool IsPieceCountOne()
+            {
+                return rounds[0].turns.Count == 0;
+            }
+
+            public void RemovePiece(LivingPieceCache piece)
+            {
+                foreach (var round in rounds)
+                {
+                    for (int i = round.turns.Count - 1; i >= 0; i--)
+                        if (round.turns[i] == piece)
+                            round.turns.RemoveAt(i);
+                }
+            }
+        }
+
         #endregion
+
+
+        #region [Vars: Serialiazables]
 
         [SerializeField]
         KnifeLevel levelProperties;
@@ -169,6 +274,12 @@ namespace Hanako.Knife
         [SerializeField]
         GameObject TileColRowCanvas;
 
+
+
+        #endregion
+
+        #region [Vars: Data Handlers]
+
         List<WallCache> leftWalls = new();
         List<WallCache> rightWalls = new();
         List<TileCache> tiles = new();
@@ -176,6 +287,7 @@ namespace Hanako.Knife
         List<LivingPieceCache> livingPieces = new();
         List<LivingPieceCache> diedPieces = new();
         List<LivingPieceCache> escapedPieces = new();
+        TurnManager turnManager = null;
         GameObject player;
         int currentMovingPieceIndex;
         int currentRound;
@@ -190,6 +302,10 @@ namespace Hanako.Knife
         public List<PieceCache> Pieces { get => pieces; }
         public List<LivingPieceCache> LivingPieces { get => livingPieces; }
         public float MoveDuration { get => moveDuration; }
+
+        #endregion
+
+        #region [Methods: Game]
 
         private void Awake()
         {
@@ -207,6 +323,94 @@ namespace Hanako.Knife
             GeneratePieces();
             StartGame();
         }
+
+        public void StartGame()
+        {
+            turnManager = new(
+                livingPieces, 
+                levelProperties.RoundCount,
+                OnPlayerTurn,
+                UpdateCache,
+                CheckWinningCondition);
+            turnManager.GoToNextRound();
+            
+            void OnPlayerTurn()
+            {
+                playerCursor.PleaseClick(OnClickDone);
+                void OnClickDone(KnifeTile tile)
+                {
+                    TryMovePieceToTile(currentMovingPiece, tile);
+                }
+            }
+        }
+
+        public bool CheckWinningCondition()
+        {
+            if (turnManager.CurrentRoundIndex >= levelProperties.RoundCount)
+            {
+                Lost();
+                return true;
+            }
+
+            if (turnManager.IsPieceCountOne())
+            {
+                if (diedPieces.Count > 0)
+                {
+                    Won();
+                }
+                else
+                {
+                    Lost();
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public void Lost()
+        {
+            Debug.Log("Game lost");
+        }
+
+        public void Won()
+        {
+            Debug.Log("Game won");
+        }
+
+        public void UpdateCache()
+        {
+            if (CheckWinningCondition()) return;
+
+            foreach (var piece in pieces)
+            {
+                foreach (var tile in tiles)
+                {
+                    if (tile.Tile.TryGetPiece(out var foundPiece) &&
+                        foundPiece == piece.Piece)
+                    {
+                        piece.SetColRow(tile.ColRow);
+                        var livingPiece = GetLivingPiece(piece.ControllerID);
+                        if (livingPiece != null)
+                        {
+                            livingPiece.UpdateCache(tile.ColRow);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            playerCursor.Refresh();
+        }
+
+        #endregion
+
+        #region [Methods: Turn]
+
+
+
+        #endregion
+
+        #region [Methods: Generators]
 
         [HorizontalGroup("Buts")]
         [Button("Make Map")]
@@ -364,49 +568,9 @@ namespace Hanako.Knife
             }
         }
 
-        public void StartGame()
-        {
-            currentRound = -1;
-            GoToNextRound();
+        #endregion
 
-            void GoToNextRound()
-            {
-                currentRound++;
-                if (currentRound < levelProperties.RoundCount)
-                {
-                    currentMovingPieceIndex = -1;
-                    GoToNextMovingPiece();
-                }
-                else
-                {
-                    Lost();
-                }
-            }
-
-            void GoToNextMovingPiece()
-            {
-
-                currentMovingPieceIndex++;
-                if (currentMovingPieceIndex < livingPieces.Count)
-                {
-                    UpdateCache();
-                    // Player's turn
-                    if (currentMovingPieceCache.ControllerID == 0)
-                    {
-                        playerCursor.PleaseClick(OnClickDone);
-                        void OnClickDone(KnifeTile tile)
-                        {
-                            TryMovePieceToTile(currentMovingPiece, tile);
-                        }
-                    }
-                    currentMovingPiece.PlaseAct(GoToNextMovingPiece);
-                }
-                else
-                {
-                    GoToNextRound();
-                }
-            }
-        }
+        #region [Methods: Getters]
 
         public bool TryMovePieceToTile(KnifePiece_Living piece, KnifeTile tile)
         {
@@ -432,51 +596,6 @@ namespace Hanako.Knife
                 }
             }
             return false;
-        }
-
-        public void Lost()
-        {
-            Debug.Log("Game lost");
-        }
-
-        public void Won()
-        {
-            Debug.Log("Game won");
-        }
-
-        void UpdateCache()
-        {
-            if (livingPieces.Count == 1)
-            {
-                if (diedPieces.Count > 0)
-                {
-                    Won();
-                }
-                else
-                {
-                    Lost();
-                }
-            }
-
-            foreach (var piece in pieces)
-            {
-                foreach (var tile in tiles)
-                {
-                    if (tile.Tile.TryGetPiece(out var foundPiece) &&
-                        foundPiece == piece.Piece)
-                    {
-                        piece.SetColRow(tile.ColRow);
-                        var livingPiece = GetLivingPiece(piece.ControllerID);
-                        if (livingPiece != null)
-                        {
-                            livingPiece.UpdateCache(tile.ColRow);
-                        }
-                        break;
-                    }
-                }
-            }
-
-            playerCursor.Refresh();
         }
 
         public bool TryGetTile(ColRow colRow, out TileCache foundTile)
@@ -550,41 +669,44 @@ namespace Hanako.Knife
             return null;
         }
 
+
+        #endregion
+
+        #region [Methods: Managing Lists]
+
         /// <summary>
         /// Remove the piece from both pieces and livingPieces list
         /// </summary>
         public void RemovePiece(KnifePiece targetPiece)
         {
-            PieceCache foundPiece = null;
             for (int i = pieces.Count - 1; i >= 0; i--)
             {
                 var pieceCache = pieces[i];
                 if (pieceCache.Piece == targetPiece)
                 {
-                    foundPiece = pieceCache;
                     pieces.Remove(pieceCache);
-                    for (int livingPieceIndex = livingPieces.Count - 1; livingPieceIndex >= 0; livingPieceIndex--)
-                    {
-                        if (livingPieces[livingPieceIndex] == pieceCache)
-                        {
-                            livingPieces.RemoveAt(livingPieceIndex);
-                            break;
-                        }
-                    }
+                    if (targetPiece is KnifePiece_Living)
+                        RemoveLivingPiece(targetPiece as KnifePiece_Living, out var foundLivingCache);
+                    break;
                 }
             }
         }
 
-        /// <summary>
-        /// Remove living piece from the livingPieces list, and add it to diedPieces list
-        /// </summary>
-        public void RemoveLivingPiece(KnifePiece_Living targetPiece)
+
+        bool RemoveLivingPiece(KnifePiece_Living targetPiece, out LivingPieceCache foundCache)
         {
-            if (TryRemovePieceFromLivingAndNonLivingList(targetPiece, out var foundPiece))
+            for (int livingPieceIndex = livingPieces.Count - 1; livingPieceIndex >= 0; livingPieceIndex--)
             {
-                diedPieces.Add(foundPiece);
-                targetPiece.transform.parent = null;
+                if (livingPieces[livingPieceIndex].Piece == targetPiece)
+                {
+                    foundCache = livingPieces[livingPieceIndex];
+                    turnManager.RemovePiece(foundCache);
+                    livingPieces.RemoveAt(livingPieceIndex);
+                    return true;
+                }
             }
+            foundCache = null;
+            return false;
         }
 
         public void ResurrectLivingPiece(KnifePiece_Living targetPiece)
@@ -607,30 +729,32 @@ namespace Hanako.Knife
             pieces.Add(foundPiece);
         }
 
-        public void MoveLivingPieceToEscapeList(KnifePiece_Living targetPiece)
+        public void RemoveLivingPieceToDeadList(KnifePiece_Living targetPiece)
         {
-            if(TryRemovePieceFromLivingAndNonLivingList(targetPiece, out var foundPiece))
+            RemovePiece(targetPiece);
+            if (RemoveLivingPiece(targetPiece, out var foundLivingCache))
             {
-                escapedPieces.Add(foundPiece);
+                diedPieces.Add(foundLivingCache);
                 targetPiece.transform.parent = null;
             }
         }
 
-        bool TryRemovePieceFromLivingAndNonLivingList(KnifePiece_Living targetPiece, out LivingPieceCache foundPiece)
+        public void MoveLivingPieceToEscapeList(KnifePiece_Living targetPiece)
         {
-            foundPiece = null;
-            for (int i = livingPieces.Count - 1; i >= 0; i--)
+            RemovePiece(targetPiece);
+            if (RemoveLivingPiece(targetPiece, out var foundLivingPiece))
             {
-                if (livingPieces[i].LivingPiece == targetPiece)
-                {
-                    foundPiece = livingPieces[i];
-                    livingPieces.RemoveAt(i);
-                    pieces.RemoveAt(i);
-                    return true;
-                }
+                escapedPieces.Add(foundLivingPiece);
+                targetPiece.transform.parent = null;
             }
-
-            return false;
         }
+
+
+
+        #endregion
+
+
+
+
     }
 }

@@ -210,7 +210,7 @@ namespace Hanako.Knife
         public virtual void Die(LivingPieceCache otherPiece)
         {
             isAlive = false;
-            levelManager.RemoveLivingPiece(this);
+            levelManager.RemovePiece(this);
             
             if (otherPiece.Piece.transform.position.x > transform.position.x)
                 transform.localEulerAngles = new(transform.localEulerAngles.x, 0, transform.localEulerAngles.z);

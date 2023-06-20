@@ -167,7 +167,6 @@ namespace Hanako.Knife
 
             if (isMyTurn)
             {
-                //if(myPiece.LivingPiece.MoveRule.IsValidTile(myPiece, levelManager.Pieces, levelManager.LevelProperties, levelManager.Tiles, hoveredTile))
                 var tileCheckResult = myPiece.CheckTile(hoveredTile);
                 if (tileCheckResult.IsValid)
                 {
