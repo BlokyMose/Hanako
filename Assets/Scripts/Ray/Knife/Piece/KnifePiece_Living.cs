@@ -59,11 +59,16 @@ namespace Hanako.Knife
         [SerializeField]
         VFXProperties vfxDie;
 
+        [Header("Misc")]
+        [SerializeField]
+        Vector2 turnOrderTextOffset = new(0, 1.5f);
+
         protected bool isAlive = true;
         protected bool IsAlive { get => isAlive;  }
 
         private float moveDuration = 1f;
         public float MoveDuration { get => moveDuration;}
+        public Vector2 TurnOrderTextOffset { get => turnOrderTextOffset;  }
 
         protected Coroutine corMyTurn, corMoving, corSetParent, corSettingPostActing;
         protected KnifeTile destinationTile = null;
@@ -72,8 +77,9 @@ namespace Hanako.Knife
         protected int int_motion;
         protected AnimationCurve moveAnimationCurve;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             int_motion = Animator.StringToHash(nameof(int_motion));
             if (animator == null)
             {
@@ -210,7 +216,7 @@ namespace Hanako.Knife
         public virtual void Die(LivingPieceCache otherPiece)
         {
             isAlive = false;
-            levelManager.RemovePiece(this);
+            levelManager.MoveLivingPieceToDeadList(this);
             
             if (otherPiece.Piece.transform.position.x > transform.position.x)
                 transform.localEulerAngles = new(transform.localEulerAngles.x, 0, transform.localEulerAngles.z);

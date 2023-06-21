@@ -20,7 +20,7 @@ namespace Hanako.Knife
                 var otherLivingPiece = otherPiece as LivingPieceCache;
 
                 foreach (var ability in abilities)
-                    ability.Interacted(otherLivingPiece, myTile);
+                    ability.Interacted(otherLivingPiece, myTile, levelManager);
                 otherLivingPiece.LivingPiece.MoveToTile(myTile.Tile, false);
 
                 otherLivingPiece.Piece.StartCoroutine(Delay(otherLivingPiece.LivingPiece.MoveDuration));

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Hanako.Knife
 {
-    [CreateAssetMenu(fileName ="KnifePieceInfo_", menuName ="SO/Piece Information")]
+    [CreateAssetMenu(fileName ="KnifePieceInfo_", menuName ="SO/Knife/Piece Information")]
 
     public class KnifePieceInformation : ScriptableObject
     {

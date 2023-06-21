@@ -28,7 +28,7 @@ namespace Hanako.Knife
         bool isFollowingMouse = true;
 
         [SerializeField]
-        KnifeInformationCanvas infoCanvas;
+        KnifePieceInfoCanvas infoCanvas;
 
         [Header("Customizations")]
 
@@ -201,6 +201,8 @@ namespace Hanako.Knife
                         {
                             validTile.Tile.Hovered(colors.TileValidMoveColor);
                         }
+
+                        levelManager.ShowTurnOrderTexts();
                     }
                 }
             }
@@ -237,6 +239,8 @@ namespace Hanako.Knife
             hoveredTile = null;
             if (infoCanvas != null )
                 infoCanvas.Clear();
+
+            levelManager.HideTurnOrderTexts();
         }
 
         public void PleaseClick(Action<KnifeTile> onClick)

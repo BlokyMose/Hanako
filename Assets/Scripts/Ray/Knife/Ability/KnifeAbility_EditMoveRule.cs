@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Hanako.Knife.KnifeLevelManager;
 
 namespace Hanako.Knife
 {
@@ -11,7 +12,7 @@ namespace Hanako.Knife
         [SerializeField]
         KnifeMoveRule moveRule;
 
-        public override void Interacted(KnifeLevelManager.LivingPieceCache otherPiece, KnifeLevelManager.TileCache myTile)
+        public override void Interacted(LivingPieceCache otherPiece, TileCache myTile, KnifeLevelManager levelManager)
         {
             otherPiece.LivingPiece.MoveRule = moveRule;
         }

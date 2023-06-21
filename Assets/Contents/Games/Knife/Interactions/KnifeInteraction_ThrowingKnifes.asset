@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c856ab49c08dd44a8638bcac10488c6, type: 3}
+  m_Name: KnifeInteraction_ThrowingKnifes
+  m_EditorClassIdentifier: 
+  interactionName: 
+  information:
+    name: "\u30CA\u30A4\u30D5\u6295\u3052"
+    desc: "\u30CA\u30A4\u30D5\u30924\u65B9\u5411\u306B\u6295\u3052\n\u5F53\u305F\u3063\u305F\u3089\u79FB\u52D5\u3067\u304D\u306A\u3044"
+    logo: {fileID: 21300000, guid: 91ad8d6e8351a7d4dbec702a08e51ffa, type: 3}
+    showMode: 1
+  abilities:
+  - {fileID: 11400000, guid: 73975444c5a40cb449d87a91ed9aeea7, type: 2}
