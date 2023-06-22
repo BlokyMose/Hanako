@@ -364,6 +364,8 @@ namespace Hanako.Knife
         public List<PieceCache> Pieces { get => pieces; }
         public List<LivingPieceCache> LivingPieces { get => livingPieces; }
         public float MoveDuration { get => moveDuration; }
+        public Transform LevelPos { get => levelPos;  }
+        public GameObject PlayerPrefab { get => playerPrefab;  }
 
         #endregion
 
