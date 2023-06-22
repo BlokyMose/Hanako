@@ -359,6 +359,7 @@ namespace Hanako.Knife
         int soulCount = 0;
 
         public KnifeLevel LevelProperties { get => levelProperties; }
+        public void SetLevelProperties(KnifeLevel newLevel) => levelProperties = newLevel;
         public KnifeColors Colors { get => colors;  }
         public List<TileCache> Tiles { get => tiles; }
         public List<PieceCache> Pieces { get => pieces; }

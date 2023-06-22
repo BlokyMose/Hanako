@@ -60,6 +60,8 @@ namespace Hanako.Knife
             col.isTrigger = true;
         }
 
+        public void CallAwake() => Awake();
+
         public void Hovered(Color tileColor)
         {
             sr.color = tileColor;

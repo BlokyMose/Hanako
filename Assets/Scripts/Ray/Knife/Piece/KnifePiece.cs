@@ -58,7 +58,6 @@ namespace Hanako.Knife
                 if (interaction.Interactions.Contains(targetInteraction))
                     return true;
             }
-
             return false;
         }
 

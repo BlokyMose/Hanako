@@ -20,6 +20,12 @@ namespace Hanako.Knife
             [SerializeField]
             ColRow colRow;
 
+            public PieceProperties(GameObject prefab, ColRow colRow)
+            {
+                this.prefab = prefab;
+                this.colRow = colRow;
+            }
+
             public GameObject Prefab { get => prefab; }
             public ColRow ColRow { get => colRow; }
         }
@@ -36,5 +42,13 @@ namespace Hanako.Knife
         public List<PieceProperties> Pieces { get => pieces; }
 
         public ColRow PlayerColRow { get => playerColRow; }
+
+        public void SetPiecesPattern(ColRow playerColRow, List<PieceProperties> pieces)
+        {
+            this.playerColRow = playerColRow;
+            this.pieces = new();
+            foreach (var piece in pieces)
+                this.pieces.Add(piece);
+        }
     }
 }
