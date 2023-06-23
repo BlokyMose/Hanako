@@ -3,14 +3,11 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityUtility;
 using static Hanako.Knife.KnifeLevel;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 namespace Hanako.Knife
 {
@@ -335,6 +332,9 @@ namespace Hanako.Knife
         [SerializeField]
         string soulCountTemplate = "x {}";
 
+        [SerializeField]
+        TextMeshProUGUI gameTimeText;
+
         [Header("Debug")]
         [SerializeField]
         GameObject TileColRowCanvas;
@@ -357,6 +357,8 @@ namespace Hanako.Knife
         int playerControllerID = 0;
         KnifePiece_Player playerPiece;
         int soulCount = 0;
+        float gameTime;
+        Coroutine corGameTime;
 
         public KnifeLevel LevelProperties { get => levelProperties; }
         public void SetLevelProperties(KnifeLevel newLevel) => levelProperties = newLevel;
@@ -402,6 +404,7 @@ namespace Hanako.Knife
 
             turnManager.GoToNextRound();
             UpdateSoulCountText();
+            StartGameTimer();
             
             void OnPlayerTurn()
             {
@@ -449,11 +452,13 @@ namespace Hanako.Knife
 
         public void Lost()
         {
+            StopGameTimer();
             Debug.Log("Game lost");
         }
 
         public void Won()
         {
+            StopGameTimer();
             Debug.Log("Game won");
         }
 
@@ -533,6 +538,27 @@ namespace Hanako.Knife
         {
             foreach (var piece in livingPieces)
                 piece.TurnOrderText.Hide();
+        }
+
+        public void StartGameTimer()
+        {
+            corGameTime = this.RestartCoroutine(Update(), corGameTime);
+            IEnumerator Update()
+            {
+                gameTime = 0f;
+                while (true)
+                {
+                    gameTime += Time.deltaTime;
+                    gameTimeText.text = MathUtility.SecondsToTimeString(gameTime);
+                    yield return null;
+                }
+            }
+        }
+
+        public void StopGameTimer()
+        {
+            if (corGameTime!=null)
+                StopCoroutine(corGameTime);
         }
 
         #endregion

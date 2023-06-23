@@ -35,10 +35,7 @@ namespace Hanako.Knife
         CanvasGroup logoCG;
 
         [SerializeField]
-        HorizontalOrVerticalLayoutGroup allParent;
-
-        [SerializeField]
-        HorizontalOrVerticalLayoutGroup textsParent;
+        List<HorizontalOrVerticalLayoutGroup> layoutGroups = new();
 
         private void Awake()
         {
@@ -53,10 +50,11 @@ namespace Hanako.Knife
             logoCG.alpha = 1f;
 
             Canvas.ForceUpdateCanvases();
-            allParent.enabled = false;
-            allParent.enabled = true;
-            textsParent.enabled = false;
-            textsParent.enabled = true;
+            foreach (var group in layoutGroups)
+                group.enabled = false;
+
+            foreach (var group in layoutGroups)
+                group.enabled = true;
         }
 
         public void FlipXLogo(bool isFlippedX)

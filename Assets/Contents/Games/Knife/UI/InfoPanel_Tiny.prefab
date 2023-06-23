@@ -432,7 +432,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 705.01996, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6157864309435994431
 MonoBehaviour:
@@ -472,8 +472,9 @@ MonoBehaviour:
   descTetx: {fileID: 6173002818422753587}
   logoImage: {fileID: 6173002817459805700}
   logoCG: {fileID: 6173002816985883025}
-  allParent: {fileID: 6173002817663476724}
-  textsParent: {fileID: 6173002816367783293}
+  layoutGroups:
+  - {fileID: 6173002817663476724}
+  - {fileID: 6173002816367783293}
 --- !u!114 &6173002817663476724
 MonoBehaviour:
   m_ObjectHideFlags: 0

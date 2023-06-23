@@ -22,15 +22,17 @@ namespace Hanako.Knife
         HorizontalOrVerticalLayoutGroup allPanelsParent;
 
         [SerializeField]
-        HorizontalOrVerticalLayoutGroup interactionPanelsParent;
+        HorizontalOrVerticalLayoutGroup interactionsParent;
 
         public KnifePieceInfoPanel ProfilePanel { get => profilePanel; }
 
         Transform profileCameraPos;
         Vector3 profileCameraOffset;
+        List<HorizontalOrVerticalLayoutGroup> layoutGroups = new();
 
         void Awake()
         {
+            layoutGroups = new() { interactionsParent, allPanelsParent };
             Clear();
         }
 
@@ -59,38 +61,37 @@ namespace Hanako.Knife
                     var interactionInfo = interaction.GetInformation();
                     if (interactionInfo.ShowMode == KnifeInteraction.Information.InformationShowMode.Panel)
                     {
-                        var infoPanel = Instantiate(interactionPanelPrefab, interactionPanelsParent.transform);
+                        var infoPanel = Instantiate(interactionPanelPrefab, interactionsParent.transform);
                         infoPanel.SetInformation(new(interactionInfo.Name, interactionInfo.Desc, interactionInfo.Logo));
                     }
                 }
             }
 
-            StartCoroutine(Delay());
-            IEnumerator Delay()
+
+            StartCoroutine(Delay(0.05f));
+            IEnumerator Delay(float delay)
             {
-                yield return null;
-                yield return null;
+                RefreshCanvas();
+                yield return new WaitForSeconds(delay);
                 RefreshCanvas();
             }
-
         }
 
         public void Clear()
         {
+            interactionsParent.transform.DestroyChildren();
             profilePanel.Clear();
             profilePanel.gameObject.SetActive(false);
-            interactionPanelsParent.transform.DestroyChildren();
-            //RefreshCanvas();
-
+            RefreshCanvas();
         }
 
         public void RefreshCanvas()
         {
             Canvas.ForceUpdateCanvases();
-            interactionPanelsParent.enabled = false;
-            interactionPanelsParent.enabled = true;
-            allPanelsParent.enabled = false;
-            allPanelsParent.enabled = true;
+            foreach (var layoutGroup in layoutGroups)
+                layoutGroup.enabled = false;
+            foreach (var layoutGroup in layoutGroups)
+                layoutGroup.enabled = true;
         }
 
 
