@@ -20,7 +20,7 @@ namespace Hanako.Knife
             [SerializeField, PreviewField]
             Sprite logo;
             [SerializeField]
-            InformationShowMode showMode = InformationShowMode.Panel;
+            InformationShowMode showMode = InformationShowMode.Hide;
 
 
             public Information(string name, string desc, Sprite logo, InformationShowMode showMode)

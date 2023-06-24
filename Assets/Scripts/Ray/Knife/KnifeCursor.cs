@@ -278,7 +278,7 @@ namespace Hanako.Knife
             hoveredTile = null;
             hoveredValidTile = null;
             if (infoCanvas != null )
-                infoCanvas.Clear();
+                infoCanvas.SetDefaultInfo();
 
             levelManager.HideTurnOrderTexts();
         }

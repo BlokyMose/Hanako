@@ -901,6 +901,7 @@ namespace Hanako.Knife
             RemovePiece(targetPiece);
             if (foundLivingCache != null)
             {
+                foundLivingCache.TurnOrderText.Hide();
                 diedPieces.Add(foundLivingCache);
                 targetPiece.transform.parent = null;
                 AddSoul();
@@ -913,6 +914,7 @@ namespace Hanako.Knife
             RemovePiece(targetPiece);
             if (foundLivingCache != null)
             {
+                foundLivingCache.TurnOrderText.Hide();
                 escapedPieces.Add(foundLivingCache);
                 targetPiece.transform.parent = null;
             }

@@ -21,6 +21,7 @@ namespace Hanako.Knife
         public void SetText(string text)
         {
             this.text.text = text;
+            transform.eulerAngles = Vector3.zero;
         }
 
         public string GetText()

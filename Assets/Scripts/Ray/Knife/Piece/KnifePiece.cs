@@ -48,7 +48,7 @@ namespace Hanako.Knife
         protected bool isInteractable = true;
         public bool IsInteractable { get => isInteractable; }
         public KnifePieceInformation Information { get => information; }
-        public Transform HeadPosForLogo { get => headPosForLogo; }
+        public Transform HeadPosForLogo { get => headPosForLogo != null ? headPosForLogo : transform; }
         public Vector3 HeadPosOffset { get => headPosOffset; }
 
         public bool HasInteraction(KnifeInteraction targetInteraction)
