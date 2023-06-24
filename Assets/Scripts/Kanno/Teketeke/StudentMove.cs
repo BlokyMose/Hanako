@@ -34,7 +34,13 @@ namespace Hanako
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            sManager.SetScore();
+            if (collision.CompareTag("Attack"))
+            {
+                gameObject.SetActive(false);
+
+                sManager.SetScore();
+            }
+            
         }
     }
 }

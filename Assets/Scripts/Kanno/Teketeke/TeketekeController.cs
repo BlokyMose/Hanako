@@ -54,10 +54,7 @@ namespace Hanako
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.CompareTag("student"))
-            {
-                collision.gameObject.SetActive(false);
-            }
+            
         }
     }
 }
