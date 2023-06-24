@@ -30,6 +30,9 @@ namespace Hanako.Knife
         [SerializeField]
         KnifePieceInfoCanvas infoCanvas;
 
+        [SerializeField]
+        Camera gameCamera;
+
         [Header("Customizations")]
 
         [SerializeField]
@@ -49,6 +52,7 @@ namespace Hanako.Knife
         LivingPieceCache myPiece;
         bool isMyTurn = false;
         Action<KnifeTile> onPleaseClick;
+        Vector2 previousPos;
 
         private void Awake()
         {
@@ -124,10 +128,44 @@ namespace Hanako.Knife
 
         private void Update()
         {
-            if(cursorInputMode == CursorInputMode.MousePosition && isFollowingMouse)
+            if (cursorInputMode == CursorInputMode.MousePosition && isFollowingMouse)
             {
                 var targetPos = Camera.main.ScreenToWorldPoint(new(Mouse.current.position.x.ReadValue(), Mouse.current.position.y.ReadValue(), 0));
                 transform.position = Vector2.Lerp(transform.position, targetPos, Time.deltaTime * cursorSpeed);
+                Pan();
+            }
+
+            void Pan()
+            {
+                if (isClicking && hoveredValidTile == null)
+                {
+                    if (gameCamera != null)
+                    {
+                        var cameraPos = gameCamera.transform.position;
+                        var direction = (Vector2)transform.position - previousPos;
+                        direction *= gameCamera.orthographicSize;
+                        var newX = cameraPos.x - direction.x;
+                        var newY = cameraPos.y - direction.y;
+
+                        if (newX > levelManager.PanAreaMax.x)
+                            newX = levelManager.PanAreaMax.x;
+                        else if (newX < levelManager.PanAreaMin.x)
+                            newX = levelManager.PanAreaMin.x;
+
+                        if (newY > levelManager.PanAreaMax.y)
+                            newY = levelManager.PanAreaMax.y;
+                        else if (newY < levelManager.PanAreaMin.y)
+                            newY = levelManager.PanAreaMin.y;
+
+                        gameCamera.transform.position = new Vector3(newX, newY, cameraPos.z); ;
+                    }
+                }
+                else
+                {
+
+                }
+                previousPos = transform.position;
+
             }
         }
 
@@ -148,6 +186,7 @@ namespace Hanako.Knife
                 Unhover(tile);
             }
         }
+
 
         public void Refresh()
         {
@@ -237,6 +276,7 @@ namespace Hanako.Knife
 
             tile.Unhovered();
             hoveredTile = null;
+            hoveredValidTile = null;
             if (infoCanvas != null )
                 infoCanvas.Clear();
 
@@ -277,22 +317,28 @@ namespace Hanako.Knife
             this.isClicking = isClicking;
             animator.SetBool(boo_isClick, isClicking);
             bloodBurst.SetBool("isPlaying", isClicking);
+            ClickHoveredTile(isClicking);
 
-            if (hoveredTile != null)
+            void ClickHoveredTile(bool isClicking)
             {
-                if (isClicking)
+                if (hoveredTile != null)
                 {
-                    if (isMyTurn && hoveredValidTile != null)
+                    if (isClicking)
                     {
-                        hoveredValidTile.Clicked(colors.TileClickColor);
-                        onPleaseClick?.Invoke(hoveredValidTile);
+                        if (isMyTurn && hoveredValidTile != null)
+                        {
+                            hoveredValidTile.Clicked(colors.TileClickColor);
+                            onPleaseClick?.Invoke(hoveredValidTile);
+                        }
+                    }
+                    else
+                    {
+                        Unhover(hoveredTile);
                     }
                 }
-                else
-                {
-                    Unhover(hoveredTile);
-                }
             }
+
+
         }
 
 

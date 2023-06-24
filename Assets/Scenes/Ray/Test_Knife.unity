@@ -4225,6 +4225,7 @@ MonoBehaviour:
   cursorSpeed: 12
   isFollowingMouse: 1
   infoCanvas: {fileID: 667709616}
+  gameCamera: {fileID: 857910864}
   colors: {fileID: 11400000, guid: 669e38f1ae0f85e40b934299b1ceb8f5, type: 2}
   bloodBurst: {fileID: 1378374641}
 --- !u!50 &471961225
@@ -4909,7 +4910,7 @@ Transform:
   m_GameObject: {fileID: 545084507}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 19.2, y: 10.8, z: 1}
+  m_LocalScale: {x: 26.497921, y: 14.905081, z: 1.3801}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1761123311}
@@ -18617,6 +18618,8 @@ MonoBehaviour:
   soulCountText: {fileID: 195125006}
   soulCountTemplate: x {}
   gameTimeText: {fileID: 1813363320}
+  panAreaMax: {x: 4, y: 2}
+  panAreaMin: {x: -4, y: -2}
   TileColRowCanvas: {fileID: 7014949825632663141, guid: 04f12600c16820a489619916e649ad24, type: 3}
 --- !u!4 &1761123311
 Transform:

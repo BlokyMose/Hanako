@@ -335,6 +335,12 @@ namespace Hanako.Knife
         [SerializeField]
         TextMeshProUGUI gameTimeText;
 
+        [SerializeField]
+        Vector2 panAreaMax = new(4, 2);
+
+        [SerializeField]
+        Vector2 panAreaMin = new(-4, -2);
+
         [Header("Debug")]
         [SerializeField]
         GameObject TileColRowCanvas;
@@ -369,6 +375,8 @@ namespace Hanako.Knife
         public float MoveDuration { get => moveDuration; }
         public Transform LevelPos { get => levelPos;  }
         public GameObject PlayerPrefab { get => playerPrefab;  }
+        public Vector2 PanAreaMax { get => panAreaMax;  }
+        public Vector2 PanAreaMin { get => panAreaMin;  }
 
         #endregion
 
