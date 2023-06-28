@@ -1,0 +1,139 @@
+using Encore.Utility;
+using Hanako.Knife;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityUtility;
+
+namespace Hanako.Knife
+{
+    public class GameInfoCanvas : MonoBehaviour
+    {
+        [Header("Timer")]
+        [SerializeField]
+        TextMeshProUGUI gameTimeText;
+
+        [Header("Targets")]
+        [SerializeField]
+        Transform targetsParent;
+
+        [SerializeField]
+        TargetCheckBox targetCheckBoxPrefab;
+
+        [Header("Rounds")]
+        [SerializeField]
+        Transform roundsParent;
+
+        [SerializeField]
+        RoundCheckBox roundCheckBoxPrefab;
+
+        List<TargetCheckBox> targetCheckBoxes = new();
+        List<RoundCheckBox> roundCheckBoxes = new();
+
+        void Start()
+        {
+            var levelManager = FindObjectOfType<KnifeLevelManager>();
+            if (levelManager != null)
+            {
+                levelManager.OnGameTime += SetGameTimeText;
+                levelManager.OnStartGame += () =>
+                {
+                    var targetsInfo = new List<KnifePieceInformation>();
+                    foreach (var livingPiece in levelManager.LivingPieces)
+                    {
+                        if (livingPiece.Piece is KnifePiece_Enemy)
+                        {
+                            targetsInfo.Add(livingPiece.Piece.Information);
+                        }
+                    }
+
+                    Init(levelManager.LevelProperties.RoundCount, targetsInfo);
+                };
+                levelManager.OnLivingPieceDied += Eliminate;
+                levelManager.OnNextRound += (roundIndex) => { CheckRound(); };
+            }
+        }
+
+        void Init(int roundCount, List<KnifePieceInformation> pieces)
+        {
+            targetCheckBoxes = new();
+            targetsParent.DestroyChildren();
+            for (int i = 0; i < pieces.Count; i++)
+            {
+                var checkBox = Instantiate(targetCheckBoxPrefab, targetsParent);
+                checkBox.Init(pieces[i]);
+                targetCheckBoxes.Add(checkBox);
+            }
+
+            roundCheckBoxes = new();
+            roundsParent.DestroyChildren();
+            for (int i = 0; i < roundCount; i++)
+            {
+                var checkBox = Instantiate(roundCheckBoxPrefab, roundsParent);
+                checkBox.Init();
+                roundCheckBoxes.Add(checkBox);
+            }
+            RefreshCanvas();
+        }
+
+        public void SetGameTimeText(float time)
+        {
+            gameTimeText.text = MathUtility.SecondsToTimeString(time);
+        }
+
+        public void RefreshCanvas()
+        {
+            Canvas.ForceUpdateCanvases();
+            var allLayoutGroups = gameObject.GetComponentsInFamily<HorizontalOrVerticalLayoutGroup>();
+            foreach (var layoutGroup in allLayoutGroups)
+                layoutGroup.enabled = false;
+            foreach (var layoutGroup in allLayoutGroups)
+                layoutGroup.enabled = true;
+        }
+
+        public void Eliminate(KnifePiece_Living livingPiece)
+        {
+            foreach (var target in targetCheckBoxes)
+            {
+                if (target.PieceInfo == livingPiece.Information && !target.IsEliminated)
+                {
+                    target.Eliminated();
+                    break;
+                }
+            }
+        }
+
+        public void CheckRound()
+        {
+            foreach (var round in roundCheckBoxes)
+            {
+                if (round.IsDotted)
+                {
+                    round.CancelDot();
+                    round.Check();
+                    break;
+                }
+            }            
+            
+            foreach (var round in roundCheckBoxes)
+            {
+                if (!round.IsChecked)
+                {
+                    round.Dot();
+                    break;
+                }
+            }
+        }
+
+        public void CheckAllRound()
+        {
+            foreach (var round in roundCheckBoxes)
+            {
+                round.Check();
+            }
+        }
+    }
+}

@@ -1,6 +1,7 @@
 ﻿using UnityUtility;
 using System.Collections;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace UnityUtility
 {
@@ -9,8 +10,10 @@ namespace UnityUtility
         public static T GetComponentInFamily<T>(this Component thisComponent) where T : Component
         {
             var targetComponent = thisComponent.GetComponent<T>();
-            targetComponent ??= thisComponent.GetComponentInParent<T>();
-            targetComponent ??= thisComponent.GetComponentInChildren<T>();
+            if (targetComponent == null)
+                targetComponent = thisComponent.GetComponentInParent<T>();
+            if (targetComponent == null)
+                targetComponent = thisComponent.GetComponentInChildren<T>();
 
             return targetComponent;
         }
@@ -30,6 +33,14 @@ namespace UnityUtility
                 targetComponent = thisComponent.GetComponentInChildren<T>();
 
             return targetComponent;
+        }
+
+        public static List<T> GetComponentsInFamily<T>(this GameObject thisComponent) where T : Component
+        {
+            var targetComponents = new List<T>(thisComponent.GetComponents<T>());
+            targetComponents.AddRange(thisComponent.GetComponentsInParent<T>());
+            targetComponents.AddRange(thisComponent.GetComponentsInChildren<T>());
+            return targetComponents;
         }
 
         public static GameObject Find(string goName)

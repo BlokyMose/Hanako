@@ -197,9 +197,9 @@ namespace Hanako.Knife
             public void GoToNextRound()
             {
                 currentRoundIndex++;
-                OnNextRound?.Invoke();
                 if (currentRoundIndex < rounds.Count)
                 {
+                    OnNextRound?.Invoke();
                     currentTurnIndex = -1;
                     GoToNextMovingPiece();
                 }
@@ -321,6 +321,9 @@ namespace Hanako.Knife
         AnimationCurve moveAnimationCurve;
 
         [SerializeField]
+        GameInfoCanvas gameInfoCanvas;
+
+        [SerializeField]
         TextMeshProUGUI roundCountText;
 
         [SerializeField]
@@ -344,7 +347,6 @@ namespace Hanako.Knife
         [Header("Debug")]
         [SerializeField]
         GameObject TileColRowCanvas;
-
 
 
         #endregion
@@ -380,6 +382,11 @@ namespace Hanako.Knife
 
         #endregion
 
+        public event Action<float> OnGameTime;
+        public event Action OnStartGame;
+        public event Action<KnifePiece_Living> OnLivingPieceDied;
+        public event Action<int> OnNextRound;
+
         #region [Methods: Game]
 
         private void Awake()
@@ -409,7 +416,7 @@ namespace Hanako.Knife
                 CheckWinningCondition,
                 OnNextRound,
                 OnNextTurn);
-
+            OnStartGame?.Invoke();
             turnManager.GoToNextRound();
             UpdateSoulCountText();
             StartGameTimer();
@@ -427,6 +434,7 @@ namespace Hanako.Knife
             {
                 UpdateRoundCountText();
                 UpdateTurnOrderTexts();
+                this.OnNextRound?.Invoke(turnManager.CurrentRoundIndex);
             }
 
             void OnNextTurn()
@@ -461,12 +469,14 @@ namespace Hanako.Knife
         public void Lost()
         {
             StopGameTimer();
+            gameInfoCanvas.CheckAllRound();
             Debug.Log("Game lost");
         }
 
         public void Won()
         {
             StopGameTimer();
+            gameInfoCanvas.CheckAllRound();
             Debug.Log("Game won");
         }
 
@@ -557,7 +567,7 @@ namespace Hanako.Knife
                 while (true)
                 {
                     gameTime += Time.deltaTime;
-                    gameTimeText.text = MathUtility.SecondsToTimeString(gameTime);
+                    OnGameTime?.Invoke(gameTime);
                     yield return null;
                 }
             }
@@ -905,6 +915,7 @@ namespace Hanako.Knife
                 diedPieces.Add(foundLivingCache);
                 targetPiece.transform.parent = null;
                 AddSoul();
+                OnLivingPieceDied?.Invoke(targetPiece);
             }
         }
 
