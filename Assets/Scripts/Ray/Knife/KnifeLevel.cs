@@ -78,6 +78,7 @@ namespace Hanako.Knife
         [SerializeField]
         KnifePiecesPattern piecesPattern;
 
+        public string LevelName { get => levelName;  }
         public ColRow LevelSize { get => levelSize;}
         public KnifeTilesPattern TilesPattern { get => tilesPattern; }
         public KnifeWallsPattern WallsPattern { get => wallsPattern; }
@@ -86,5 +87,7 @@ namespace Hanako.Knife
         public KnifePiecesPattern PiecesPattern { get => piecesPattern; }
         public void SetPiecesPattern(KnifePiecesPattern newPattern) { piecesPattern = newPattern; }
         public int RoundCount { get => roundCount;  }
+
+
     }
 }

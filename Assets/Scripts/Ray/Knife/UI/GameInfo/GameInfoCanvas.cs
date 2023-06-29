@@ -33,28 +33,42 @@ namespace Hanako.Knife
         List<TargetCheckBox> targetCheckBoxes = new();
         List<RoundCheckBox> roundCheckBoxes = new();
 
-        void Start()
+        void Awake()
         {
             var levelManager = FindObjectOfType<KnifeLevelManager>();
             if (levelManager != null)
             {
                 levelManager.OnGameTime += SetGameTimeText;
-                levelManager.OnStartGame += () =>
-                {
-                    var targetsInfo = new List<KnifePieceInformation>();
-                    foreach (var livingPiece in levelManager.LivingPieces)
-                    {
-                        if (livingPiece.Piece is KnifePiece_Enemy)
-                        {
-                            targetsInfo.Add(livingPiece.Piece.Information);
-                        }
-                    }
-
-                    Init(levelManager.LevelProperties.RoundCount, targetsInfo);
-                };
+                levelManager.OnStartGame += () => { OnStartGame(levelManager); };
                 levelManager.OnLivingPieceDied += Eliminate;
                 levelManager.OnNextRound += (roundIndex) => { CheckRound(); };
             }
+        }
+
+        void OnDestroy()
+        {
+            var levelManager = FindObjectOfType<KnifeLevelManager>();
+            if (levelManager != null)
+            {
+                levelManager.OnGameTime -= SetGameTimeText;
+                levelManager.OnStartGame -= () => { OnStartGame(levelManager); };
+                levelManager.OnLivingPieceDied -= Eliminate;
+                levelManager.OnNextRound -= (roundIndex) => { CheckRound(); };
+            }
+        }
+
+        void OnStartGame(KnifeLevelManager levelManager)
+        {
+            var targetsInfo = new List<KnifePieceInformation>();
+            foreach (var livingPiece in levelManager.LivingPieces)
+            {
+                if (livingPiece.Piece is KnifePiece_Enemy)
+                {
+                    targetsInfo.Add(livingPiece.Piece.Information);
+                }
+            }
+
+            Init(levelManager.LevelProperties.RoundCount, targetsInfo);
         }
 
         void Init(int roundCount, List<KnifePieceInformation> pieces)

@@ -55,6 +55,10 @@ namespace Hanako.Knife
         void Awake()
         {
             layoutGroups = new() { interactionsParent, allPanelsParent };
+        }
+
+        void Start()
+        {
             SetDefaultInfo();
         }
 

@@ -53,6 +53,8 @@ namespace Hanako.Knife
         bool isMyTurn = false;
         Action<KnifeTile> onPleaseClick;
         Vector2 previousPos;
+        bool canHover = true;
+        bool canPan = true;
 
         private void Awake()
         {
@@ -70,6 +72,8 @@ namespace Hanako.Knife
             this.levelManager = levelManager;
             this.colors = levelManager.Colors;
             this.controllerID = controllerID;
+
+            levelManager.OnGameOver += (isPlayerDead) => { canHover = false; canPan = false; };
         }
 
         private void OnEnable()
@@ -137,6 +141,8 @@ namespace Hanako.Knife
 
             void Pan()
             {
+                if (!canPan) return;
+
                 if (isClicking && hoveredValidTile == null)
                 {
                     if (gameCamera != null)
@@ -198,6 +204,8 @@ namespace Hanako.Knife
 
         void Hover(KnifeTile tile)
         {
+            if (!canHover) return;
+
             if (hoveredTile != null)
                 Unhover(hoveredTile);
 

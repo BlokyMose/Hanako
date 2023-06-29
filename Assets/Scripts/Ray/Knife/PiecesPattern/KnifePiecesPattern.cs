@@ -50,5 +50,15 @@ namespace Hanako.Knife
             foreach (var piece in pieces)
                 this.pieces.Add(piece);
         }
+
+        public List<KnifePiece_Living> GetLivingPieces()
+        {
+            var list = new List<KnifePiece_Living>();
+            foreach (var piece in pieces)
+                if (piece.Prefab.TryGetComponent<KnifePiece_Living>(out var livingPiece))
+                    list.Add(livingPiece);
+
+            return list;
+        }
     }
 }

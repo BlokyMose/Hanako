@@ -233,7 +233,7 @@ namespace Hanako.Knife
 
             public bool IsPieceCountOne()
             {
-                return rounds[0].turns.Count == 0;
+                return currentRound.turns.Count == 1;
             }
 
             public void RemovePiece(LivingPieceCache piece)
@@ -324,21 +324,6 @@ namespace Hanako.Knife
         GameInfoCanvas gameInfoCanvas;
 
         [SerializeField]
-        TextMeshProUGUI roundCountText;
-
-        [SerializeField]
-        string roundCountTemplate = "Round: {} left";
-
-        [SerializeField]
-        TextMeshProUGUI soulCountText;
-
-        [SerializeField]
-        string soulCountTemplate = "x {}";
-
-        [SerializeField]
-        TextMeshProUGUI gameTimeText;
-
-        [SerializeField]
         Vector2 panAreaMax = new(4, 2);
 
         [SerializeField]
@@ -379,6 +364,9 @@ namespace Hanako.Knife
         public GameObject PlayerPrefab { get => playerPrefab;  }
         public Vector2 PanAreaMax { get => panAreaMax;  }
         public Vector2 PanAreaMin { get => panAreaMin;  }
+        public int SoulCount { get => soulCount;  }
+        public int RoundCount { get => turnManager != null ? turnManager.CurrentRoundIndex : 0; }
+        public float GameTime { get => gameTime;  }
 
         #endregion
 
@@ -386,6 +374,7 @@ namespace Hanako.Knife
         public event Action OnStartGame;
         public event Action<KnifePiece_Living> OnLivingPieceDied;
         public event Action<int> OnNextRound;
+        public event Action<bool> OnGameOver;
 
         #region [Methods: Game]
 
@@ -418,7 +407,6 @@ namespace Hanako.Knife
                 OnNextTurn);
             OnStartGame?.Invoke();
             turnManager.GoToNextRound();
-            UpdateSoulCountText();
             StartGameTimer();
             
             void OnPlayerTurn()
@@ -432,7 +420,6 @@ namespace Hanako.Knife
 
             void OnNextRound()
             {
-                UpdateRoundCountText();
                 UpdateTurnOrderTexts();
                 this.OnNextRound?.Invoke(turnManager.CurrentRoundIndex);
             }
@@ -447,43 +434,37 @@ namespace Hanako.Knife
         {
             if (turnManager.CurrentRoundIndex >= levelProperties.RoundCount)
             {
-                Lost();
+                Won();
                 return true;
             }
 
             if (turnManager.IsPieceCountOne())
             {
-                if (diedPieces.Count > 0)
-                {
-                    Won();
-                }
-                else
-                {
-                    Lost();
-                }
+                Won();
                 return true;
             }
             return false;
-        }
-
-        public void Lost()
-        {
-            StopGameTimer();
-            gameInfoCanvas.CheckAllRound();
-            Debug.Log("Game lost");
         }
 
         public void Won()
         {
             StopGameTimer();
             gameInfoCanvas.CheckAllRound();
+            OnGameOver?.Invoke(true);
             Debug.Log("Game won");
+        }
+
+        public void PlayerDied()
+        {
+            StopGameTimer();
+            gameInfoCanvas.CheckAllRound();
+            OnGameOver?.Invoke(false);
+            Debug.Log("Game lost");
         }
 
         public void AddSoul()
         {
             soulCount++;
-            UpdateSoulCountText();
         }
 
         public void UpdateCache()
@@ -512,15 +493,6 @@ namespace Hanako.Knife
         }
 
 
-        void UpdateSoulCountText()
-        {
-            soulCountText.text = soulCountTemplate.Replace("{}", soulCount.ToString());
-        }
-
-        void UpdateRoundCountText()
-        {
-            roundCountText.text = roundCountTemplate.Replace("{}", (LevelProperties.RoundCount - turnManager.CurrentRoundIndex).ToString());
-        }
 
         public void RemoveTurnOf(LivingPieceCache targetPiece, int count = 1)
         {
@@ -934,7 +906,6 @@ namespace Hanako.Knife
 
 
         #endregion
-
 
     }
 }
