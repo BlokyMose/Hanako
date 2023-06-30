@@ -9,7 +9,7 @@ namespace Hanako.Knife
     public class RoundCheckBox : MonoBehaviour
     {
         [SerializeField]
-        Image checkBox;
+        Image border;
 
         [SerializeField]
         Image fill;
@@ -18,7 +18,7 @@ namespace Hanako.Knife
         Image dot;
 
         [SerializeField]
-        List<Sprite> checkBoxVariants = new();
+        List<Sprite> borderVariants = new();
 
         [SerializeField]
         List<Sprite> fillVariants = new();
@@ -28,15 +28,22 @@ namespace Hanako.Knife
 
         bool isChecked = false;
         bool isDotted = false;
-
+        Animator borderAnimator;
+        int tri_jiggle;
         public bool IsChecked { get => isChecked; }
         public bool IsDotted { get => isDotted; }
+
+        private void Awake()
+        {
+            borderAnimator = border.GetComponent<Animator>();
+            tri_jiggle = Animator.StringToHash(nameof(tri_jiggle));
+        }
 
         public void Init(bool randomize = true)
         {
             if (randomize)
             {
-                checkBox.sprite = checkBoxVariants.GetRandom();
+                border.sprite = borderVariants.GetRandom();
                 fill.sprite = fillVariants.GetRandom();
                 dot.sprite = dotVariants.GetRandom();
             }
@@ -46,6 +53,8 @@ namespace Hanako.Knife
 
         public void Dot()
         {
+            if (isDotted) return;
+            borderAnimator.SetTrigger(tri_jiggle);
             isDotted = true;
             dot.gameObject.SetActive(true);
             fill.gameObject.SetActive(false);
@@ -59,6 +68,8 @@ namespace Hanako.Knife
 
         public void Check()
         {
+            if (isChecked) return;
+
             isChecked = true;
             fill.gameObject.SetActive(true);
             dot.gameObject.SetActive(false);

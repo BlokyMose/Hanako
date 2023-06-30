@@ -12,6 +12,9 @@ namespace Hanako.Knife
 {
     public class GameInfoCanvas : MonoBehaviour
     {
+        [SerializeField]
+        Animator ligthingAnimator;
+
         [Header("Timer")]
         [SerializeField]
         TextMeshProUGUI gameTimeText;
@@ -32,16 +35,19 @@ namespace Hanako.Knife
 
         List<TargetCheckBox> targetCheckBoxes = new();
         List<RoundCheckBox> roundCheckBoxes = new();
+        int tri_red;
 
         void Awake()
         {
+            tri_red = Animator.StringToHash(nameof(tri_red));
+
             var levelManager = FindObjectOfType<KnifeLevelManager>();
             if (levelManager != null)
             {
                 levelManager.OnGameTime += SetGameTimeText;
                 levelManager.OnStartGame += () => { OnStartGame(levelManager); };
                 levelManager.OnLivingPieceDied += Eliminate;
-                levelManager.OnNextRound += (roundIndex) => { CheckRound(); };
+                levelManager.OnNextRound += (roundIndex) => { PlayRedAnimation(); CheckRound(); };
             }
         }
 
@@ -53,7 +59,7 @@ namespace Hanako.Knife
                 levelManager.OnGameTime -= SetGameTimeText;
                 levelManager.OnStartGame -= () => { OnStartGame(levelManager); };
                 levelManager.OnLivingPieceDied -= Eliminate;
-                levelManager.OnNextRound -= (roundIndex) => { CheckRound(); };
+                levelManager.OnNextRound -= (roundIndex) => { PlayRedAnimation(); CheckRound(); };
             }
         }
 
@@ -96,6 +102,11 @@ namespace Hanako.Knife
         public void SetGameTimeText(float time)
         {
             gameTimeText.text = MathUtility.SecondsToTimeString(time);
+        }
+
+        void PlayRedAnimation()
+        {
+            ligthingAnimator.SetTrigger(tri_red);
         }
 
         public void RefreshCanvas()

@@ -367,6 +367,7 @@ namespace Hanako.Knife
         public int SoulCount { get => soulCount;  }
         public int RoundCount { get => turnManager != null ? turnManager.CurrentRoundIndex : 0; }
         public float GameTime { get => gameTime;  }
+        public KnifePiece_Player PlayerPiece { get => playerPiece; }
 
         #endregion
 

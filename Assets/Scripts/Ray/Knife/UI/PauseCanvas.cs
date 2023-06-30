@@ -42,7 +42,7 @@ namespace Hanako.Knife
         List<Animator> functionalButs = new();
         int int_mode, tri_click;
         Animator pauseButAnimator, sfxButAnimator, bgmButAnimator, exitButAnimator;
-
+        bool isInPause = false;
         void Awake()
         {
             int_mode = Animator.StringToHash(nameof(int_mode));
@@ -84,21 +84,42 @@ namespace Hanako.Knife
             IdleBut(pauseButAnimator);
             foreach (var but in functionalButs)
                 HideBut(but);
+            isInPause = false;
         }
 
         public void Show()
         {
+            isInPause = true;
             hitAreaHide.gameObject.SetActive(true);
             HoverBut(pauseButAnimator);
-
             foreach (var but in functionalButs)
                 IdleBut(but);
+
         }
 
-        public void HideBut(Animator animator) => animator.SetInteger(int_mode, (int)ButMode.Hidden);
-        public void HoverBut(Animator animator) => animator.SetInteger(int_mode, (int)ButMode.Hover);
-        public void IdleBut(Animator animator) => animator.SetInteger(int_mode, (int)ButMode.Idle);
-        public void ClickBut(Animator animator) => animator.SetTrigger(tri_click);
+        public void HideBut(Animator animator)
+        {
+            if (isInPause || animator == pauseButAnimator)
+                animator.SetInteger(int_mode, (int)ButMode.Hidden);
+        }
+
+        public void HoverBut(Animator animator)
+        {
+            if (isInPause || animator == pauseButAnimator)
+                animator.SetInteger(int_mode, (int)ButMode.Hover);
+        }
+
+        public void IdleBut(Animator animator)
+        {
+            if (isInPause || animator == pauseButAnimator)
+                animator.SetInteger(int_mode, (int)ButMode.Idle);
+        }
+
+        public void ClickBut(Animator animator)
+        {
+            if (isInPause || animator == pauseButAnimator)
+                animator.SetTrigger(tri_click);
+        }
 
         public void ChangeSFXVolume()
         {

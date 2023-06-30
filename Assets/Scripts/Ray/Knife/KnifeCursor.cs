@@ -244,9 +244,10 @@ namespace Hanako.Knife
                     if (tilePiece is KnifePiece_Living)
                     {
                         var livingPieceCache = levelManager.GetLivingPiece(tilePiece as KnifePiece_Living);
+                        var color = tilePiece == levelManager.PlayerPiece ? colors.TileValidMoveColor : colors.TileOtherValidMoveColor;
                         foreach (var validTile in livingPieceCache.ValidTilesByMoveRule)
                         {
-                            validTile.Tile.Hovered(colors.TileValidMoveColor);
+                            validTile.Tile.Hovered(color);
                         }
 
                         levelManager.ShowTurnOrderTexts();
