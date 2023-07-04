@@ -138,6 +138,8 @@ namespace Hanako.Knife
                 }
                 return new TileCheckResult(false, false);
             }
+
+            public bool HasValidTile() => validTilesByMoveRule.Count > 0;
         }
 
         public class TurnManager
@@ -161,7 +163,7 @@ namespace Hanako.Knife
 
             public int CurrentRoundIndex { get => currentRoundIndex; }
 
-            public Func<bool> OnCheckWinningCondition;
+            public Func<bool> IsWinningConditionFulfilled;
             public Action OnUpdateCache;
             public Action OnPlayerTurn;
             public Action OnNextRound;
@@ -172,12 +174,12 @@ namespace Hanako.Knife
                 int roundCount,
                 Action onPlayerTurn,
                 Action onUpdateCache, 
-                Func<bool> onCheckWinningCondition,
+                Func<bool> isWinningConditionFulfilled,
                 Action onNextRound,
                 Action onNextTurn
                 )
             {
-                OnCheckWinningCondition = onCheckWinningCondition;
+                IsWinningConditionFulfilled = isWinningConditionFulfilled;
                 OnUpdateCache = onUpdateCache;
                 OnPlayerTurn = onPlayerTurn;
                 OnNextRound = onNextRound;
@@ -197,7 +199,9 @@ namespace Hanako.Knife
             public void GoToNextRound()
             {
                 currentRoundIndex++;
-                if (currentRoundIndex < rounds.Count)
+                OnUpdateCache?.Invoke();
+
+                if (!IsWinningConditionFulfilled())
                 {
                     OnNextRound?.Invoke();
                     currentTurnIndex = -1;
@@ -205,7 +209,7 @@ namespace Hanako.Knife
                 }
                 else
                 {
-                    OnCheckWinningCondition?.Invoke();
+
                 }
             }
 
@@ -403,15 +407,17 @@ namespace Hanako.Knife
                 levelProperties.RoundCount,
                 OnPlayerTurn,
                 UpdateCache,
-                CheckWinningCondition,
+                IsWinningConditionFulfilled,
                 OnNextRound,
-                OnNextTurn);
+                OnNextTurn
+                );
             OnStartGame?.Invoke();
             turnManager.GoToNextRound();
             StartGameTimer();
             
             void OnPlayerTurn()
             {
+                
                 playerCursor.PleaseClick(OnClickDone);
                 void OnClickDone(KnifeTile tile)
                 {
@@ -431,7 +437,7 @@ namespace Hanako.Knife
             }
         }
 
-        public bool CheckWinningCondition()
+        public bool IsWinningConditionFulfilled()
         {
             if (turnManager.CurrentRoundIndex >= levelProperties.RoundCount)
             {
@@ -444,6 +450,24 @@ namespace Hanako.Knife
                 Won();
                 return true;
             }
+
+            for (int i = livingPieces.Count - 1; i >= 0; i--)
+            {
+                var piece = livingPieces[i];
+                if (!piece.HasValidTile())
+                {
+                    if (piece.LivingPiece == playerPiece)
+                    {
+                        PlayerDied();
+                        return true; // Lost
+                    }
+                    else
+                    {
+                        piece.LivingPiece.Die(piece);
+                    }
+                }
+            }
+
             return false;
         }
 
@@ -452,7 +476,6 @@ namespace Hanako.Knife
             StopGameTimer();
             gameInfoCanvas.CheckAllRound();
             OnGameOver?.Invoke(true);
-            Debug.Log("Game won");
         }
 
         public void PlayerDied()
@@ -460,7 +483,6 @@ namespace Hanako.Knife
             StopGameTimer();
             gameInfoCanvas.CheckAllRound();
             OnGameOver?.Invoke(false);
-            Debug.Log("Game lost");
         }
 
         public void AddSoul()
@@ -470,8 +492,6 @@ namespace Hanako.Knife
 
         public void UpdateCache()
         {
-            if (CheckWinningCondition()) return;
-
             foreach (var piece in pieces)
             {
                 foreach (var tile in tiles)

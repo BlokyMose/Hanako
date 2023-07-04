@@ -21,9 +21,19 @@ namespace Hanako
             ChangeAlpha(duration, 0f);
         }
 
+        public void BeTransparentFromOpaque(float duration)
+        {
+            ChangeAlpha(duration, 0f, 1f);
+        }
+
         public void BeOpaque(float duration)
         {
             ChangeAlpha(duration, 1f);
+        }
+
+        public void BeOpaqueFromTransparent(float duration)
+        {
+            ChangeAlpha(duration, 1f, 0f);
         }
 
         /// <summary>
@@ -44,13 +54,13 @@ namespace Hanako
             Debug.LogWarning("Failed to change alpha because the string format is wrong; it should be 'duration;alpha'");
         }
 
-        public void ChangeAlpha(float duration, float alpha)
+        public void ChangeAlpha(float duration, float alpha, float? alphaOrigin = null)
         {
             StopAllCoroutines();
             StartCoroutine(Delay());
             IEnumerator Delay()
             {
-                var curve = AnimationCurve.EaseInOut(0, srs[0].color.a, duration, alpha);
+                var curve = AnimationCurve.EaseInOut(0, alphaOrigin == null ? srs[0].color.a : (float)alphaOrigin, duration, alpha);
                 var time = 0f;
                 while (true)
                 {

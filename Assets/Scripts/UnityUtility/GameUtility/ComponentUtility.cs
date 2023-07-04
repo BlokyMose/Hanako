@@ -59,6 +59,36 @@ namespace UnityUtility
             return null;
         }
 
+        public static Transform FindDescendant(this Transform root, string targetName)
+        {
+            Transform foundTarget = null;
+            for (int i = 0; i < root.childCount; i++)
+            {
+                var child = root.GetChild(i);
+                if (child.gameObject.name == targetName)
+                    return child;
+            }
+
+            if (foundTarget == null)
+            {
+                for (int i = 0; i < root.childCount; i++)
+                {
+                    var child = root.GetChild(i);
+                    var _foundTarget = FindDescendant(child, targetName);
+                    if (_foundTarget != null)
+                        return _foundTarget;
+                }
+            }
+                
+            return foundTarget;
+        }
+
+        public static bool TryFindDescendant(this Transform root, string targetName, out Transform foundTarget)
+        {
+            foundTarget = FindDescendant(root, targetName);
+            return foundTarget != null;
+        }
+
         public static bool TryInstantiate<T>(this Object context, T original, out T instantiatedObject, Transform parent = null) where T : Object
         {
             if (original != null) 

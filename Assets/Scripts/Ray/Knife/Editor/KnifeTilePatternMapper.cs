@@ -107,11 +107,9 @@ namespace Hanako.Knife
             levelManager = FindObjectOfType<KnifeLevelManager>();
         }
 
-
         protected override void OnGUI()
         {
             base.OnGUI();
-
             if (levelManager == null)
                 levelManager = FindObjectOfType<KnifeLevelManager>();
 
@@ -119,6 +117,7 @@ namespace Hanako.Knife
             if (Application.isPlaying && !isPiecesDestroyedWhenPlay)
             {
                 DestroyPieces();
+                isPiecesDestroyedWhenPlay = true;
             }
             else if (Application.isEditor)
             {
@@ -359,6 +358,7 @@ namespace Hanako.Knife
 
         void DestroyPieces()
         {
+
             GameObject piecesGO = null;
             var allGOs = new List<GameObject>(FindObjectsByType<GameObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None));
             foreach (var go in allGOs)

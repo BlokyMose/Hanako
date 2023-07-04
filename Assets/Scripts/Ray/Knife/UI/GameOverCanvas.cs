@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityUtility;
+using static UnityEditor.Rendering.FilterWindow;
 
 namespace Hanako.Knife
 {
@@ -28,6 +29,9 @@ namespace Hanako.Knife
 
         [SerializeField]
         string titleTemplate;
+
+        [SerializeField]
+        string titleLostTemplate;
 
         [Header("Soul")]
         [SerializeField]
@@ -68,8 +72,8 @@ namespace Hanako.Knife
             canvasGroup.blocksRaycasts = false;
 
             animator = GetComponent<Animator>();
-            animator.SetInteger(int_mode, (int)CanvasMode.Hidden);
             int_mode = Animator.StringToHash(nameof(int_mode));
+            animator.SetInteger(int_mode, (int)CanvasMode.Hidden);
             boo_isShown = Animator.StringToHash(nameof(boo_isShown));
 
             playAgainAnimator = playAgainBut.GetComponent<Animator>();
@@ -107,6 +111,14 @@ namespace Hanako.Knife
 
         public void Init(bool isPlayerDead, KnifeLevelManager levelManager)
         {
+            if (isPlayerDead)
+                Won(levelManager);
+            else
+                Lost(levelManager);
+        }
+
+        void Won(KnifeLevelManager levelManager)
+        {
             titleText.text = titleTemplate.Replace("{}", levelManager.LevelProperties.LevelName);
             soulCountText.text = soulTemplate.ReplaceFirst("{}", levelManager.SoulCount.ToString());
             soulCountText.text = soulCountText.text.ReplaceFirst("{}", (levelManager.LevelProperties.PiecesPattern.GetLivingPieces().Count).ToString());
@@ -114,17 +126,36 @@ namespace Hanako.Knife
             roundCountText.text = roundCountText.text.ReplaceFirst("{}", levelManager.LevelProperties.RoundCount.ToString());
             timeText.text = timeTemplate.Replace("{}", MathUtility.SecondsToTimeString(levelManager.GameTime));
 
+            ShowCanvas();
+
+        }
+
+        void Lost(KnifeLevelManager levelManager)
+        {
+            titleText.text = titleLostTemplate.Replace("{}", levelManager.LevelProperties.LevelName);
+            soulCountText.text = soulTemplate.ReplaceFirst("{}", levelManager.SoulCount.ToString());
+            soulCountText.text = soulCountText.text.ReplaceFirst("{}", (levelManager.LevelProperties.PiecesPattern.GetLivingPieces().Count).ToString());
+            roundCountText.text = roundTemplate.ReplaceFirst("{}", levelManager.RoundCount.ToString());
+            roundCountText.text = roundCountText.text.ReplaceFirst("{}", levelManager.LevelProperties.RoundCount.ToString());
+            timeText.text = timeTemplate.Replace("{}", MathUtility.SecondsToTimeString(levelManager.GameTime));
+
+            ShowCanvas();
+        }
+
+        void ShowCanvas()
+        {
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
             animator.SetInteger(int_mode, (int)CanvasMode.Idle);
             StartCoroutine(ShowingElements());
-            IEnumerator ShowingElements()
+        }
+
+        IEnumerator ShowingElements()
+        {
+            foreach (var element in uiElementAnimators)
             {
-                foreach (var element in uiElementAnimators)
-                {
-                    element.SetBool(boo_isShown, true);
-                    yield return new WaitForSeconds(interval);
-                }
+                element.SetBool(boo_isShown, true);
+                yield return new WaitForSeconds(interval);
             }
         }
 

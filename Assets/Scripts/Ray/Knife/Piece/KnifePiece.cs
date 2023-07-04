@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityUtility;
 using static Hanako.Knife.KnifeLevelManager;
 
 namespace Hanako.Knife
@@ -43,6 +44,10 @@ namespace Hanako.Knife
         [SerializeField, LabelText("Offset")]
         Vector3 headPosOffset = new(0, 0.25f, -3f);
 
+        [Header("Debug")]
+        [SerializeField]
+        bool ignoreWarnings = false;
+
         protected KnifeLevelManager levelManager;
 
         protected bool isInteractable = true;
@@ -63,8 +68,12 @@ namespace Hanako.Knife
 
         protected virtual void Awake()
         {
-            if (interactionProperties.Count == 0)
+            if (!ignoreWarnings && interactionProperties.Count == 0)
                 Debug.LogWarning($"{gameObject.name} has no interaction properties; The game will be stucked because SetActingState is not called via Interacted()");
+
+            if (headPosForLogo == null)
+                if(transform.TryFindDescendant("head", out var head))
+                    headPosForLogo = head;
         }
 
         public virtual void Init(KnifeLevelManager levelManager)

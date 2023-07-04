@@ -44,6 +44,7 @@ namespace Hanako.Knife
 
         #endregion
 
+        [Header("Move")]
         [SerializeField]
         protected KnifeMoveRule moveRule;
         public KnifeMoveRule MoveRule { get => moveRule; set => this.moveRule = value; }
