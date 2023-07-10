@@ -654,6 +654,78 @@ namespace UnityEngine.InputSystem
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Hub"",
+            ""id"": ""c4770faa-6899-4842-bbf7-167be6672203"",
+            ""actions"": [
+                {
+                    ""name"": ""Move"",
+                    ""type"": ""Value"",
+                    ""id"": ""d240a2d1-f6d7-4bbd-b149-0f3d5a621445"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""68507dd4-46f9-4df6-9bad-59ea5120a89a"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""0ce6da87-b492-4060-927b-cc2d2f9bee16"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""fa7d7c26-558b-41ee-91ee-86902451f86e"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""f2a17459-073f-49b7-834a-6493075ad211"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""b6650668-ac82-4039-82de-44c91044bfeb"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -735,6 +807,9 @@ namespace UnityEngine.InputSystem
             m_UI_RightClick = m_UI.FindAction("RightClick", throwIfNotFound: true);
             m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
             m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
+            // Hub
+            m_Hub = asset.FindActionMap("Hub", throwIfNotFound: true);
+            m_Hub_Move = m_Hub.FindAction("Move", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -964,6 +1039,52 @@ namespace UnityEngine.InputSystem
             }
         }
         public UIActions @UI => new UIActions(this);
+
+        // Hub
+        private readonly InputActionMap m_Hub;
+        private List<IHubActions> m_HubActionsCallbackInterfaces = new List<IHubActions>();
+        private readonly InputAction m_Hub_Move;
+        public struct HubActions
+        {
+            private @KnifeInput m_Wrapper;
+            public HubActions(@KnifeInput wrapper) { m_Wrapper = wrapper; }
+            public InputAction @Move => m_Wrapper.m_Hub_Move;
+            public InputActionMap Get() { return m_Wrapper.m_Hub; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(HubActions set) { return set.Get(); }
+            public void AddCallbacks(IHubActions instance)
+            {
+                if (instance == null || m_Wrapper.m_HubActionsCallbackInterfaces.Contains(instance)) return;
+                m_Wrapper.m_HubActionsCallbackInterfaces.Add(instance);
+                @Move.started += instance.OnMove;
+                @Move.performed += instance.OnMove;
+                @Move.canceled += instance.OnMove;
+            }
+
+            private void UnregisterCallbacks(IHubActions instance)
+            {
+                @Move.started -= instance.OnMove;
+                @Move.performed -= instance.OnMove;
+                @Move.canceled -= instance.OnMove;
+            }
+
+            public void RemoveCallbacks(IHubActions instance)
+            {
+                if (m_Wrapper.m_HubActionsCallbackInterfaces.Remove(instance))
+                    UnregisterCallbacks(instance);
+            }
+
+            public void SetCallbacks(IHubActions instance)
+            {
+                foreach (var item in m_Wrapper.m_HubActionsCallbackInterfaces)
+                    UnregisterCallbacks(item);
+                m_Wrapper.m_HubActionsCallbackInterfaces.Clear();
+                AddCallbacks(instance);
+            }
+        }
+        public HubActions @Hub => new HubActions(this);
         private int m_KeyboardMouseSchemeIndex = -1;
         public InputControlScheme KeyboardMouseScheme
         {
@@ -1026,6 +1147,10 @@ namespace UnityEngine.InputSystem
             void OnRightClick(InputAction.CallbackContext context);
             void OnTrackedDevicePosition(InputAction.CallbackContext context);
             void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
+        }
+        public interface IHubActions
+        {
+            void OnMove(InputAction.CallbackContext context);
         }
     }
 }

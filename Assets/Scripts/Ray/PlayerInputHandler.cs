@@ -8,21 +8,31 @@ using static UnityEngine.InputSystem.KnifeInput;
 
 namespace Hanako
 {
-    public class PlayerInputHandler : MonoBehaviour, IKnifeActions
+    public class PlayerInputHandler : MonoBehaviour, IKnifeActions, IHubActions
     {
         [SerializeField]
         float cursorSpeed = 1f;
 
+        [SerializeField]
+        bool knifeActions = true;
+
+        [SerializeField]
+        bool hubActions = true;
+
         public Action<Vector2> OnCursorInput;
         public Action OnClickInput;
         public Action<bool> OnClickStateInput;
+        public Action<Vector2> OnMoveInput;
         Vector2 cursorMoveDeltaRaw;
         bool isClicking;
 
         private void Awake()
         {
             var inputs = new KnifeInput();
-            inputs.Knife.SetCallbacks(this);
+            if (knifeActions)
+                inputs.Knife.SetCallbacks(this);
+            if (hubActions)
+                inputs.Hub.SetCallbacks(this);
             inputs.Enable();
         }
 
@@ -63,5 +73,9 @@ namespace Hanako
             Cursor.visible = false; 
         }
 
+        public void OnMove(InputAction.CallbackContext context)
+        {
+            OnMoveInput?.Invoke(context.ReadValue<Vector2>());
+        }
     }
 }
