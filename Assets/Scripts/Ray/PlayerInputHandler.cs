@@ -8,13 +8,16 @@ using static UnityEngine.InputSystem.KnifeInput;
 
 namespace Hanako
 {
-    public class PlayerInputHandler : MonoBehaviour, IKnifeActions, IHubActions
+    public class PlayerInputHandler : MonoBehaviour, IKnifeActions, IHubActions, IHanakoActions
     {
         [SerializeField]
         float cursorSpeed = 1f;
 
         [SerializeField]
         bool knifeActions = true;
+
+        [SerializeField]
+        bool hanakoActions = true;
 
         [SerializeField]
         bool hubActions = true;
@@ -31,6 +34,8 @@ namespace Hanako
             var inputs = new KnifeInput();
             if (knifeActions)
                 inputs.Knife.SetCallbacks(this);
+            if (hanakoActions)
+                inputs.Hanako.SetCallbacks(this);
             if (hubActions)
                 inputs.Hub.SetCallbacks(this);
             inputs.Enable();

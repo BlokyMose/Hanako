@@ -14,18 +14,9 @@ namespace Hanako.Knife
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(Animator))]
-    public class KnifeCursor : MonoBehaviour
+    public class KnifeCursor : PlayerCursor
     {
-        public enum CursorInputMode { MousePosition, InputDelta }
-
-        [SerializeField]
-        CursorInputMode cursorInputMode = CursorInputMode.MousePosition;
-
-        [SerializeField, ShowIf(nameof(cursorInputMode))]
-        float cursorSpeed = 1f;
-
-        [SerializeField, ShowIf(nameof(cursorInputMode))]
-        bool isFollowingMouse = true;
+        [Header("Knife")]
 
         [SerializeField]
         KnifePieceInfoCanvas infoCanvas;
@@ -33,20 +24,10 @@ namespace Hanako.Knife
         [SerializeField]
         Camera gameCamera;
 
-        [Header("Customizations")]
-
         [SerializeField]
         KnifeColors colors;
 
-        [SerializeField]
-        VisualEffect bloodBurst;
-
-        Animator animator;
-        Rigidbody2D rb;
-        Collider2D col;
-        int boo_isClick, flo_moveByX;
         KnifeTile hoveredTile, hoveredValidTile;
-        bool isClicking;
         KnifeLevelManager levelManager;
         int controllerID;
         LivingPieceCache myPiece;
@@ -55,17 +36,6 @@ namespace Hanako.Knife
         Vector2 previousPos;
         bool canHover = true;
         bool canPan = true;
-
-        private void Awake()
-        {
-            rb = GetComponent<Rigidbody2D>();
-            animator = GetComponent<Animator>();
-            col = GetComponent<Collider2D>();
-            col.isTrigger = true;
-
-            boo_isClick = Animator.StringToHash(nameof(boo_isClick));
-            flo_moveByX = Animator.StringToHash(nameof(flo_moveByX));
-        }
 
         public void Init(KnifeLevelManager levelManager, int controllerID)
         {
@@ -76,68 +46,10 @@ namespace Hanako.Knife
             levelManager.OnGameOver += (isPlayerDead) => { canHover = false; canPan = false; };
         }
 
-        private void OnEnable()
+        protected override void Update()
         {
-            transform.position = Vector2.zero;
-
-            var playerInput = FindAnyObjectByType<PlayerInputHandler>();
-            if (playerInput != null)
-            {
-                playerInput.HideMouseCursor();
-                playerInput.OnClickInput += Click;
-                playerInput.OnClickStateInput += ClickState;
-                if (cursorInputMode == CursorInputMode.InputDelta)
-                {
-                    playerInput.OnCursorInput += Move;
-                    playerInput.SetMouseCursorToCenter();
-                }
-
-            }
-            else
-            {
-                Debug.LogWarning("Cannot find Player Input Handler");
-            }
-
-
-            StartCoroutine(Delay(0.1f));
-            IEnumerator Delay(float delay)
-            {
-                while (true)
-                {
-                    var previousPos = transform.position;
-                    yield return new WaitForSeconds(delay);
-                    animator.SetFloat(flo_moveByX, transform.position.x - previousPos.x);
-                }
-            }
-        }
-
-        private void OnDisable()
-        {
-            var playerInput = FindAnyObjectByType<PlayerInputHandler>();
-            if (playerInput != null)
-            {
-                playerInput.OnClickInput -= Click;
-                playerInput.OnClickStateInput -= ClickState;
-                if (cursorInputMode == CursorInputMode.InputDelta)
-                {
-                    playerInput.OnCursorInput -= Move;
-                }
-
-            }
-            else
-            {
-                Debug.LogWarning("Cannot find Player Input Handler when disabling");
-            }
-        }
-
-        private void Update()
-        {
-            if (cursorInputMode == CursorInputMode.MousePosition && isFollowingMouse)
-            {
-                var targetPos = Camera.main.ScreenToWorldPoint(new(Mouse.current.position.x.ReadValue(), Mouse.current.position.y.ReadValue(), 0));
-                transform.position = Vector2.Lerp(transform.position, targetPos, Time.deltaTime * cursorSpeed);
-                Pan();
-            }
+            base.Update();
+            Pan();
 
             void Pan()
             {
@@ -192,7 +104,6 @@ namespace Hanako.Knife
                 Unhover(tile);
             }
         }
-
 
         public void Refresh()
         {
@@ -311,21 +222,9 @@ namespace Hanako.Knife
 
         }
 
-        public void Move(Vector2 moveBy)
+        public override void ClickState(bool isClicking)
         {
-            transform.position += (Vector3) moveBy;
-        }
-
-        public void Click()
-        {
-            
-        }
-
-        public void ClickState(bool isClicking)
-        {
-            this.isClicking = isClicking;
-            animator.SetBool(boo_isClick, isClicking);
-            bloodBurst.SetBool("isPlaying", isClicking);
+            base.ClickState(isClicking);
             ClickHoveredTile(isClicking);
 
             void ClickHoveredTile(bool isClicking)
@@ -346,11 +245,7 @@ namespace Hanako.Knife
                     }
                 }
             }
-
-
         }
-
-
 
     }
 }

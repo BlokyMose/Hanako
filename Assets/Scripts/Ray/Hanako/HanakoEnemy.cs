@@ -14,73 +14,86 @@ namespace Hanako.Hanako
         float moveSpeed = 1;
 
         [SerializeField]
-        List<int> destinationPointSequence = new();
+        List<HanakoDestinationID> destinationSequence = new();
 
         [Header("Components")]
         [SerializeField]
-        HanakoLevelManager levelManager;
+        GameObject thoughtBubblePrefab;
+
+        [SerializeField]
+        Transform thoughtBubbleParent;
 
         [SerializeField]
         Animator animator;
 
-        HanakoDestination currentDestinationPoint;
+        HanakoLevelManager levelManager;
+        HanakoDestination currentDestination;
         int currentDestinationPointIndex;
         Coroutine corMoving;
         int int_motion;
+        bool isKillable = false;
+        HanakoThoughtBubble thoughtBubble;
 
-        public HanakoDestination CurrentDestinationPoint { get => currentDestinationPoint; }
+        public HanakoDestination CurrentDestinationPoint { get => currentDestination; }
+        public bool IsKillable { get => isKillable; }
 
         void Awake()
         {
             if (animator == null)
                 animator = gameObject.GetComponentInFamily<Animator>();
             int_motion = Animator.StringToHash(nameof(int_motion));
+            thoughtBubble = Instantiate(thoughtBubblePrefab, thoughtBubbleParent).GetComponent<HanakoThoughtBubble>();
+            thoughtBubble.transform.localPosition = Vector3.zero;
         }
 
         void Update()
         {
         }
 
-        public void Init(HanakoLevelManager levelManager, List<int> destinationPointSequence)
+        public void Init(HanakoLevelManager levelManager, List<HanakoDestinationID> destinationSequence)
         {
             this.levelManager = levelManager;
-            this.destinationPointSequence = destinationPointSequence;
+            this.destinationSequence = destinationSequence;
             currentDestinationPointIndex = 0;
-            currentDestinationPoint = levelManager.GetDestinationPoint(destinationPointSequence[currentDestinationPointIndex]);
+            currentDestination = levelManager.GetDestination(destinationSequence[currentDestinationPointIndex]);
         }
 
         public void MoveToCurrentDestination()
         {
-            MoveTo(currentDestinationPoint);
+            if (currentDestination != null)
+                MoveTo(currentDestination);
+            else
+                MoveToNextDestination();
         }
 
         public void MoveToNextDestination()
         {
-            if (currentDestinationPoint == levelManager.Door) // Prevent going to other destination once door has been reached
+            if (currentDestination == levelManager.Door) // Prevent going to other destination once door has been reached
                 return;
 
             currentDestinationPointIndex++;
-            if (currentDestinationPointIndex < destinationPointSequence.Count)
-                currentDestinationPoint = levelManager.GetDestinationPoint(destinationPointSequence[currentDestinationPointIndex]);
+            if (currentDestinationPointIndex < destinationSequence.Count)
+                currentDestination = levelManager.GetDestination(destinationSequence[currentDestinationPointIndex]);
             else
             {
                 currentDestinationPointIndex = -1;
-                currentDestinationPoint = levelManager.Door;
+                currentDestination = levelManager.Door;
             }
             
             MoveToCurrentDestination();
         }
 
-        public void MoveTo(HanakoDestination destinationPoint)
+        public void MoveTo(HanakoDestination destination)
         {
-
             corMoving = this.RestartCoroutine(Moving(), corMoving);
             IEnumerator Moving()
             {
+                isKillable = true;
+                thoughtBubble.Show(destination.Id.Logo);
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
                 while (true)
                 {
-                    var destinationX = destinationPoint.Position.position.x;
+                    var destinationX = destination.Position.position.x;
                     var currentX = transform.position.x;
                     var isDirectionRight = destinationX > currentX;
                     transform.localEulerAngles = new(transform.localEulerAngles.x, isDirectionRight ? 0 : 180);
@@ -92,9 +105,22 @@ namespace Hanako.Hanako
 
                     yield return null;
                 }
+                thoughtBubble.Hide();
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
 
-                MoveToNextDestination();
+                if (!destination.IsOccupied)
+                {
+                    isKillable = false;
+                    yield return StartCoroutine(destination.Interact(this));
+                    isKillable = true;
+
+                    MoveToNextDestination();
+                }
+                else
+                {
+                    MoveToNextDestination();
+                }
+
             }
         }
 

@@ -107,17 +107,14 @@ namespace Hanako.Hanako
             }
         }
 
-        public HanakoDestination GetDestinationPoint(int index)
+        public HanakoDestination GetDestination(HanakoDestinationID id)
         {
-            if (destinations.HasIndex(index))
-            {
-                return destinations[index];
-            }
-            else
-            {
-                Debug.Log("Cannot find destination index: "+index);
-                return door;
-            }
+            foreach (var destination in destinations)
+                if (destination.Id == id && !destination.IsOccupied)
+                    return destination;
+
+
+            return null;
         }
 
     }

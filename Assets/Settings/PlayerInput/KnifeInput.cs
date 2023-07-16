@@ -140,6 +140,120 @@ namespace UnityEngine.InputSystem
             ]
         },
         {
+            ""name"": ""Hanako"",
+            ""id"": ""5fbc88fc-f4d4-4eea-a1f1-61953645c2fb"",
+            ""actions"": [
+                {
+                    ""name"": ""Cursor"",
+                    ""type"": ""Value"",
+                    ""id"": ""879b7ead-8eab-4ba8-bc08-87cbd80c22f3"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Click"",
+                    ""type"": ""Button"",
+                    ""id"": ""2c159f62-c203-4749-b3ca-450c06994287"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""ed2d1ee9-6b5f-43f9-9f24-d05bd698b452"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""Cursor"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b91cd51e-bb65-406e-ad82-097854a39f7f"",
+                    ""path"": ""<Pointer>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse;Touch"",
+                    ""action"": ""Cursor"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""17e1da82-ab32-4acb-a32a-c352d3dac1c3"",
+                    ""path"": ""<Joystick>/{Hatswitch}"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Joystick"",
+                    ""action"": ""Cursor"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""84157a2a-7921-41fc-a7cb-38355e7dd187"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3c0afe21-651b-4443-9df4-0c56a55eeabb"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""04c77050-77bd-43dd-ab36-2efb21590401"",
+                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Touch"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""21ed8de1-1df1-47e8-85b8-503bceec4dc4"",
+                    ""path"": ""<Joystick>/trigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Joystick"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7d0a878d-5471-41f8-84ab-cd89b251063d"",
+                    ""path"": ""<XRController>/{PrimaryAction}"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""XR"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
             ""name"": ""UI"",
             ""id"": ""272f6d14-89ba-496f-b7ff-215263d3219f"",
             ""actions"": [
@@ -795,6 +909,10 @@ namespace UnityEngine.InputSystem
             m_Knife = asset.FindActionMap("Knife", throwIfNotFound: true);
             m_Knife_Cursor = m_Knife.FindAction("Cursor", throwIfNotFound: true);
             m_Knife_Click = m_Knife.FindAction("Click", throwIfNotFound: true);
+            // Hanako
+            m_Hanako = asset.FindActionMap("Hanako", throwIfNotFound: true);
+            m_Hanako_Cursor = m_Hanako.FindAction("Cursor", throwIfNotFound: true);
+            m_Hanako_Click = m_Hanako.FindAction("Click", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -921,6 +1039,60 @@ namespace UnityEngine.InputSystem
             }
         }
         public KnifeActions @Knife => new KnifeActions(this);
+
+        // Hanako
+        private readonly InputActionMap m_Hanako;
+        private List<IHanakoActions> m_HanakoActionsCallbackInterfaces = new List<IHanakoActions>();
+        private readonly InputAction m_Hanako_Cursor;
+        private readonly InputAction m_Hanako_Click;
+        public struct HanakoActions
+        {
+            private @KnifeInput m_Wrapper;
+            public HanakoActions(@KnifeInput wrapper) { m_Wrapper = wrapper; }
+            public InputAction @Cursor => m_Wrapper.m_Hanako_Cursor;
+            public InputAction @Click => m_Wrapper.m_Hanako_Click;
+            public InputActionMap Get() { return m_Wrapper.m_Hanako; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(HanakoActions set) { return set.Get(); }
+            public void AddCallbacks(IHanakoActions instance)
+            {
+                if (instance == null || m_Wrapper.m_HanakoActionsCallbackInterfaces.Contains(instance)) return;
+                m_Wrapper.m_HanakoActionsCallbackInterfaces.Add(instance);
+                @Cursor.started += instance.OnCursor;
+                @Cursor.performed += instance.OnCursor;
+                @Cursor.canceled += instance.OnCursor;
+                @Click.started += instance.OnClick;
+                @Click.performed += instance.OnClick;
+                @Click.canceled += instance.OnClick;
+            }
+
+            private void UnregisterCallbacks(IHanakoActions instance)
+            {
+                @Cursor.started -= instance.OnCursor;
+                @Cursor.performed -= instance.OnCursor;
+                @Cursor.canceled -= instance.OnCursor;
+                @Click.started -= instance.OnClick;
+                @Click.performed -= instance.OnClick;
+                @Click.canceled -= instance.OnClick;
+            }
+
+            public void RemoveCallbacks(IHanakoActions instance)
+            {
+                if (m_Wrapper.m_HanakoActionsCallbackInterfaces.Remove(instance))
+                    UnregisterCallbacks(instance);
+            }
+
+            public void SetCallbacks(IHanakoActions instance)
+            {
+                foreach (var item in m_Wrapper.m_HanakoActionsCallbackInterfaces)
+                    UnregisterCallbacks(item);
+                m_Wrapper.m_HanakoActionsCallbackInterfaces.Clear();
+                AddCallbacks(instance);
+            }
+        }
+        public HanakoActions @Hanako => new HanakoActions(this);
 
         // UI
         private readonly InputActionMap m_UI;
@@ -1131,6 +1303,11 @@ namespace UnityEngine.InputSystem
             }
         }
         public interface IKnifeActions
+        {
+            void OnCursor(InputAction.CallbackContext context);
+            void OnClick(InputAction.CallbackContext context);
+        }
+        public interface IHanakoActions
         {
             void OnCursor(InputAction.CallbackContext context);
             void OnClick(InputAction.CallbackContext context);

@@ -17,13 +17,13 @@ namespace Hanako.Hanako
             GameObject prefab;
 
             [SerializeField]
-            List<int> destinationSequence = new();
+            List<HanakoDestinationID> destinationSequence = new();
 
             [SerializeField]
             float delay = 2f;
 
             public GameObject Prefab { get => prefab; }
-            public List<int> DestinationSequence { get => destinationSequence; }
+            public List<HanakoDestinationID> DestinationSequence { get => destinationSequence; }
             public float Delay { get => delay; }
         }
 
