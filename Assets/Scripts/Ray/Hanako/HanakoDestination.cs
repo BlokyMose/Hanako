@@ -7,6 +7,7 @@ using UnityUtility;
 
 namespace Hanako.Hanako
 {
+    [RequireComponent(typeof(Animator))]
     public class HanakoDestination : MonoBehaviour
     {
         [SerializeField]
@@ -32,19 +33,21 @@ namespace Hanako.Hanako
         [SerializeField]
         protected Transform position;
 
+        protected Animator animator;    
         protected HanakoDestinationUI destinationUI;
-        protected bool isOccupied = false;
+        protected HanakoEnemy currentOccupant, lastOccupant;
         protected float durationLeft;
         public event Action<float> OnDurationDepleted;
         public event Action OnDurationEnd;
 
-        public HanakoDestinationID Id { get => id; }
+        public HanakoDestinationID ID { get => id; }
         public Transform Position => position == null ? transform : position;
 
-        public bool IsOccupied { get => isOccupied; }
+        public virtual bool IsOccupied { get => currentOccupant!=null; }
 
         protected virtual void Awake()
         {
+            animator = GetComponent<Animator>();
             destinationUI = Instantiate(destinationUIPrefab, destinationUIParent).GetComponent<HanakoDestinationUI>();
             destinationUI.transform.localPosition = Vector3.zero;
             destinationUI.Init(ref OnDurationDepleted, ref OnDurationEnd);
@@ -67,7 +70,7 @@ namespace Hanako.Hanako
 
         public virtual IEnumerator Interact(HanakoEnemy enemy)
         {
-            isOccupied = true;
+            currentOccupant = enemy;
             durationLeft = interactDuration;
             WhenInteractStart(enemy);
             while (durationLeft > 0f)
@@ -77,12 +80,34 @@ namespace Hanako.Hanako
                 yield return null;
             }
             OnDurationEnd?.Invoke();
-            isOccupied = false;
+            lastOccupant = currentOccupant;
+            currentOccupant = null;
+            WhenInteractEnd(enemy);
         }
 
         protected virtual void WhenInteractStart(HanakoEnemy enemy)
         {
 
+        }
+
+        protected virtual void WhenInteractEnd(HanakoEnemy enemy)
+        {
+
+        }
+
+        protected IEnumerator MoveOccupant(HanakoEnemy occupant, Vector2 targetPos, float duration)
+        {
+            occupant.PlayAnimation(HanakoEnemy.PieceAnimationState.Run);
+            var speed = Vector2.Distance(transform.position, targetPos) / duration;
+            var time = 0f;
+            while (time < duration)
+            {
+                occupant.transform.position = Vector2.MoveTowards(occupant.transform.position, targetPos, speed * Time.deltaTime);
+                time += Time.deltaTime;
+                yield return null;
+            }
+            if (this.currentOccupant == occupant)
+                occupant.PlayAnimation(HanakoEnemy.PieceAnimationState.Idle);
         }
     }
 }

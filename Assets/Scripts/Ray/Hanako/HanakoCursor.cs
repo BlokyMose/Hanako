@@ -9,11 +9,10 @@ namespace Hanako.Hanako
     public class HanakoCursor : PlayerCursor
     {
         HanakoDestination_Toilet hoveredToilet;
+        HanakoDestination_Toilet possessedToilet;
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (isClicking) return;
-
             if (collision.TryGetComponentInFamily<HanakoDestination_Toilet>(out var toilet))
             {
                 Hover(toilet);
@@ -28,10 +27,29 @@ namespace Hanako.Hanako
             }
         }
 
+        public override void ClickState(bool isClicking)
+        {
+            base.ClickState(isClicking);
+            if (isClicking)
+            {
+                if (hoveredToilet != null && !hoveredToilet.IsOccupied)
+                {
+                    if (possessedToilet != null)
+                        possessedToilet.Dispossess();
+
+                    possessedToilet = hoveredToilet;
+                    possessedToilet.Possess();
+                }
+            }
+        }
+
         void Hover(HanakoDestination_Toilet toilet)
         {
+            if (hoveredToilet!=null)
+                Unhover(hoveredToilet);
+
             hoveredToilet = toilet;
-            toilet.Hover();
+            hoveredToilet.Hover();
         }
 
         void Unhover(HanakoDestination_Toilet toilet)

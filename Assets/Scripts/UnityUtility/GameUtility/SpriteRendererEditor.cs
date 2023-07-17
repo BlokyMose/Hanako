@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityUtility;
 
@@ -73,6 +74,14 @@ namespace Hanako
                     if (time > duration) break;
                     yield return null;
                 }
+            }
+        }
+
+        public void ChangeAlpha(float alpha)
+        {
+            foreach (var sr in srs)
+            {
+                sr.color = sr.color.ChangeAlpha(alpha);
             }
         }
     }

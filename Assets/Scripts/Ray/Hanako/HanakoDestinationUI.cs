@@ -8,11 +8,19 @@ namespace Hanako.Hanako
 {
     public class HanakoDestinationUI : MonoBehaviour
     {
+        public enum PlayerHereMode { Idle, Hide }
+
         [SerializeField]
         Image fillImage;
 
+        [SerializeField]
+        Animator playerHere;
+
+        int int_mode;
+
         private void Awake()
         {
+            int_mode = Animator.StringToHash(nameof(int_mode));
             HideFill();
         }
 
@@ -39,5 +47,17 @@ namespace Hanako.Hanako
         {
             fillImage.enabled = false;
         }
+
+        public void ShowPlayerHere()
+        {
+            playerHere.SetInteger(int_mode, (int)PlayerHereMode.Idle);
+        }
+
+        public void HidePlayerHere()
+        {
+            playerHere.SetInteger(int_mode, (int)PlayerHereMode.Hide);
+        }
+
+
     }
 }

@@ -44,6 +44,8 @@ namespace Hanako.Hanako
             int_motion = Animator.StringToHash(nameof(int_motion));
             thoughtBubble = Instantiate(thoughtBubblePrefab, thoughtBubbleParent).GetComponent<HanakoThoughtBubble>();
             thoughtBubble.transform.localPosition = Vector3.zero;
+            if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
+                srEditor.ChangeAlpha(0f);
         }
 
         void Update()
@@ -56,6 +58,8 @@ namespace Hanako.Hanako
             this.destinationSequence = destinationSequence;
             currentDestinationPointIndex = 0;
             currentDestination = levelManager.GetDestination(destinationSequence[currentDestinationPointIndex]);
+            if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
+                srEditor.BeOpaqueFromTransparent(0.33f);
         }
 
         public void MoveToCurrentDestination()
@@ -89,7 +93,7 @@ namespace Hanako.Hanako
             IEnumerator Moving()
             {
                 isKillable = true;
-                thoughtBubble.Show(destination.Id.Logo);
+                thoughtBubble.Show(destination.ID.Logo);
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
                 while (true)
                 {
@@ -124,5 +128,9 @@ namespace Hanako.Hanako
             }
         }
 
+        public void PlayAnimation(PieceAnimationState state)
+        {
+            animator.SetInteger(int_motion, (int)state);
+        }
     }
 }

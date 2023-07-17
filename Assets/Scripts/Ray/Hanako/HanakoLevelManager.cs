@@ -78,8 +78,8 @@ namespace Hanako.Hanako
                 foreach (var enemy in enemySequence.Sequence)
                 {
                     var enemyGO = Instantiate(enemy.Prefab, enemiesParent);
+                    enemyGO.transform.localPosition = Vector3.zero;
                     var enemyComponent = enemyGO.GetComponent<HanakoEnemy>();
-                    enemyComponent.Init(this, enemy.DestinationSequence);
                     enemies.Add(enemyComponent);
                 }
 
@@ -101,6 +101,7 @@ namespace Hanako.Hanako
                 foreach (var enemy in enemySequence.Sequence)
                 {
                     yield return new WaitForSeconds(enemy.Delay);
+                    enemies[index].Init(this, enemy.DestinationSequence);
                     enemies[index].MoveToCurrentDestination();
                     index++;
                 }
@@ -110,7 +111,7 @@ namespace Hanako.Hanako
         public HanakoDestination GetDestination(HanakoDestinationID id)
         {
             foreach (var destination in destinations)
-                if (destination.Id == id && !destination.IsOccupied)
+                if (destination.ID == id && !destination.IsOccupied)
                     return destination;
 
 
