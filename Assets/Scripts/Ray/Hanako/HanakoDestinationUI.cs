@@ -6,56 +6,81 @@ using UnityEngine.UI;
 
 namespace Hanako.Hanako
 {
+    [RequireComponent(typeof(Animator))]
     public class HanakoDestinationUI : MonoBehaviour
     {
         public enum PlayerHereMode { Idle, Hide }
+        public enum FillMode { Idle, Full }
 
         [SerializeField]
-        Image fillImage;
+        Animator fillAnimator;
 
-        [SerializeField]
-        Animator playerHere;
-
-        int int_mode;
+        int int_mode, flo_speed, boo_show;
+        Animator animator;
 
         private void Awake()
         {
+            animator = GetComponent<Animator>();
+            boo_show = Animator.StringToHash(nameof(boo_show));
             int_mode = Animator.StringToHash(nameof(int_mode));
-            HideFill();
+            flo_speed = Animator.StringToHash(nameof(flo_speed));
+            Hide();
         }
 
-        public void Init(ref Action<float> onShowFill, ref Action onHideFill)
+        public void Init(ref Action<float> onStartFill, ref Action onShow, ref Action onHide)
         {
-            onShowFill += ShowFill;
-            onHideFill += HideFill;
+            onStartFill += StartFullToIdle;
+            onShow += Show;
+            onHide += Hide;
         }
 
 
-        public void Exit(ref Action<float> onShowFill, ref Action onHideFill)
+        public void Exit(ref Action<float> onStartFill, ref Action onShow, ref Action onHide)
         {
-            onShowFill -= ShowFill;
-            onHideFill -= HideFill;
+            onStartFill -= StartFullToIdle;
+            onShow -= Show;
+            onHide -= Hide;
         }
 
-        public void ShowFill(float fill)
+        public void Show()
         {
-            fillImage.enabled = true;
-            fillImage.fillAmount = 1f-fill;
+            animator.SetBool(boo_show, true);
+        }
+
+        public void Hide()
+        {
+            animator.SetBool(boo_show, false);
+        }
+
+        public void StartFullToIdle(float duration)
+        {
+            const float durationToFull = 0.33f;
+            StartCoroutine(Delay());
+            IEnumerator Delay()
+            {
+                fillAnimator.SetInteger(int_mode, (int)FillMode.Full);
+                fillAnimator.SetFloat(flo_speed, 1f/durationToFull);
+
+                yield return new WaitForSeconds(durationToFull);
+
+                fillAnimator.SetInteger(int_mode, (int)FillMode.Idle);
+                fillAnimator.SetFloat(flo_speed, 1f/(duration-durationToFull));
+            }
+
         }
 
         public void HideFill()
         {
-            fillImage.enabled = false;
         }
 
         public void ShowPlayerHere()
         {
-            playerHere.SetInteger(int_mode, (int)PlayerHereMode.Idle);
+            //playerHere.SetInteger(int_mode, (int)PlayerHereMode.Idle);
         }
 
         public void HidePlayerHere()
         {
-            playerHere.SetInteger(int_mode, (int)PlayerHereMode.Hide);
+            //playerHere.SetInteger(int_mode, (int)PlayerHereMode.Hide);
         }
 
 

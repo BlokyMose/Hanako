@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,9 +19,12 @@ namespace Hanako.Hanako
 
         [Header("UI")]
         [SerializeField]
+        bool isDisplayUI = true;
+
+        [SerializeField, ShowIf(nameof(isDisplayUI))]
         protected GameObject destinationUIPrefab;
         
-        [SerializeField]
+        [SerializeField, ShowIf(nameof(isDisplayUI))]
         protected Transform destinationUIParent;
 
         [Header("Components")]
@@ -37,8 +41,12 @@ namespace Hanako.Hanako
         protected HanakoDestinationUI destinationUI;
         protected HanakoEnemy currentOccupant, lastOccupant;
         protected float durationLeft;
-        public event Action<float> OnDurationDepleted;
+        public event Action<float> OnDurationDepleting;
+        public event Action<float> OnDurationStartDepleting;
         public event Action OnDurationEnd;
+        public event Action OnInteractStart;
+        public event Action OnInteractEnd;
+
 
         public HanakoDestinationID ID { get => id; }
         public Transform Position => position == null ? transform : position;
@@ -48,9 +56,12 @@ namespace Hanako.Hanako
         protected virtual void Awake()
         {
             animator = GetComponent<Animator>();
-            destinationUI = Instantiate(destinationUIPrefab, destinationUIParent).GetComponent<HanakoDestinationUI>();
-            destinationUI.transform.localPosition = Vector3.zero;
-            destinationUI.Init(ref OnDurationDepleted, ref OnDurationEnd);
+            if (isDisplayUI)
+            {
+                destinationUI = Instantiate(destinationUIPrefab, destinationUIParent).GetComponent<HanakoDestinationUI>();
+                destinationUI.transform.localPosition = Vector3.zero;
+                destinationUI.Init(ref OnDurationStartDepleting, ref OnInteractStart, ref OnInteractEnd);
+            }
 
             if (srs.Count == 0)
             {
@@ -60,7 +71,10 @@ namespace Hanako.Hanako
 
         protected virtual void OnDestroy()
         {
-            destinationUI.Exit(ref OnDurationDepleted, ref OnDurationEnd);
+            if (isDisplayUI)
+            {
+                destinationUI.Exit(ref OnDurationStartDepleting, ref OnInteractStart, ref OnInteractEnd);
+            }
         }
 
         public void Init(HanakoLevelManager levelManager)
@@ -73,10 +87,11 @@ namespace Hanako.Hanako
             currentOccupant = enemy;
             durationLeft = interactDuration;
             WhenInteractStart(enemy);
+            OnDurationStartDepleting?.Invoke(interactDuration);
             while (durationLeft > 0f)
             {
                 durationLeft -= Time.deltaTime;
-                OnDurationDepleted?.Invoke(durationLeft / interactDuration);
+                OnDurationDepleting?.Invoke(durationLeft / interactDuration);
                 yield return null;
             }
             OnDurationEnd?.Invoke();
@@ -87,12 +102,12 @@ namespace Hanako.Hanako
 
         protected virtual void WhenInteractStart(HanakoEnemy enemy)
         {
-
+            OnInteractStart?.Invoke();
         }
 
         protected virtual void WhenInteractEnd(HanakoEnemy enemy)
         {
-
+            OnInteractEnd?.Invoke();
         }
 
         protected IEnumerator MoveOccupant(HanakoEnemy occupant, Vector2 targetPos, float duration)
