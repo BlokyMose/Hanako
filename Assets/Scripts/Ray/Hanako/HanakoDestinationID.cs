@@ -13,7 +13,11 @@ namespace Hanako.Hanako
         [SerializeField]
         Sprite logo;
 
+        [SerializeField]
+        Color color = Color.white;
+
         public string DisplayName { get => displayName; }
         public Sprite Logo { get => logo; }
+        public Color Color { get => color;  }
     }
 }

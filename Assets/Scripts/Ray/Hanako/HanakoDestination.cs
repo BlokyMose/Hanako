@@ -27,20 +27,38 @@ namespace Hanako.Hanako
         [SerializeField, ShowIf(nameof(isDisplayUI))]
         protected Transform destinationUIParent;
 
+        [Header("Interact")]
+        [SerializeField]
+        protected Transform interactablePos;
+
+        [SerializeField]
+        protected Transform postInteractPos;
+
+        [SerializeField]
+        protected float durationToPostInteractPos = 0.1f;
+
         [Header("Components")]
         [SerializeField]
-        protected List<SpriteRenderer> srs = new();
+        protected List<SpriteRenderer> coloredSRs = new();
+
+        [SerializeField]
+        protected List<SpriteRenderer> hoverSRs = new();
+
+        [SerializeField]
+        protected List<SpriteRenderer> excludedHoverSRs = new();
 
         [SerializeField]
         protected HanakoLevelManager levelManager;
 
-        [SerializeField]
-        protected Transform position;
 
         protected Animator animator;    
         protected HanakoDestinationUI destinationUI;
         protected HanakoEnemy currentOccupant, lastOccupant;
         protected float durationLeft;
+        protected Dictionary<SpriteRenderer, Color> cacheHoveredSRs = new();
+        protected bool isHovered = false;
+        protected Vector2 occupantLastPos;
+
         public event Action<float> OnDurationDepleting;
         public event Action<float> OnDurationStartDepleting;
         public event Action OnDurationEnd;
@@ -49,7 +67,7 @@ namespace Hanako.Hanako
 
 
         public HanakoDestinationID ID { get => id; }
-        public Transform Position => position == null ? transform : position;
+        public Transform InteractablePos => interactablePos == null ? transform : interactablePos;
 
         public virtual bool IsOccupied { get => currentOccupant!=null; }
 
@@ -63,10 +81,25 @@ namespace Hanako.Hanako
                 destinationUI.Init(ref OnDurationStartDepleting, ref OnInteractStart, ref OnInteractEnd);
             }
 
-            if (srs.Count == 0)
+            if (hoverSRs.Count == 0)
             {
-                srs.AddRange(gameObject.GetComponentsInFamily<SpriteRenderer>());
+                hoverSRs.AddRange(gameObject.GetComponentsInFamily<SpriteRenderer>());
             }
+
+            foreach (var sr in excludedHoverSRs)
+            {
+                var foundSR = hoverSRs.Find(x => x == sr);
+                if (foundSR != null) hoverSRs.Remove(foundSR);
+            }
+
+            foreach (var sr in coloredSRs)
+            {
+                var alpha = sr.color.a;
+                sr.color = id.Color.ChangeAlpha(alpha);
+            }
+
+            if (postInteractPos == null)
+                postInteractPos = transform;
         }
 
         protected virtual void OnDestroy()
@@ -86,6 +119,10 @@ namespace Hanako.Hanako
         {
             currentOccupant = enemy;
             durationLeft = interactDuration;
+
+            occupantLastPos = enemy.transform.position;
+            StartCoroutine(MoveOccupant(enemy, postInteractPos.position, durationToPostInteractPos));
+
             WhenInteractStart(enemy);
             OnDurationStartDepleting?.Invoke(interactDuration);
             while (durationLeft > 0f)
@@ -97,6 +134,7 @@ namespace Hanako.Hanako
             OnDurationEnd?.Invoke();
             lastOccupant = currentOccupant;
             currentOccupant = null;
+            StartCoroutine(MoveOccupant(enemy, occupantLastPos, durationToPostInteractPos));
             WhenInteractEnd(enemy);
         }
 
@@ -123,6 +161,27 @@ namespace Hanako.Hanako
             }
             if (this.currentOccupant == occupant)
                 occupant.PlayAnimation(HanakoEnemy.PieceAnimationState.Idle);
+        }
+
+
+        public virtual void Hover()
+        {
+            if (isHovered) return;
+            isHovered = true;
+            cacheHoveredSRs = new();
+            foreach (var sr in hoverSRs)
+            {
+                cacheHoveredSRs.Add(sr, sr.color);
+                sr.color = Color.red;
+            }
+        }
+
+        public virtual void Unhover()
+        {
+            if (!isHovered) return;
+            isHovered = false;
+            foreach (var sr in cacheHoveredSRs)
+                sr.Key.color = sr.Value;
         }
     }
 }

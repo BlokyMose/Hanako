@@ -93,11 +93,11 @@ namespace Hanako.Hanako
             IEnumerator Moving()
             {
                 isKillable = true;
-                thoughtBubble.Show(destination.ID.Logo);
+                thoughtBubble.Show(destination.ID.Logo, destination.ID.Color);
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
                 while (true)
                 {
-                    var destinationX = destination.Position.position.x;
+                    var destinationX = destination.InteractablePos.position.x;
                     var currentX = transform.position.x;
                     var isDirectionRight = destinationX > currentX;
                     transform.localEulerAngles = new(transform.localEulerAngles.x, isDirectionRight ? 0 : 180);

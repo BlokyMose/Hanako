@@ -57,7 +57,7 @@ namespace Hanako.Hanako
                     bool isInserted = false;
                     foreach (var sortedDestination in sortedDestinations)
                     {
-                        if (destination.Position.position.x < sortedDestination.Position.position.x)
+                        if (destination.InteractablePos.position.x < sortedDestination.InteractablePos.position.x)
                         {
                             sortedDestinations.Insert(0,destination);
                             isInserted = true;

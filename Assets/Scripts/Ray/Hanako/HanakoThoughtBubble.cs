@@ -23,10 +23,10 @@ namespace Hanako.Hanako
             Hide();
         }
 
-        public void Show(Sprite sprite)
+        public void Show(Sprite sprite, Color color)
         {
             animator.SetInteger(int_mode, (int)Mode.Idle);
-            logo.color = new Color(1, 1, 1, 1);
+            logo.color = color;
             logo.sprite = sprite;
         }
 
