@@ -9,13 +9,14 @@ namespace Hanako.Hanako
     {
         public override bool IsOccupied { get => currentOccupant != null || isPossessed; }
 
-        int tri_open;
+        int tri_open, boo_isPossessed;
         bool isPossessed = false;
 
         protected override void Awake()
         {
             base.Awake();
             tri_open = Animator.StringToHash(nameof(tri_open));
+            boo_isPossessed = Animator.StringToHash(nameof(boo_isPossessed));
         }
 
         protected override void WhenInteractStart(HanakoEnemy enemy)
@@ -43,16 +44,31 @@ namespace Hanako.Hanako
             }
         }
 
-        public void Possess()
+        public void Possess(bool playAnimation = false)
         {
             isPossessed = true;
+            ChangeSRsColor(Color.green);
             destinationUI.ShowPlayerHere();
+            if (playAnimation)
+                PlayAnimationPossessed();
         }
 
-        public void Dispossess()
+        public void Dispossess(bool playAnimation = false)
         {
             isPossessed = false;
+            ResetSRsColor();
             destinationUI.HidePlayerHere();
+            if (playAnimation)
+                PlayAnimationUnpossessed();
+        }
+
+        public void PlayAnimationPossessed()
+        {
+            animator.SetBool(boo_isPossessed, true);
+        }
+        public void PlayAnimationUnpossessed()
+        {
+            animator.SetBool(boo_isPossessed, false);
         }
     }
 }

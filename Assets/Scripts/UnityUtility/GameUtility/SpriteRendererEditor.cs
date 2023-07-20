@@ -9,7 +9,25 @@ namespace Hanako
 {
     public class SpriteRendererEditor : MonoBehaviour
     {
+        [System.Serializable]
+        public class CustomAlpha
+        {
+            [SerializeField]
+            SpriteRenderer sr;
+
+            [SerializeField]
+            float maxAlpha = 1f;
+
+            [SerializeField]
+            float minAlpha = 0f;
+
+            public SpriteRenderer SR { get => sr; }
+            public float MaxAlpha { get => maxAlpha; }
+            public float MinAlpha { get => minAlpha; }
+        }
+
         public List<SpriteRenderer> srs = new();
+        public List<CustomAlpha> customSRs = new();
 
         [Button("Get All SRs")]
         public void GetAllSpriteRenderersInChildren()
@@ -65,15 +83,14 @@ namespace Hanako
                 var time = 0f;
                 while (true)
                 {
-                    foreach (var sr in srs)
-                    {
-                        sr.color = sr.color.ChangeAlpha(curve.Evaluate(time));
-                    }
+                    ChangeAlpha(curve.Evaluate(time));
                     time += Time.deltaTime;
 
                     if (time > duration) break;
                     yield return null;
                 }
+
+                ChangeAlpha(alpha);
             }
         }
 
@@ -82,6 +99,18 @@ namespace Hanako
             foreach (var sr in srs)
             {
                 sr.color = sr.color.ChangeAlpha(alpha);
+            }
+
+            foreach (var sr in customSRs)
+            {
+                if (sr.SR.color.a > sr.MaxAlpha)
+                {
+                    sr.SR.color = sr.SR.color.ChangeAlpha(sr.MaxAlpha);
+                }
+                else if (sr.SR.color.a < sr.MinAlpha)
+                {
+                    sr.SR.color = sr.SR.color.ChangeAlpha(sr.MinAlpha);
+                }
             }
         }
     }

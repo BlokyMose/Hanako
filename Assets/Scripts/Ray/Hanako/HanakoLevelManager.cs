@@ -23,6 +23,13 @@ namespace Hanako.Hanako
         [SerializeField]
         HanakoDestination door;
 
+        [Header("Hanako")]
+        [SerializeField]
+        float hanakoMoveDuration = 1f;
+
+        [SerializeField]
+        HanakoCrawl hanakoCrawl;
+
         List<HanakoDestination> destinations = new();
         List<HanakoEnemy> enemies = new();
 
@@ -33,6 +40,27 @@ namespace Hanako.Hanako
             destinations = InstantiateDestinations(destinationSequence);
             destinations = SortDestinations(destinations);
             enemies = InstantiateEnemies(enemySequence);
+
+            var cursor = FindAnyObjectByType<HanakoCursor>();
+            if (cursor != null)
+            {
+                HanakoDestination_Toilet initialToilet = null;
+                int toiletIndex = 0;
+                int targetIndex = 2;
+                foreach (var destination in destinations)
+                {
+                    if (destination is HanakoDestination_Toilet)
+                    {
+                        initialToilet = destination as HanakoDestination_Toilet;
+                        toiletIndex++;
+                        if (toiletIndex == targetIndex)
+                            break;
+                    }
+                }
+
+                initialToilet.Possess(true);
+                cursor.Init(initialToilet, SetHanakoCrawl);
+            }
 
             List<HanakoDestination> InstantiateDestinations(HanakoDestinationSequence destinationSequence)
             {
@@ -87,6 +115,7 @@ namespace Hanako.Hanako
             }
         }
 
+
         private void Start()
         {
             StartGame();
@@ -114,8 +143,12 @@ namespace Hanako.Hanako
                 if (destination.ID == id && !destination.IsOccupied)
                     return destination;
 
-
             return null;
+        }
+
+        public void SetHanakoCrawl(HanakoDestination_Toilet fromToilet, HanakoDestination_Toilet toToilet)
+        {
+            hanakoCrawl.Crawl(fromToilet, toToilet, hanakoMoveDuration);
         }
 
     }

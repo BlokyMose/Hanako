@@ -1,4 +1,5 @@
 using Hanako.Knife;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,20 @@ namespace Hanako.Hanako
     {
         HanakoDestination_Toilet hoveredToilet;
         HanakoDestination_Toilet possessedToilet;
+        event Action<HanakoDestination_Toilet, HanakoDestination_Toilet> OnPossess;
+
+        public void Init(HanakoDestination_Toilet possessedToilet, Action<HanakoDestination_Toilet, HanakoDestination_Toilet> onPossess)
+        {
+            this.possessedToilet = possessedToilet;
+            OnPossess += onPossess;
+
+        }
+
+        public void Exit(Action<HanakoDestination_Toilet, HanakoDestination_Toilet> onPossess)
+        {
+            OnPossess -= onPossess;
+
+        }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
@@ -34,9 +49,8 @@ namespace Hanako.Hanako
             {
                 if (hoveredToilet != null && !hoveredToilet.IsOccupied)
                 {
-                    if (possessedToilet != null)
-                        possessedToilet.Dispossess();
-
+                    OnPossess?.Invoke(possessedToilet, hoveredToilet);
+                    possessedToilet.Dispossess();
                     possessedToilet = hoveredToilet;
                     possessedToilet.Possess();
                 }

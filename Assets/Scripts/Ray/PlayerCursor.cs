@@ -41,6 +41,11 @@ namespace Hanako
             boo_isClick = Animator.StringToHash(nameof(boo_isClick));
             flo_moveByX = Animator.StringToHash(nameof(flo_moveByX));
         }
+        protected virtual void OnDestroy()
+        {
+            
+        }
+
 
         protected virtual void OnEnable()
         {

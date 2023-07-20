@@ -70,6 +70,7 @@ namespace Hanako.Hanako
         public Transform InteractablePos => interactablePos == null ? transform : interactablePos;
 
         public virtual bool IsOccupied { get => currentOccupant!=null; }
+        public Transform PostInteractPos { get => postInteractPos;  }
 
         protected virtual void Awake()
         {
@@ -169,17 +170,28 @@ namespace Hanako.Hanako
             if (isHovered) return;
             isHovered = true;
             cacheHoveredSRs = new();
-            foreach (var sr in hoverSRs)
-            {
-                cacheHoveredSRs.Add(sr, sr.color);
-                sr.color = Color.red;
-            }
+            ChangeSRsColor(Color.red);
         }
 
         public virtual void Unhover()
         {
             if (!isHovered) return;
             isHovered = false;
+            ResetSRsColor();
+        }
+
+        public void ChangeSRsColor(Color color, bool doCache = true)
+        {
+            foreach (var sr in hoverSRs)
+            {
+                if (doCache && !cacheHoveredSRs.ContainsKey(sr))
+                    cacheHoveredSRs.Add(sr, sr.color);
+                sr.color = color;
+            }
+        }
+
+        public void ResetSRsColor()
+        {
             foreach (var sr in cacheHoveredSRs)
                 sr.Key.color = sr.Value;
         }
