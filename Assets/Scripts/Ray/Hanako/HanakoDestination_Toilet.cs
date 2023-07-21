@@ -1,22 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Hanako.Hanako.HanakoEnemySequence;
+using static Hanako.Hanako.HanakoDestination;
 
 namespace Hanako.Hanako
 {
     public class HanakoDestination_Toilet : HanakoDestination
     {
-        public override bool IsOccupied { get => currentOccupant != null || isPossessed; }
-
-        int tri_open, boo_isPossessed;
-        bool isPossessed = false;
+        int tri_open, boo_isPossessed, boo_hanakoPeeks;
 
         protected override void Awake()
         {
             base.Awake();
             tri_open = Animator.StringToHash(nameof(tri_open));
             boo_isPossessed = Animator.StringToHash(nameof(boo_isPossessed));
+            boo_hanakoPeeks = Animator.StringToHash(nameof(boo_hanakoPeeks));
         }
 
         protected override void WhenInteractStart(HanakoEnemy enemy)
@@ -33,9 +31,16 @@ namespace Hanako.Hanako
 
         public void OnAnimationToiletIsOpened()
         {
-            if (IsOccupied) // enemy enters
+            if (occupationMode == OccupationMode.Enemy) // enemy enters
             {
-                currentOccupant.transform.parent = postInteractPos;
+                if (currentOccupant != null)
+                {
+                    currentOccupant.transform.parent = postInteractPos;
+                }
+                else
+                {
+                    Debug.LogWarning($"{gameObject.name}   ERROR !!! NULL currentOccu");
+                }
             }
             else // enemy exits
             {
@@ -46,29 +51,46 @@ namespace Hanako.Hanako
 
         public void Possess(bool playAnimation = false)
         {
-            isPossessed = true;
+            occupationMode = OccupationMode.Player;
             ChangeSRsColor(Color.green);
             destinationUI.ShowPlayerHere();
             if (playAnimation)
+            {
                 PlayAnimationPossessed();
+                PlayAnimationHanakoPeeks();
+            }
         }
 
         public void Dispossess(bool playAnimation = false)
         {
-            isPossessed = false;
+            occupationMode = OccupationMode.Unoccupied;
             ResetSRsColor();
             destinationUI.HidePlayerHere();
             if (playAnimation)
+            {
                 PlayAnimationUnpossessed();
+                PlayAnimationHanakoHides();
+            }
         }
 
         public void PlayAnimationPossessed()
         {
             animator.SetBool(boo_isPossessed, true);
         }
+
         public void PlayAnimationUnpossessed()
         {
             animator.SetBool(boo_isPossessed, false);
+        }
+
+        public void PlayAnimationHanakoPeeks()
+        {
+            animator.SetBool(boo_hanakoPeeks, true);
+        }
+
+        public void PlayAnimationHanakoHides()
+        {
+            animator.SetBool(boo_hanakoPeeks, false);
         }
     }
 }

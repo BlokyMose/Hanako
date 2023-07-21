@@ -8,6 +8,9 @@ namespace Hanako.Hanako
     public class HanakoLevelManager : MonoBehaviour
     {
         [SerializeField]
+        bool isAutoStart = true;
+
+        [SerializeField]
         HanakoEnemySequence enemySequence;
 
         [SerializeField]
@@ -68,6 +71,7 @@ namespace Hanako.Hanako
                 foreach (var destination in destinationSequence.Sequence)
                 {
                     var destinationGO = Instantiate(destination.Prefab, destinationsParent);
+                    destinationGO.name = destinations.Count+"_"+ destinationGO.name;
                     destinationGO.transform.localPosition = destination.Position;
 
                     var destinationComponent = destinationGO.GetComponent<HanakoDestination>();
@@ -115,10 +119,10 @@ namespace Hanako.Hanako
             }
         }
 
-
         private void Start()
         {
-            StartGame();
+            if (isAutoStart)
+                StartGame();
         }
 
         public void StartGame()
@@ -137,10 +141,10 @@ namespace Hanako.Hanako
             }
         }
 
-        public HanakoDestination GetDestination(HanakoDestinationID id)
+        public HanakoDestination GetUnoccupiedDestination(HanakoDestinationID id)
         {
             foreach (var destination in destinations)
-                if (destination.ID == id && !destination.IsOccupied)
+                if (destination.ID == id && destination.Occupation == HanakoDestination.OccupationMode.Unoccupied)
                     return destination;
 
             return null;

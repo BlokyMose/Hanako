@@ -57,7 +57,7 @@ namespace Hanako.Hanako
             this.levelManager = levelManager;
             this.destinationSequence = destinationSequence;
             currentDestinationPointIndex = 0;
-            currentDestination = levelManager.GetDestination(destinationSequence[currentDestinationPointIndex]);
+            currentDestination = levelManager.GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex]);
             if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
                 srEditor.BeOpaqueFromTransparent(0.33f);
         }
@@ -77,7 +77,7 @@ namespace Hanako.Hanako
 
             currentDestinationPointIndex++;
             if (currentDestinationPointIndex < destinationSequence.Count)
-                currentDestination = levelManager.GetDestination(destinationSequence[currentDestinationPointIndex]);
+                currentDestination = levelManager.GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex]);
             else
             {
                 currentDestinationPointIndex = -1;
@@ -112,7 +112,7 @@ namespace Hanako.Hanako
                 thoughtBubble.Hide();
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
 
-                if (!destination.IsOccupied)
+                if (destination.Occupation == HanakoDestination.OccupationMode.Unoccupied)
                 {
                     isKillable = false;
                     yield return StartCoroutine(destination.Interact(this));

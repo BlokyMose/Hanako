@@ -1,8 +1,11 @@
+using Encore.Utility;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.VFX;
 using UnityUtility;
+using static UnityEditor.PlayerSettings;
 
 namespace Hanako.Hanako
 {
@@ -17,15 +20,25 @@ namespace Hanako.Hanako
         [SerializeField]
         float changeAlphaDuration = 0.1f;
 
+        [SerializeField]
+        bool isAutoInvisible = true;
+
 
         [Header("Components")]
+        [SerializeField]
+        VisualEffect pebbleVFX;
+
         [SerializeField]
         Animator animator;
         
         [SerializeField]
         SpriteRendererEditor srEditor;
 
+        [SerializeField]
+        Transform faceTarget;
+
         int boo_isCrawling;
+        Coroutine corCrawling;
 
         void Awake()
         {
@@ -33,49 +46,76 @@ namespace Hanako.Hanako
             if (srEditor==null) srEditor= gameObject.GetComponentInFamily<SpriteRendererEditor>();
 
             boo_isCrawling = Animator.StringToHash(nameof(boo_isCrawling));
-            srEditor.ChangeAlpha(0f);
+            if (isAutoInvisible)
+                srEditor.ChangeAlpha(0f);
+
+            pebbleVFX.SetBool("isPlaying", false);
         }
 
         public void Crawl(HanakoDestination_Toilet fromToilet, HanakoDestination_Toilet toToilet, float duration)
         {
-            StartCoroutine(crawling());
-            IEnumerator crawling()
+            corCrawling = this.RestartCoroutine(Crawling(), corCrawling);
+            IEnumerator Crawling()
             {
                 fromToilet.PlayAnimationUnpossessed();
+                fromToilet.PlayAnimationHanakoHides();
                 animator.SetBool(boo_isCrawling, true);
                 srEditor.BeOpaque(changeAlphaDuration);
 
-                transform.localEulerAngles = new Vector3(0, 0, 90);
-                transform.position = fromToilet.transform.position;
-
+                Vector3 from = fromToilet.transform.position;
+                Vector3 position = toToilet.transform.position;
                 var movePos = new List<Vector2>() 
                 {
-                    new Vector3(fromToilet.transform.position.x, fromToilet.transform.position.y + moveHeight, 0),
-                    new Vector3(toToilet.transform.position.x, toToilet.transform.position.y + moveHeight,0),
-                    new Vector3(toToilet.transform.position.x, toToilet.transform.position.y + endYHeightOffset)
+                    new Vector3(from.x, from.y + moveHeight/2, 0),
+                    new Vector3(from.x, from.y + moveHeight, 0),
+                    new Vector3(position.x, position.y + moveHeight,0),
+                    new Vector3(position.x, position.y + endYHeightOffset)
+                };                
+                var moveDuration = new List<float>() 
+                {
+                    duration*0.25f,
+                    duration*0.15f,
+                    duration*0.30f,
+                    duration*0.30f,
                 };
 
-                var durationPerPos = duration / movePos.Count;
+                transform.SetPositionAndRotation(from, Quaternion.Euler(0, 0, MathUtility.GetAngle(transform.position, movePos[0])));
+                faceTarget.transform.position =  movePos[1];
+
                 var index = 0;
                 var isTransparent = false;
                 var isAnimationtransition = false;
-                foreach (var pos in movePos)
+                var isPebbleVFXActive = false;
+                foreach (var currentMovePos in movePos)
                 {
                     var time = 0f;
                     var originPos = transform.position;
+                    var originPos_Target = faceTarget.transform.position;
                     var originRot = transform.rotation;
-                    
-                    // Calculating target rotation
-                    var direction = pos - (Vector2)transform.position;
-                    var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                    var targetQuaternion = Quaternion.Euler(0, 0, angle);
-                    var durationPerPosRot = durationPerPos / 1.5f;
+                    var targetRotation = Quaternion.Euler(0, 0, MathUtility.GetAngle(transform.position, currentMovePos));
+                    var duration_Rotation = moveDuration[index] / 1.5f;
 
-                    while (time < durationPerPos)
+                    if (!isPebbleVFXActive && index == 1)
+                    {
+                        isPebbleVFXActive = true;
+                        pebbleVFX.SetBool("isPlaying", true);
+                    }
+
+
+                    while (time < moveDuration[index])
                     {
                         time += Time.deltaTime;
-                        transform.position = Vector2.LerpUnclamped(originPos, pos, time / durationPerPos);
-                        transform.rotation = Quaternion.Lerp(originRot, targetQuaternion, time / durationPerPosRot);
+                        transform.position = Vector2.Lerp(originPos, currentMovePos, time /  moveDuration[index]);
+                        if (index < movePos.Count - 1)
+                        {
+                            faceTarget.transform.position = Vector2.Lerp(originPos_Target, movePos[index+1], time / moveDuration[index] );
+                        }
+                        else
+                        {
+                            faceTarget.transform.position = movePos[index];
+                        }
+
+                        transform.rotation = Quaternion.Lerp(originRot, targetRotation, time / duration_Rotation);
 
                         if (index == movePos.Count - 1)
                         {
@@ -83,23 +123,25 @@ namespace Hanako.Hanako
                             {
                                 isAnimationtransition = true;
                                 animator.SetBool(boo_isCrawling, false);
-
+                                pebbleVFX.SetBool("isPlaying", false);
                             }
 
                             if (!isTransparent && 
-                                time > durationPerPos - changeAlphaDuration)
+                                time > moveDuration[index] - changeAlphaDuration)
                             {
                                 toToilet.PlayAnimationPossessed();
                                 isTransparent = true;
-                                srEditor.BeTransparent(0.2f);
+                                srEditor.BeTransparent(changeAlphaDuration);
                             }
                         }
 
-
                         yield return null;
                     }
+
                     index++;
                 }
+
+                toToilet.PlayAnimationHanakoPeeks();
             }
         }
     }

@@ -47,7 +47,7 @@ namespace Hanako.Hanako
             base.ClickState(isClicking);
             if (isClicking)
             {
-                if (hoveredToilet != null && !hoveredToilet.IsOccupied)
+                if (hoveredToilet != null && hoveredToilet.Occupation == HanakoDestination.OccupationMode.Unoccupied)
                 {
                     OnPossess?.Invoke(possessedToilet, hoveredToilet);
                     possessedToilet.Dispossess();
@@ -68,6 +68,7 @@ namespace Hanako.Hanako
 
         void Unhover(HanakoDestination_Toilet toilet)
         {
+            hoveredToilet = null;
             toilet.Unhover();
         }
     }

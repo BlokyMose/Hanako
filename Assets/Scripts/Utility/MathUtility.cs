@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 namespace Encore.Utility
 {
@@ -97,6 +99,12 @@ namespace Encore.Utility
             int minutes = (int)seconds / 60; // calculate the number of minutes
             int sec = (int)seconds % 60; // calculate the number of seconds
             return $"{minutes:D2}:{sec:D2}"; // return the time string in the format "mm:ss"
+        }
+
+        public static float GetAngle(Vector2 from, Vector2 to)
+        {
+            var direction = to - from;
+            return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         }
     }
 }

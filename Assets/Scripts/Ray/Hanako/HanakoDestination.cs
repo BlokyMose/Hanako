@@ -11,6 +11,8 @@ namespace Hanako.Hanako
     [RequireComponent(typeof(Animator))]
     public class HanakoDestination : MonoBehaviour
     {
+        public enum OccupationMode { Unoccupied, Enemy, Player }
+
         [SerializeField]
         private HanakoDestinationID id;
 
@@ -58,6 +60,7 @@ namespace Hanako.Hanako
         protected Dictionary<SpriteRenderer, Color> cacheHoveredSRs = new();
         protected bool isHovered = false;
         protected Vector2 occupantLastPos;
+        protected OccupationMode occupationMode = OccupationMode.Unoccupied;
 
         public event Action<float> OnDurationDepleting;
         public event Action<float> OnDurationStartDepleting;
@@ -69,7 +72,7 @@ namespace Hanako.Hanako
         public HanakoDestinationID ID { get => id; }
         public Transform InteractablePos => interactablePos == null ? transform : interactablePos;
 
-        public virtual bool IsOccupied { get => currentOccupant!=null; }
+        public virtual OccupationMode Occupation { get => occupationMode; }
         public Transform PostInteractPos { get => postInteractPos;  }
 
         protected virtual void Awake()
@@ -120,6 +123,7 @@ namespace Hanako.Hanako
         {
             currentOccupant = enemy;
             durationLeft = interactDuration;
+            occupationMode = OccupationMode.Enemy;
 
             occupantLastPos = enemy.transform.position;
             StartCoroutine(MoveOccupant(enemy, postInteractPos.position, durationToPostInteractPos));
@@ -135,6 +139,7 @@ namespace Hanako.Hanako
             OnDurationEnd?.Invoke();
             lastOccupant = currentOccupant;
             currentOccupant = null;
+            occupationMode = OccupationMode.Unoccupied;
             StartCoroutine(MoveOccupant(enemy, occupantLastPos, durationToPostInteractPos));
             WhenInteractEnd(enemy);
         }
