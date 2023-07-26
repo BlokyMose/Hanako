@@ -18,6 +18,9 @@ namespace Hanako.Hanako
 
         [Header("Components")]
         [SerializeField]
+        HanakoCursor cursor;
+
+        [SerializeField]
         Transform enemiesParent;
 
         [SerializeField]
@@ -44,26 +47,8 @@ namespace Hanako.Hanako
             destinations = SortDestinations(destinations);
             enemies = InstantiateEnemies(enemySequence);
 
-            var cursor = FindAnyObjectByType<HanakoCursor>();
             if (cursor != null)
-            {
-                HanakoDestination_Toilet initialToilet = null;
-                int toiletIndex = 0;
-                int targetIndex = 2;
-                foreach (var destination in destinations)
-                {
-                    if (destination is HanakoDestination_Toilet)
-                    {
-                        initialToilet = destination as HanakoDestination_Toilet;
-                        toiletIndex++;
-                        if (toiletIndex == targetIndex)
-                            break;
-                    }
-                }
-
-                initialToilet.Possess(true);
-                cursor.Init(initialToilet, SetHanakoCrawl);
-            }
+                cursor = FindAnyObjectByType<HanakoCursor>();
 
             List<HanakoDestination> InstantiateDestinations(HanakoDestinationSequence destinationSequence)
             {
@@ -130,7 +115,29 @@ namespace Hanako.Hanako
             StartCoroutine(Delay());
             IEnumerator Delay()
             {
+                if (cursor != null)
+                {
+                    HanakoDestination_Toilet initialToilet = null;
+                    int toiletIndex = 0;
+                    int targetIndex = 2;
+                    foreach (var destination in destinations)
+                    {
+                        if (destination is HanakoDestination_Toilet)
+                        {
+                            initialToilet = destination as HanakoDestination_Toilet;
+                            toiletIndex++;
+                            if (toiletIndex == targetIndex)
+                                break;
+                        }
+                    }
+
+                    initialToilet.Possess(true);
+                    cursor.Init(initialToilet, SetHanakoCrawl);
+                }
+
                 int index = 0;
+
+
                 foreach (var enemy in enemySequence.Sequence)
                 {
                     yield return new WaitForSeconds(enemy.Delay);
