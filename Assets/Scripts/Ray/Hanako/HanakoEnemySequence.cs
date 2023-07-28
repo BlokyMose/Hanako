@@ -14,7 +14,7 @@ namespace Hanako.Hanako
         public class Enemy
         {
             [SerializeField]
-            GameObject prefab;
+            HanakoEnemyID id;
 
             [SerializeField]
             List<HanakoDestinationID> destinationSequence = new();
@@ -22,7 +22,7 @@ namespace Hanako.Hanako
             [SerializeField]
             float delay = 2f;
 
-            public GameObject Prefab { get => prefab; }
+            public HanakoEnemyID ID { get => id; }
             public List<HanakoDestinationID> DestinationSequence { get => destinationSequence; }
             public float Delay { get => delay; }
         }

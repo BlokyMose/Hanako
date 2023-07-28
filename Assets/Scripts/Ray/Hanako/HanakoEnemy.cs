@@ -57,7 +57,7 @@ namespace Hanako.Hanako
             this.levelManager = levelManager;
             this.destinationSequence = destinationSequence;
             currentDestinationPointIndex = 0;
-            currentDestination = levelManager.GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex]);
+            currentDestination = levelManager.GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex], transform.position);
             if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
                 srEditor.BeOpaqueFromTransparent(0.33f);
         }
@@ -77,7 +77,7 @@ namespace Hanako.Hanako
 
             currentDestinationPointIndex++;
             if (currentDestinationPointIndex < destinationSequence.Count)
-                currentDestination = levelManager.GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex]);
+                currentDestination = levelManager.GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex], transform.position);
             else
             {
                 currentDestinationPointIndex = -1;
@@ -124,7 +124,6 @@ namespace Hanako.Hanako
                 {
                     MoveToNextDestination();
                 }
-
             }
         }
 
