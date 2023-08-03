@@ -68,6 +68,7 @@ namespace Hanako
         {
             switch (obstacleType)
             {
+                //机を出す
                 case 0:
 
                     for (int i = 0; i < initialObstacleToSpawn; i++)
@@ -82,6 +83,7 @@ namespace Hanako
 
                     break;
 
+                    //椅子を出す
                  case 1:
                     for (int i = 0; i < initialObstacleToSpawn; i++)
                     {
@@ -95,6 +97,7 @@ namespace Hanako
 
                     break;
 
+                    //教卓を出す
                 case 2:
                     for (int i = 0; i < initialObstacleToSpawn; i++)
                     {
@@ -114,6 +117,7 @@ namespace Hanako
             }
         }
 
+        //オブジェクトを出す間隔
         void ObstacleSpawning()
         {
             if(Time.time > spawnWaitTime)

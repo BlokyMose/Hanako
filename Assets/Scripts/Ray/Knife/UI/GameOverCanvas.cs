@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityUtility;
-using static UnityEditor.Rendering.FilterWindow;
+//using static UnityEditor.Rendering.FilterWindow;
 
 namespace Hanako.Knife
 {
