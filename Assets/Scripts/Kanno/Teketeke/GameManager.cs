@@ -21,8 +21,8 @@ namespace Hanako
 
         // Start is called before the first frame update
         void Start()
-        {        
-            countdownSeconds = countdownMinutes * 60;Å@
+        {
+            countdownSeconds = countdownMinutes * 60;
         }
 
         // Update is called once per frame

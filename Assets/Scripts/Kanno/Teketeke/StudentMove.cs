@@ -29,7 +29,7 @@ namespace Hanako
 
         private void MoveStudent()
         {
-            this.transform.Translate(moveSpeed, 0, 0);@//X²•ûŒü‚É“®‚©‚·
+            this.transform.Translate(moveSpeed, 0, 0);//X²•ûŒü‚É“®‚©‚·
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
