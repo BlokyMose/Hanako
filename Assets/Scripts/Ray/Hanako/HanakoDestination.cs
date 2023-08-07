@@ -52,6 +52,10 @@ namespace Hanako.Hanako
         [SerializeField]
         protected HanakoLevelManager levelManager;
 
+        [Header("Customizations")]
+        [SerializeField]
+        protected HanakoColors colors;
+
 
         protected Animator animator;    
         protected HanakoDestinationUI destinationUI;
@@ -61,12 +65,13 @@ namespace Hanako.Hanako
         protected bool isHovered = false;
         protected Vector2 occupantLastPos;
         protected OccupationMode occupationMode = OccupationMode.Unoccupied;
+        protected HashSet<HanakoEnemy> detectedByEnemies = new();
 
         public event Action<float> OnDurationDepleting;
         public event Action<float> OnDurationStartDepleting;
         public event Action OnDurationEnd;
-        public event Action OnInteractStart;
-        public event Action OnInteractEnd;
+        public event Action OnOccupationStart;
+        public event Action OnOccupationEnd;
 
 
         public HanakoDestinationID ID { get => id; }
@@ -82,7 +87,7 @@ namespace Hanako.Hanako
             {
                 destinationUI = Instantiate(destinationUIPrefab, destinationUIParent).GetComponent<HanakoDestinationUI>();
                 destinationUI.transform.localPosition = Vector3.zero;
-                destinationUI.Init(ref OnDurationStartDepleting, ref OnInteractStart, ref OnInteractEnd);
+                destinationUI.Init(ref OnDurationStartDepleting, ref OnOccupationStart, ref OnOccupationEnd);
             }
 
             if (hoverSRs.Count == 0)
@@ -110,48 +115,57 @@ namespace Hanako.Hanako
         {
             if (isDisplayUI)
             {
-                destinationUI.Exit(ref OnDurationStartDepleting, ref OnInteractStart, ref OnInteractEnd);
+                destinationUI.Exit(ref OnDurationStartDepleting, ref OnOccupationStart, ref OnOccupationEnd);
             }
         }
 
         public void Init(HanakoLevelManager levelManager)
         {
             this.levelManager = levelManager;
+            this.colors = levelManager.Colors;
         }
 
-        public virtual IEnumerator Interact(HanakoEnemy enemy)
+        public virtual IEnumerator Occupy(HanakoEnemy enemy)
         {
             currentOccupant = enemy;
-            durationLeft = interactDuration;
-            occupationMode = OccupationMode.Enemy;
-
             occupantLastPos = enemy.transform.position;
+            occupationMode = OccupationMode.Enemy;
+            if (colors == null) Debug.Log("AAA :"+levelManager+" : "+gameObject.name);
+            ChangeSRsColor(colors.OccupiedColor);
             StartCoroutine(MoveOccupant(enemy, postInteractPos.position, durationToPostInteractPos));
+            WhenOccupationStart(enemy);
 
-            WhenInteractStart(enemy);
-            OnDurationStartDepleting?.Invoke(interactDuration);
-            while (durationLeft > 0f)
-            {
-                durationLeft -= Time.deltaTime;
-                OnDurationDepleting?.Invoke(durationLeft / interactDuration);
-                yield return null;
-            }
-            OnDurationEnd?.Invoke();
+            yield return StartCoroutine(DepletingDuration());
+
             lastOccupant = currentOccupant;
             currentOccupant = null;
             occupationMode = OccupationMode.Unoccupied;
+            ResetSRsColor();
             StartCoroutine(MoveOccupant(enemy, occupantLastPos, durationToPostInteractPos));
-            WhenInteractEnd(enemy);
+            WhenOccupationEnd(enemy);
+
+            IEnumerator DepletingDuration()
+            {
+                OnDurationStartDepleting?.Invoke(interactDuration);
+                durationLeft = interactDuration;
+                while (durationLeft > 0f)
+                {
+                    durationLeft -= Time.deltaTime;
+                    OnDurationDepleting?.Invoke(durationLeft / interactDuration);
+                    yield return null;
+                }
+                OnDurationEnd?.Invoke();
+            }
         }
 
-        protected virtual void WhenInteractStart(HanakoEnemy enemy)
+        protected virtual void WhenOccupationStart(HanakoEnemy enemy)
         {
-            OnInteractStart?.Invoke();
+            OnOccupationStart?.Invoke();
         }
 
-        protected virtual void WhenInteractEnd(HanakoEnemy enemy)
+        protected virtual void WhenOccupationEnd(HanakoEnemy enemy)
         {
-            OnInteractEnd?.Invoke();
+            OnOccupationEnd?.Invoke();
         }
 
         protected IEnumerator MoveOccupant(HanakoEnemy occupant, Vector2 targetPos, float duration)
@@ -172,10 +186,10 @@ namespace Hanako.Hanako
 
         public virtual void Hover()
         {
-            if (isHovered) return;
+            if (isHovered || occupationMode != OccupationMode.Unoccupied) return;
             isHovered = true;
             cacheHoveredSRs = new();
-            ChangeSRsColor(Color.red);
+            ChangeSRsColor(colors.HoverColor);
         }
 
         public virtual void Unhover()
@@ -190,7 +204,9 @@ namespace Hanako.Hanako
             foreach (var sr in hoverSRs)
             {
                 if (doCache && !cacheHoveredSRs.ContainsKey(sr))
+                {
                     cacheHoveredSRs.Add(sr, sr.color);
+                }
                 sr.color = color;
             }
         }
@@ -199,6 +215,16 @@ namespace Hanako.Hanako
         {
             foreach (var sr in cacheHoveredSRs)
                 sr.Key.color = sr.Value;
+        }
+
+        public void AddDetectedBy(HanakoEnemy enemy)
+        {
+            detectedByEnemies.Add(enemy);
+        }
+
+        public void RemoveDetectedBy(HanakoEnemy enemy)
+        {
+            detectedByEnemies.Remove(enemy);
         }
     }
 }

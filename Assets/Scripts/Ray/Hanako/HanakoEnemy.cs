@@ -9,6 +9,10 @@ namespace Hanako.Hanako
     {
         public enum PieceAnimationState { Die = -1, Idle, Run, Attack }
 
+        [Header("Initialization")]
+        [SerializeField]
+        bool autoTransparent = true;
+
         [Header("Properties")]
         [SerializeField]
         float moveSpeed = 1;
@@ -18,6 +22,9 @@ namespace Hanako.Hanako
 
         [Header("Components")]
         [SerializeField]
+        ColliderProxy colDetectArea;
+
+        [SerializeField]
         GameObject thoughtBubblePrefab;
 
         [SerializeField]
@@ -25,6 +32,9 @@ namespace Hanako.Hanako
 
         [SerializeField]
         Animator animator;
+
+        [SerializeField]
+        List<GameObject> gosToDeactivateWhenNotMoving = new();
 
         HanakoLevelManager levelManager;
         HanakoDestination currentDestination;
@@ -44,8 +54,36 @@ namespace Hanako.Hanako
             int_motion = Animator.StringToHash(nameof(int_motion));
             thoughtBubble = Instantiate(thoughtBubblePrefab, thoughtBubbleParent).GetComponent<HanakoThoughtBubble>();
             thoughtBubble.transform.localPosition = Vector3.zero;
-            if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
-                srEditor.ChangeAlpha(0f);
+
+            if (autoTransparent)
+            {
+                if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
+                    srEditor.ChangeAlpha(0f);
+
+                DeactivateGOs(gosToDeactivateWhenNotMoving);
+            }
+
+            if (colDetectArea!=null)
+            {
+                colDetectArea.OnEnter += OnEnter;
+                colDetectArea.OnExit += OnExit;
+
+                void OnEnter(Collider2D col)
+                {
+                    if (col.TryGetComponent<HanakoDestination>(out var destination))
+                    {
+                        destination.AddDetectedBy(this);
+                    }
+                }
+
+                void OnExit(Collider2D col)
+                {
+                    if (col.TryGetComponent<HanakoDestination>(out var destination))
+                    {
+                        destination.RemoveDetectedBy(this);
+                    }
+                }
+            }
         }
 
         void Update()
@@ -95,6 +133,7 @@ namespace Hanako.Hanako
                 isKillable = true;
                 thoughtBubble.Show(destination.ID.Logo, destination.ID.Color);
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
+                ActivateGOs(gosToDeactivateWhenNotMoving);
                 while (true)
                 {
                     var destinationX = destination.InteractablePos.position.x;
@@ -111,11 +150,12 @@ namespace Hanako.Hanako
                 }
                 thoughtBubble.Hide();
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+                DeactivateGOs(gosToDeactivateWhenNotMoving);
 
                 if (destination.Occupation == HanakoDestination.OccupationMode.Unoccupied)
                 {
                     isKillable = false;
-                    yield return StartCoroutine(destination.Interact(this));
+                    yield return StartCoroutine(destination.Occupy(this));
                     isKillable = true;
 
                     MoveToNextDestination();
@@ -124,12 +164,26 @@ namespace Hanako.Hanako
                 {
                     MoveToNextDestination();
                 }
+
+
             }
         }
 
         public void PlayAnimation(PieceAnimationState state)
         {
             animator.SetInteger(int_motion, (int)state);
+        }
+
+        void DeactivateGOs(List<GameObject> gos)
+        {
+            foreach (var go in gos)
+                go.SetActive(false);
+        }
+
+        void ActivateGOs(List<GameObject> gos)
+        {
+            foreach (var go in gos)
+                go.SetActive(true);
         }
     }
 }

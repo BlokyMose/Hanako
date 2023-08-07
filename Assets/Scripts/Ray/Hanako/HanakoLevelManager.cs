@@ -70,11 +70,16 @@ namespace Hanako.Hanako
         [SerializeField]
         float initHanakoSpeed = 0.2f;
 
+        [Header("Customization")]
+        [SerializeField]
+        HanakoColors colors;
+
         List<HanakoDestination> destinations = new();
         List<HanakoEnemy> enemies = new();
         int tri_intoToilet;
 
         public HanakoDestination Door { get => door; }
+        public HanakoColors Colors { get => colors; }
 
         private void Awake()
         {
@@ -92,21 +97,16 @@ namespace Hanako.Hanako
             var initialToilet = GetInitialToilet();
             initHanako.transform.position = (Vector2)initialToilet.InteractablePos.position + new Vector2(-1, -1);
             initProtagonist.transform.position = (Vector2)initialToilet.InteractablePos.position + new Vector2(-1, -1);
+            initProtagonist.gameObject.SetActive(false);    
             initHanako.gameObject.SetActive(false);
+            startBut.gameObject.SetActive(false);
 
-            StartCoroutine(Delay());
-            IEnumerator Delay()
-            {
-                startBut.gameObject.SetActive(false);
-                yield return new WaitForSeconds(delayEnemyList);
-                enemyList.Init(enemySequence, previewPanelCount);
-                yield return new WaitForSeconds(delayStartBut);
-                InitStartBut();
-            }
 
 
             List<HanakoDestination> InstantiateDestinations(HanakoDestinationSequence destinationSequence)
             {
+                door.Init(this);
+
                 var destinations = new List<HanakoDestination>();
                 foreach (var destination in destinationSequence.Sequence)
                 {
@@ -158,41 +158,6 @@ namespace Hanako.Hanako
                 return enemies;
             }
 
-            void InitStartBut()
-            {
-                startBut.gameObject.SetActive(true);
-
-                var startButAnimator = startBut.GetComponent<Animator>();
-                int boo_hover, boo_show;
-                boo_hover = Animator.StringToHash(nameof(boo_hover));
-                boo_show = Animator.StringToHash(nameof(boo_show));
-
-                EventTrigger startBut_et = startBut.gameObject.AddComponent<EventTrigger>();
-                EventTrigger.Entry startBut_entry_enter = new EventTrigger.Entry();
-                startBut_entry_enter.eventID = EventTriggerType.PointerEnter;
-                startBut_entry_enter.callback.AddListener((data) =>
-                {
-                    startButAnimator.SetBool(boo_hover, true);
-                });
-                startBut_et.triggers.Add(startBut_entry_enter);
-
-                EventTrigger.Entry startBut_entry_exit = new EventTrigger.Entry();
-                startBut_entry_exit.eventID = EventTriggerType.PointerExit;
-                startBut_entry_exit.callback.AddListener((data) =>
-                {
-                    startButAnimator.SetBool(boo_hover, false);
-                });
-                startBut_et.triggers.Add(startBut_entry_exit);
-
-                EventTrigger.Entry startBut_entry_click = new EventTrigger.Entry();
-                startBut_entry_click.eventID = EventTriggerType.PointerClick;
-                startBut_entry_click.callback.AddListener((data) =>
-                {
-                    StartGame();
-                    startButAnimator.SetBool(boo_show, false);
-                });
-                startBut_et.triggers.Add(startBut_entry_click);
-            }
         }
 
         private void Start()
@@ -204,6 +169,53 @@ namespace Hanako.Hanako
                 {
                     yield return new WaitForSeconds(delay);
                     StartGame();
+                }
+            }
+            else
+            {
+                StartCoroutine(Delay());
+                IEnumerator Delay()
+                {
+                    yield return new WaitForSeconds(delayEnemyList);
+                    enemyList.Init(enemySequence, previewPanelCount);
+                    yield return new WaitForSeconds(delayStartBut);
+                    InitStartBut();
+
+                    void InitStartBut()
+                    {
+                        startBut.gameObject.SetActive(true);
+
+                        var startButAnimator = startBut.GetComponent<Animator>();
+                        int boo_hover, boo_show;
+                        boo_hover = Animator.StringToHash(nameof(boo_hover));
+                        boo_show = Animator.StringToHash(nameof(boo_show));
+
+                        EventTrigger startBut_et = startBut.gameObject.AddComponent<EventTrigger>();
+                        EventTrigger.Entry startBut_entry_enter = new EventTrigger.Entry();
+                        startBut_entry_enter.eventID = EventTriggerType.PointerEnter;
+                        startBut_entry_enter.callback.AddListener((data) =>
+                        {
+                            startButAnimator.SetBool(boo_hover, true);
+                        });
+                        startBut_et.triggers.Add(startBut_entry_enter);
+
+                        EventTrigger.Entry startBut_entry_exit = new EventTrigger.Entry();
+                        startBut_entry_exit.eventID = EventTriggerType.PointerExit;
+                        startBut_entry_exit.callback.AddListener((data) =>
+                        {
+                            startButAnimator.SetBool(boo_hover, false);
+                        });
+                        startBut_et.triggers.Add(startBut_entry_exit);
+
+                        EventTrigger.Entry startBut_entry_click = new EventTrigger.Entry();
+                        startBut_entry_click.eventID = EventTriggerType.PointerClick;
+                        startBut_entry_click.callback.AddListener((data) =>
+                        {
+                            StartGame();
+                            startButAnimator.SetBool(boo_show, false);
+                        });
+                        startBut_et.triggers.Add(startBut_entry_click);
+                    }
                 }
             }
         }

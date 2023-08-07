@@ -14,9 +14,9 @@ namespace Hanako.Hanako
         [SerializeField]
         Transform extraRunPosition;
 
-        protected override void WhenInteractStart(HanakoEnemy enemy)
+        protected override void WhenOccupationStart(HanakoEnemy enemy)
         {
-            base.WhenInteractStart(enemy);
+            base.WhenOccupationStart(enemy);
             if (enemy.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
                 srEditor.BeTransparent(fadeOutDuration);
             StartCoroutine(MoveOccupant(currentOccupant, extraRunPosition.position, fadeOutDuration));

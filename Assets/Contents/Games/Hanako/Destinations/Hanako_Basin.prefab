@@ -140,7 +140,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2449589202364083203}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.31, y: -3.05, z: 0}
+  m_LocalPosition: {x: -0.31, y: -3.237, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -157,7 +157,7 @@ SortingGroup:
   m_Enabled: 1
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
 --- !u!1 &2526380403258448569
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,6 +387,7 @@ MonoBehaviour:
   excludedHoverSRs:
   - {fileID: 9211277124350771062}
   levelManager: {fileID: 0}
+  colors: {fileID: 0}
 --- !u!1 &6847214412370431653
 GameObject:
   m_ObjectHideFlags: 0

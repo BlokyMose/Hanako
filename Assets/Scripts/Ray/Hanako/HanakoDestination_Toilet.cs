@@ -17,15 +17,15 @@ namespace Hanako.Hanako
             boo_hanakoPeeks = Animator.StringToHash(nameof(boo_hanakoPeeks));
         }
 
-        protected override void WhenInteractStart(HanakoEnemy enemy)
+        protected override void WhenOccupationStart(HanakoEnemy enemy)
         {
-            base.WhenInteractStart(enemy);
+            base.WhenOccupationStart(enemy);
             animator.SetTrigger(tri_open);
         }
 
-        protected override void WhenInteractEnd(HanakoEnemy enemy)
+        protected override void WhenOccupationEnd(HanakoEnemy enemy)
         {
-            base.WhenInteractEnd(enemy);
+            base.WhenOccupationEnd(enemy);
             animator.SetTrigger(tri_open);
         }
 
@@ -52,7 +52,8 @@ namespace Hanako.Hanako
         public void Possess(bool playAnimation = false)
         {
             occupationMode = OccupationMode.Player;
-            ChangeSRsColor(Color.green);
+            ChangeSRsColor(colors.PlayerColor);
+            isHovered = false;
             destinationUI.ShowPlayerHere();
             if (playAnimation)
             {
