@@ -23,6 +23,7 @@ namespace Hanako
         // Update is called once per frame
         void Update()
         {
+            //ˆê’èŠÔ‚²‚Æ‚É‘¬“xã¸
             transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
 
             currentTime += Time.deltaTime;

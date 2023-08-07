@@ -74,8 +74,10 @@ namespace Hanako
             }
         }
 
+
         void CheckForBackGround()
         {
+            //背景と地面を出す間隔
             if(Time.time > waitTime)
             {
                 SetNewGround();
@@ -85,6 +87,7 @@ namespace Hanako
             }
         }
 
+        //新しい地面を出す
         void SetNewGround()
         {
             Vector3 groundPosition = Vector3.zero;
@@ -102,6 +105,7 @@ namespace Hanako
             }
         }
 
+        //新しい背景を出す
         void SetNewBackGround()
         {
             Vector3 backGroundPosition = Vector3.zero;

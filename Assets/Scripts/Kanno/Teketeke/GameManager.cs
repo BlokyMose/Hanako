@@ -22,7 +22,7 @@ namespace Hanako
         // Start is called before the first frame update
         void Start()
         {        
-            countdownSeconds = countdownMinutes * 60;
+            countdownSeconds = countdownMinutes * 60;　
         }
 
         // Update is called once per frame
@@ -35,17 +35,18 @@ namespace Hanako
             if (countdownSeconds <= 0)
             {
                 Time.timeScale = 0;
-                if(iScore < 10)
+                //スコアが10未満の時のスコアを表示
+                if (iScore < 10)
                 {
                     GameEnd1.GameEndShowPanel1();
                 }
-
-                if (10 <= iScore)
+                //スコアが10以上20未満の時スコアを表示
+                if ((10 <= iScore)&&(iScore < 20))
                 {
                     GameEnd2.GameEndShowPanel2();
                 }
-
-                if (50 <= iScore)
+                //スコアが20以上の時のスコアを表示
+                if (20 <= iScore)
                 {
                     GameEnd3.GameEndShowPanel3();
                 }
@@ -56,24 +57,27 @@ namespace Hanako
 
         public void SetScore()
         {
+            //スコアをカウントする
             iScore += 1;
             txtScore.text = "スコア：" + iScore.ToString();
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.gameObject.CompareTag("desk"))
+            //机に当たった時
+            if (other.gameObject.CompareTag("desk")) 
             {
-                countdownSeconds -= 10;
+                countdownSeconds -= 10; 
             }
-
+            //椅子に当たった時
             if (other.gameObject.CompareTag("chair"))
             {
-                countdownSeconds -= 10;
+                countdownSeconds -= 15;
             }
+            //教卓に当たった時
             if (other.gameObject.CompareTag("lectern"))
             {
-                countdownSeconds -= 10;
+                countdownSeconds -= 20;
             }
         }
     }
