@@ -48,13 +48,19 @@ namespace Hanako.Hanako
             if (isClicking)
             {
                 if (possessedToilet != null &&
-                    hoveredToilet != null && 
-                    hoveredToilet.Occupation == HanakoDestination.OccupationMode.Unoccupied)
+                    hoveredToilet != null)
                 {
-                    OnPossess?.Invoke(possessedToilet, hoveredToilet);
-                    possessedToilet.Dispossess();
-                    possessedToilet = hoveredToilet;
-                    possessedToilet.Possess();
+                    if (hoveredToilet.Occupation == HanakoDestination.OccupationMode.Unoccupied)
+                    {
+                        OnPossess?.Invoke(possessedToilet, hoveredToilet);
+                        possessedToilet.Dispossess();
+                        possessedToilet = hoveredToilet;
+                        possessedToilet.Possess();
+                    }
+                    else if (possessedToilet == hoveredToilet)
+                    {
+                        possessedToilet.Attack();
+                    }
                 }
             }
         }

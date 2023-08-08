@@ -1,20 +1,51 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityUtility;
 using static Hanako.Hanako.HanakoDestination;
 
 namespace Hanako.Hanako
 {
     public class HanakoDestination_Toilet : HanakoDestination
     {
-        int tri_open, boo_isPossessed, boo_hanakoPeeks;
+        [SerializeField]
+        ColliderProxy detectArea;
+
+        int tri_open, tri_attack, boo_isPossessed, boo_hanakoPeeks;
+        HashSet<HanakoEnemy> enemiesInDetectArea = new();
 
         protected override void Awake()
         {
             base.Awake();
             tri_open = Animator.StringToHash(nameof(tri_open));
+            tri_attack = Animator.StringToHash(nameof(tri_attack));
             boo_isPossessed = Animator.StringToHash(nameof(boo_isPossessed));
             boo_hanakoPeeks = Animator.StringToHash(nameof(boo_hanakoPeeks));
+
+            if (detectArea != null)
+            {
+                detectArea.OnEnter += OnEnter;
+                detectArea.OnExit += OnExit;
+
+                void OnEnter(Collider2D col)
+                {
+                    if (col.TryGetComponent<HanakoEnemy>(out var enemy))
+                    {
+                        DebugLog.Color(DebugLog.ColorName.Green, "Enter " , enemy.gameObject.name);
+                        enemiesInDetectArea.Add(enemy);
+                    }
+                }
+
+                void OnExit(Collider2D col)
+                {
+                    if (col.TryGetComponent<HanakoEnemy>(out var enemy))
+                    {
+                        Debug.Log("Exit : " + enemy.gameObject.name);
+                        enemiesInDetectArea.Remove(enemy);
+                    }
+                }
+
+            }
         }
 
         protected override void WhenOccupationStart(HanakoEnemy enemy)
@@ -71,6 +102,25 @@ namespace Hanako.Hanako
             {
                 PlayAnimationUnpossessed();
                 PlayAnimationHanakoHides();
+            }
+        }
+
+        public void Attack()
+        {
+            animator.SetTrigger(tri_attack);
+
+            if (detectingEnemies.Count > 0)
+            {
+                Debug.Log(nameof(detectingEnemies.Count) + " : " + detectingEnemies.Count);
+                foreach (var enemy in enemiesInDetectArea)
+                    enemy.ReceiveAttack(this);
+
+                enemiesInDetectArea.Clear();
+            }
+            else
+            {
+
+                Debug.Log("No enemies detected");
             }
         }
 

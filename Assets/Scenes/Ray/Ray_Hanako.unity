@@ -3873,7 +3873,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 0.9101571, g: 1, b: 0.9009434, a: 1}
-  m_Intensity: 0.3
+  m_Intensity: 0.33
   m_LightVolumeIntensity: 1
   m_LightVolumeIntensityEnabled: 0
   m_ApplyToSortingLayers: 250a6cb4000000004d04b676f511c08575eadfaff72e9058
@@ -5839,11 +5839,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3625728510422226015, guid: 7b5b5e1c66a9c8245855a85dae514733, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.305282
+      value: -6.997
       objectReference: {fileID: 0}
     - target: {fileID: 3625728510422226015, guid: 7b5b5e1c66a9c8245855a85dae514733, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -13.768106
+      value: -17.264
       objectReference: {fileID: 0}
     - target: {fileID: 3625728510422226015, guid: 7b5b5e1c66a9c8245855a85dae514733, type: 3}
       propertyPath: m_LocalPosition.z
@@ -6463,11 +6463,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6629668864783541412, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.52
+      value: -3.86
       objectReference: {fileID: 0}
     - target: {fileID: 6629668864783541412, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -13.86
+      value: -17.7
       objectReference: {fileID: 0}
     - target: {fileID: 6629668864783541412, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9329,8 +9329,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isAutoStart: 1
   autoStartDuration: 0
-  enemySequence: {fileID: 11400000, guid: 1e2106e7c2c03a343b60726cd35b603b, type: 2}
-  destinationSequence: {fileID: 11400000, guid: b8184e3b4103ffc4197d5393d4d0a7f8, type: 2}
+  enemySequence: {fileID: 11400000, guid: b11a451a90b0bb64aa443d6ba3557349, type: 2}
+  destinationSequence: {fileID: 11400000, guid: bca8f9dd428bfb649b2dc0d7cf0fca13, type: 2}
   cursor: {fileID: 0}
   enemiesParent: {fileID: 1176296396}
   destinationsParent: {fileID: 2078453598}
@@ -11694,6 +11694,7 @@ MonoBehaviour:
   destinationUIParent: {fileID: 305418277}
   interactablePos: {fileID: 1385774121}
   postInteractPos: {fileID: 776886672}
+  postAttackPos: {fileID: 0}
   durationToPostInteractPos: 0.25
   coloredSRs: []
   hoverSRs: []

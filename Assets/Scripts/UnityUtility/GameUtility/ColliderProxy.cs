@@ -5,13 +5,29 @@ using UnityEngine;
 
 namespace UnityUtility
 {
+    [RequireComponent(typeof(Collider2D))]
     public class ColliderProxy : MonoBehaviour
     {
         public Action<Collider2D> OnEnter;
         public Action<Collider2D> OnExit;
         public Action<Collision2D> OnCollide;
         public Action<Collision2D> OnCollideExit;
+        Collider2D col;
 
+        private void Awake()
+        {
+            col = GetComponent<Collider2D>();
+        }
+
+        public void ActivateCollider()
+        {
+            col.enabled = true;
+        }
+
+        public void DeactivateCollider()
+        {
+            col.enabled = false;
+        }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {

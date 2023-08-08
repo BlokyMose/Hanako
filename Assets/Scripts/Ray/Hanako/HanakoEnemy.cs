@@ -7,7 +7,7 @@ namespace Hanako.Hanako
 {
     public class HanakoEnemy : MonoBehaviour
     {
-        public enum PieceAnimationState { Die = -1, Idle, Run, Attack }
+        public enum PieceAnimationState { Die = -1, Idle, Run, Attack, Pushed }
 
         [Header("Initialization")]
         [SerializeField]
@@ -134,6 +134,7 @@ namespace Hanako.Hanako
                 thoughtBubble.Show(destination.ID.Logo, destination.ID.Color);
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
                 ActivateGOs(gosToDeactivateWhenNotMoving);
+                colDetectArea.ActivateCollider();
                 while (true)
                 {
                     var destinationX = destination.InteractablePos.position.x;
@@ -151,6 +152,7 @@ namespace Hanako.Hanako
                 thoughtBubble.Hide();
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
                 DeactivateGOs(gosToDeactivateWhenNotMoving);
+                colDetectArea.DeactivateCollider();
 
                 if (destination.Occupation == HanakoDestination.OccupationMode.Unoccupied)
                 {
@@ -184,6 +186,34 @@ namespace Hanako.Hanako
         {
             foreach (var go in gos)
                 go.SetActive(true);
+        }
+
+        public void ReceiveAttack(HanakoDestination_Toilet toilet)
+        {
+            if (!isKillable) return;
+            isKillable = false;
+            this.StopCoroutineIfExists(corMoving);
+
+            thoughtBubble.Hide();
+            animator.SetInteger(int_motion, (int)PieceAnimationState.Pushed);
+            colDetectArea.DeactivateCollider();
+            DeactivateGOs(gosToDeactivateWhenNotMoving);
+
+            StartCoroutine(Animating());
+            IEnumerator Animating()
+            {
+                var speed = 5f;
+                while (transform.localScale.x > 0f)
+                {
+                    transform.localScale = new(
+                        transform.localScale.x - speed * Time.deltaTime,
+                        transform.localScale.y - speed * Time.deltaTime);
+
+                    transform.position = Vector2.MoveTowards(transform.position, toilet.PostAttackPos.position, speed * Time.deltaTime);
+
+                    yield return null;
+                }
+            }
         }
     }
 }

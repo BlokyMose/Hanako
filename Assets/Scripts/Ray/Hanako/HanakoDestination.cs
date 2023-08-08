@@ -37,6 +37,9 @@ namespace Hanako.Hanako
         protected Transform postInteractPos;
 
         [SerializeField]
+        protected Transform postAttackPos;
+
+        [SerializeField]
         protected float durationToPostInteractPos = 0.1f;
 
         [Header("Components")]
@@ -65,7 +68,7 @@ namespace Hanako.Hanako
         protected bool isHovered = false;
         protected Vector2 occupantLastPos;
         protected OccupationMode occupationMode = OccupationMode.Unoccupied;
-        protected HashSet<HanakoEnemy> detectedByEnemies = new();
+        protected HashSet<HanakoEnemy> detectingEnemies = new();
 
         public event Action<float> OnDurationDepleting;
         public event Action<float> OnDurationStartDepleting;
@@ -79,6 +82,7 @@ namespace Hanako.Hanako
 
         public virtual OccupationMode Occupation { get => occupationMode; }
         public Transform PostInteractPos { get => postInteractPos;  }
+        public Transform PostAttackPos { get => postAttackPos;  }
 
         protected virtual void Awake()
         {
@@ -219,12 +223,12 @@ namespace Hanako.Hanako
 
         public void AddDetectedBy(HanakoEnemy enemy)
         {
-            detectedByEnemies.Add(enemy);
+            detectingEnemies.Add(enemy);
         }
 
         public void RemoveDetectedBy(HanakoEnemy enemy)
         {
-            detectedByEnemies.Remove(enemy);
+            detectingEnemies.Remove(enemy);
         }
     }
 }

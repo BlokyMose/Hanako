@@ -150,6 +150,7 @@ namespace Hanako.Hanako
                 foreach (var enemy in enemySequence.Sequence)
                 {
                     var enemyGO = Instantiate(enemy.ID.Prefab, enemiesParent);
+                    enemyGO.name = enemies.Count + "_" + enemyGO.name;
                     enemyGO.transform.localPosition = Vector3.zero;
                     var enemyComponent = enemyGO.GetComponent<HanakoEnemy>();
                     enemies.Add(enemyComponent);
