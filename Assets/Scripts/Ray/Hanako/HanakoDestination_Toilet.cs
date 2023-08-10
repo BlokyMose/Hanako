@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityUtility;
 using static Hanako.Hanako.HanakoDestination;
@@ -11,7 +12,11 @@ namespace Hanako.Hanako
         [SerializeField]
         ColliderProxy detectArea;
 
-        int tri_open, tri_attack, boo_isPossessed, boo_hanakoPeeks;
+        [SerializeField]
+        Transform hanakoFront;
+
+        int tri_open, tri_attack, tri_attackFailed, boo_isPossessed, boo_hanakoPeeks;
+        bool canAttack = false;
         HashSet<HanakoEnemy> enemiesInDetectArea = new();
 
         protected override void Awake()
@@ -19,6 +24,7 @@ namespace Hanako.Hanako
             base.Awake();
             tri_open = Animator.StringToHash(nameof(tri_open));
             tri_attack = Animator.StringToHash(nameof(tri_attack));
+            tri_attackFailed = Animator.StringToHash(nameof(tri_attackFailed));
             boo_isPossessed = Animator.StringToHash(nameof(boo_isPossessed));
             boo_hanakoPeeks = Animator.StringToHash(nameof(boo_hanakoPeeks));
 
@@ -31,7 +37,6 @@ namespace Hanako.Hanako
                 {
                     if (col.TryGetComponent<HanakoEnemy>(out var enemy))
                     {
-                        DebugLog.Color(DebugLog.ColorName.Green, "Enter " , enemy.gameObject.name);
                         enemiesInDetectArea.Add(enemy);
                     }
                 }
@@ -40,7 +45,6 @@ namespace Hanako.Hanako
                 {
                     if (col.TryGetComponent<HanakoEnemy>(out var enemy))
                     {
-                        Debug.Log("Exit : " + enemy.gameObject.name);
                         enemiesInDetectArea.Remove(enemy);
                     }
                 }
@@ -80,7 +84,7 @@ namespace Hanako.Hanako
             }
         }
 
-        public void Possess(bool playAnimation = false)
+        public void Possess(float animationDuration, bool playAnimation = false)
         {
             occupationMode = OccupationMode.Player;
             ChangeSRsColor(colors.PlayerColor);
@@ -90,6 +94,14 @@ namespace Hanako.Hanako
             {
                 PlayAnimationPossessed();
                 PlayAnimationHanakoPeeks();
+            }
+
+
+            StartCoroutine(Delay(animationDuration));
+            IEnumerator Delay(float delay)
+            {
+                yield return new WaitForSeconds(delay);
+                canAttack = true;
             }
         }
 
@@ -105,22 +117,49 @@ namespace Hanako.Hanako
             }
         }
 
-        public void Attack()
+        public void Attack(float cooldown, float enemyReceiveAttackDelay)
         {
-            animator.SetTrigger(tri_attack);
+            if (!canAttack) return;
+            canAttack = false;
 
-            if (detectingEnemies.Count > 0)
+            if (IsOuterEnemyDetecting())
             {
-                Debug.Log(nameof(detectingEnemies.Count) + " : " + detectingEnemies.Count);
-                foreach (var enemy in enemiesInDetectArea)
-                    enemy.ReceiveAttack(this);
-
-                enemiesInDetectArea.Clear();
+                LostGame();
             }
             else
             {
+                animator.SetTrigger(tri_attack);
+                
+                foreach (var enemy in enemiesInDetectArea)
+                    enemy.ReceiveAttack(this, enemyReceiveAttackDelay, enemyReceiveAttackDelay / 2f);
+                enemiesInDetectArea.Clear();
+                
+                StartCoroutine(ResetCanAttack(cooldown));
+                IEnumerator ResetCanAttack(float delay)
+                {
+                    yield return new WaitForSeconds(delay);
+                    canAttack = true;
+                }
+            }
 
-                Debug.Log("No enemies detected");
+
+            bool IsOuterEnemyDetecting()
+            {
+                if (detectingEnemies.Count > 0)
+                    foreach (var detectingEnemy in detectingEnemies)
+                        if (!enemiesInDetectArea.Contains(detectingEnemy))
+                            return true;
+
+                return false;
+            }
+
+            void LostGame()
+            {
+                animator.SetTrigger(tri_attackFailed);
+                PlayAnimationHanakoHides();
+                var isFacingRight = detectingEnemies.First().transform.position.x > transform.position.x;
+                hanakoFront.localEulerAngles = new Vector3(0, isFacingRight ? 0 : 180, 0);
+                levelManager.LostGame();
             }
         }
 

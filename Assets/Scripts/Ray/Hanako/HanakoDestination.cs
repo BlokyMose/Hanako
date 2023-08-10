@@ -134,12 +134,14 @@ namespace Hanako.Hanako
             currentOccupant = enemy;
             occupantLastPos = enemy.transform.position;
             occupationMode = OccupationMode.Enemy;
-            if (colors == null) Debug.Log("AAA :"+levelManager+" : "+gameObject.name);
             ChangeSRsColor(colors.OccupiedColor);
             StartCoroutine(MoveOccupant(enemy, postInteractPos.position, durationToPostInteractPos));
             WhenOccupationStart(enemy);
 
             yield return StartCoroutine(DepletingDuration());
+
+            if (levelManager.GameState == HanakoLevelManager.HanakoGameState.Lost)
+                yield break;
 
             lastOccupant = currentOccupant;
             currentOccupant = null;

@@ -12,12 +12,26 @@ namespace Hanako.Hanako
         HanakoDestination_Toilet hoveredToilet;
         HanakoDestination_Toilet possessedToilet;
         event Action<HanakoDestination_Toilet, HanakoDestination_Toilet> OnPossess;
+        HanakoLevelManager levelManager;
+        float possessCooldown = 0f;
 
-        public void Init(HanakoDestination_Toilet possessedToilet, Action<HanakoDestination_Toilet, HanakoDestination_Toilet> onPossess)
+        public HanakoDestination_Toilet PossessedToilet { get => possessedToilet; }
+
+        public void Init(HanakoLevelManager levelManager, HanakoDestination_Toilet initialPossessedToilet, Action<HanakoDestination_Toilet, HanakoDestination_Toilet> onPossess)
         {
-            this.possessedToilet = possessedToilet;
+            this.possessedToilet = initialPossessedToilet;
             OnPossess += onPossess;
+            this.levelManager = levelManager;
 
+            StartCoroutine(Update());
+            IEnumerator Update()
+            {
+                while (true)
+                {
+                    this.possessCooldown -= Time.deltaTime;
+                    yield return null;
+                }
+            }
         }
 
         public void Exit(Action<HanakoDestination_Toilet, HanakoDestination_Toilet> onPossess)
@@ -36,9 +50,10 @@ namespace Hanako.Hanako
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.TryGetComponentInFamily<HanakoDestination_Toilet>(out var toilet) && hoveredToilet == toilet)
+            if (collision.TryGetComponentInFamily<HanakoDestination_Toilet>(out var toilet))
             {
-                Unhover(toilet);
+                if (toilet == hoveredToilet)
+                    Unhover(toilet);
             }
         }
 
@@ -52,14 +67,18 @@ namespace Hanako.Hanako
                 {
                     if (hoveredToilet.Occupation == HanakoDestination.OccupationMode.Unoccupied)
                     {
+                        if (possessCooldown > 0f) return;
+
+                        possessCooldown = levelManager.HanakoMoveDuration;
                         OnPossess?.Invoke(possessedToilet, hoveredToilet);
                         possessedToilet.Dispossess();
                         possessedToilet = hoveredToilet;
-                        possessedToilet.Possess();
+                        possessedToilet.Possess(levelManager.HanakoMoveDuration);
                     }
                     else if (possessedToilet == hoveredToilet)
                     {
-                        possessedToilet.Attack();
+                        possessCooldown = levelManager.AttackCooldown/2f;
+                        possessedToilet.Attack(levelManager.AttackCooldown, levelManager.EnemyReceiveAttackDelay);
                     }
                 }
             }
@@ -67,9 +86,8 @@ namespace Hanako.Hanako
 
         void Hover(HanakoDestination_Toilet toilet)
         {
-            if (hoveredToilet!=null)
+            if (hoveredToilet != null)
                 Unhover(hoveredToilet);
-
             hoveredToilet = toilet;
             hoveredToilet.Hover();
         }

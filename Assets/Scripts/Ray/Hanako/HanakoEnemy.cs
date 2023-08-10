@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityUtility;
 
@@ -7,7 +8,7 @@ namespace Hanako.Hanako
 {
     public class HanakoEnemy : MonoBehaviour
     {
-        public enum PieceAnimationState { Die = -1, Idle, Run, Attack, Pushed }
+        public enum PieceAnimationState { Die = -1, Idle, Run, Attack, Pushed, Scared = 11 }
 
         [Header("Initialization")]
         [SerializeField]
@@ -42,6 +43,7 @@ namespace Hanako.Hanako
         Coroutine corMoving;
         int int_motion;
         bool isKillable = false;
+        bool isAlive = true;
         HanakoThoughtBubble thoughtBubble;
 
         public HanakoDestination CurrentDestinationPoint { get => currentDestination; }
@@ -86,10 +88,6 @@ namespace Hanako.Hanako
             }
         }
 
-        void Update()
-        {
-        }
-
         public void Init(HanakoLevelManager levelManager, List<HanakoDestinationID> destinationSequence)
         {
             this.levelManager = levelManager;
@@ -121,7 +119,7 @@ namespace Hanako.Hanako
                 currentDestinationPointIndex = -1;
                 currentDestination = levelManager.Door;
             }
-            
+
             MoveToCurrentDestination();
         }
 
@@ -149,6 +147,9 @@ namespace Hanako.Hanako
 
                     yield return null;
                 }
+
+                if (!isAlive) yield break;
+
                 thoughtBubble.Hide();
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
                 DeactivateGOs(gosToDeactivateWhenNotMoving);
@@ -171,6 +172,15 @@ namespace Hanako.Hanako
             }
         }
 
+        public void DetectHanako(Vector2 hanakoPos)
+        {
+            this.StopCoroutineIfExists(corMoving);
+            animator.SetInteger(int_motion, (int)PieceAnimationState.Scared);
+            var isFacingRight = hanakoPos.x > transform.position.x;
+            transform.localEulerAngles = new(0, isFacingRight ? 0 : 180, 0);
+            thoughtBubble.Hide();
+        }
+
         public void PlayAnimation(PieceAnimationState state)
         {
             animator.SetInteger(int_motion, (int)state);
@@ -188,11 +198,11 @@ namespace Hanako.Hanako
                 go.SetActive(true);
         }
 
-        public void ReceiveAttack(HanakoDestination_Toilet toilet)
+        public void ReceiveAttack(HanakoDestination_Toilet toilet, float delayScalingAnimation, float scalingAnimationDuration)
         {
             if (!isKillable) return;
             isKillable = false;
-            this.StopCoroutineIfExists(corMoving);
+            isAlive = false; // this will prevent corMoving from entering a destination
 
             thoughtBubble.Hide();
             animator.SetInteger(int_motion, (int)PieceAnimationState.Pushed);
@@ -202,17 +212,22 @@ namespace Hanako.Hanako
             StartCoroutine(Animating());
             IEnumerator Animating()
             {
-                var speed = 5f;
-                while (transform.localScale.x > 0f)
+                yield return new WaitForSeconds(delayScalingAnimation);
+                this.StopCoroutineIfExists(corMoving);
+
+                var time = 0f;
+                var originPos = transform.position;
+                var originScale = transform.localScale;
+                while (time<scalingAnimationDuration)
                 {
-                    transform.localScale = new(
-                        transform.localScale.x - speed * Time.deltaTime,
-                        transform.localScale.y - speed * Time.deltaTime);
-
-                    transform.position = Vector2.MoveTowards(transform.position, toilet.PostAttackPos.position, speed * Time.deltaTime);
-
+                    transform.localScale = Vector2.Lerp(originScale, Vector2.zero, time / scalingAnimationDuration);
+                    transform.position = Vector2.Lerp(originPos, toilet.PostAttackPos.position,time/scalingAnimationDuration);
+                    time += Time.deltaTime;
                     yield return null;
                 }
+
+                transform.position = toilet.PostInteractPos.position;
+                transform.localScale = Vector2.zero;
             }
         }
     }

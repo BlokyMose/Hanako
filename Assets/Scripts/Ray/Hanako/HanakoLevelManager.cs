@@ -9,6 +9,8 @@ namespace Hanako.Hanako
 {
     public class HanakoLevelManager : MonoBehaviour
     {
+        public enum HanakoGameState { Init, Play, Won, Lost }
+
         [SerializeField]
         bool isAutoStart = true;
 
@@ -44,9 +46,15 @@ namespace Hanako.Hanako
         [SerializeField]
         Image startBut;
 
-        [Header("Hanako Crawl")]
+        [Header("Player: Hanako Crawl")]
+        [SerializeField]
+        float attackCooldown = 0.8f;
+
         [SerializeField]
         float hanakoMoveDuration = 1f;
+
+        [SerializeField]
+        float enemyReceiveAttackDelay = 0.25f;
 
         [SerializeField]
         HanakoCrawl hanakoCrawl;
@@ -77,9 +85,16 @@ namespace Hanako.Hanako
         List<HanakoDestination> destinations = new();
         List<HanakoEnemy> enemies = new();
         int tri_intoToilet;
+        bool isPlayerMoving = false;
+        Coroutine corInitializingGame;
+        HanakoGameState gameState = HanakoGameState.Init;
 
         public HanakoDestination Door { get => door; }
         public HanakoColors Colors { get => colors; }
+        public float AttackCooldown { get => attackCooldown; }
+        public float HanakoMoveDuration { get => hanakoMoveDuration; }
+        public float EnemyReceiveAttackDelay { get => enemyReceiveAttackDelay; }
+        public HanakoGameState GameState { get => gameState;  }
 
         private void Awake()
         {
@@ -223,10 +238,11 @@ namespace Hanako.Hanako
 
         public void StartGame()
         {
-            StartCoroutine(Delay());
+            gameState = HanakoGameState.Play;
+            StartCoroutine(AnimatingInitHanako());
+            corInitializingGame = StartCoroutine(InitializingGame());
 
-            StartCoroutine(Update());
-            IEnumerator Update()
+            IEnumerator AnimatingInitHanako()
             {
                 var time = 0f;
                 var initialToilet = GetInitialToilet();
@@ -238,7 +254,7 @@ namespace Hanako.Hanako
                 }
             }
 
-            IEnumerator Delay()
+            IEnumerator InitializingGame()
             {
                 initHanako.SetTrigger(tri_intoToilet);
                 yield return new WaitForSeconds(intoToiletDuration/1.5f);
@@ -246,8 +262,8 @@ namespace Hanako.Hanako
                 if (cursor != null)
                 {
                     var initialToilet = GetInitialToilet();
-                    initialToilet.Possess(true);
-                    cursor.Init(initialToilet, SetHanakoCrawl);
+                    initialToilet.Possess(hanakoMoveDuration, true);
+                    cursor.Init(this, initialToilet, SetHanakoCrawl);
                 }
 
                 int index = 0;
@@ -263,6 +279,21 @@ namespace Hanako.Hanako
                         enemyList.AddPanel(enemy.ID, enemy.DestinationSequence);
                 }
             }
+        }
+
+        public void LostGame()
+        {
+            gameState = HanakoGameState.Lost;
+            StopCoroutine(corInitializingGame);
+            foreach (var enemy in enemies)
+            {
+                enemy.DetectHanako(cursor.PossessedToilet.transform.position);
+            }
+        }
+
+        public void WonGame()
+        {
+            gameState = HanakoGameState.Won;
         }
 
         private HanakoDestination_Toilet GetInitialToilet()
