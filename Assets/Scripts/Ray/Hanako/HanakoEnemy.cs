@@ -6,9 +6,12 @@ using UnityUtility;
 
 namespace Hanako.Hanako
 {
+    [RequireComponent(typeof(SpriteRendererColorSetter))]
     public class HanakoEnemy : MonoBehaviour
     {
         public enum PieceAnimationState { Die = -1, Idle, Run, Attack, Pushed, Scared = 11 }
+
+        public enum HighlightMode { None, Detecting, Attackable }
 
         [Header("Initialization")]
         [SerializeField]
@@ -32,18 +35,23 @@ namespace Hanako.Hanako
         Transform thoughtBubbleParent;
 
         [SerializeField]
+        SpriteRenderer highlightIcon;
+
+        [SerializeField]
         Animator animator;
 
         [SerializeField]
         List<GameObject> gosToDeactivateWhenNotMoving = new();
 
         HanakoLevelManager levelManager;
+        SpriteRendererColorSetter colorSetter;
         HanakoDestination currentDestination;
         int currentDestinationPointIndex;
         Coroutine corMoving;
         int int_motion;
         bool isKillable = false;
         bool isAlive = true;
+        bool hasInitialMove = false;
         HanakoThoughtBubble thoughtBubble;
 
         public HanakoDestination CurrentDestinationPoint { get => currentDestination; }
@@ -51,11 +59,13 @@ namespace Hanako.Hanako
 
         void Awake()
         {
+            colorSetter = GetComponent<SpriteRendererColorSetter>();
             if (animator == null)
                 animator = gameObject.GetComponentInFamily<Animator>();
             int_motion = Animator.StringToHash(nameof(int_motion));
             thoughtBubble = Instantiate(thoughtBubblePrefab, thoughtBubbleParent).GetComponent<HanakoThoughtBubble>();
             thoughtBubble.transform.localPosition = Vector3.zero;
+            highlightIcon.sprite = null;
 
             if (autoTransparent)
             {
@@ -66,9 +76,29 @@ namespace Hanako.Hanako
             }
 
             if (colDetectArea!=null)
+                colDetectArea.DisableCollider();
+        }
+
+        public void Init(HanakoLevelManager levelManager, List<HanakoDestinationID> destinationSequence)
+        {
+            this.levelManager = levelManager;
+            this.destinationSequence = destinationSequence;
+        }
+
+        public void StartInitialMove()
+        {
+            hasInitialMove = true;
+            currentDestinationPointIndex = 0;
+            currentDestination = levelManager.GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex], transform.position);
+            MoveToCurrentDestination();
+            if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
+                srEditor.BeOpaqueFromTransparent(0.33f);
+
+            if (colDetectArea != null)
             {
                 colDetectArea.OnEnter += OnEnter;
                 colDetectArea.OnExit += OnExit;
+                colDetectArea.EnableCollider();
 
                 void OnEnter(Collider2D col)
                 {
@@ -86,16 +116,6 @@ namespace Hanako.Hanako
                     }
                 }
             }
-        }
-
-        public void Init(HanakoLevelManager levelManager, List<HanakoDestinationID> destinationSequence)
-        {
-            this.levelManager = levelManager;
-            this.destinationSequence = destinationSequence;
-            currentDestinationPointIndex = 0;
-            currentDestination = levelManager.GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex], transform.position);
-            if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
-                srEditor.BeOpaqueFromTransparent(0.33f);
         }
 
         public void MoveToCurrentDestination()
@@ -132,7 +152,7 @@ namespace Hanako.Hanako
                 thoughtBubble.Show(destination.ID.Logo, destination.ID.Color);
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
                 ActivateGOs(gosToDeactivateWhenNotMoving);
-                colDetectArea.ActivateCollider();
+                colDetectArea.EnableCollider();
                 while (true)
                 {
                     var destinationX = destination.InteractablePos.position.x;
@@ -153,7 +173,7 @@ namespace Hanako.Hanako
                 thoughtBubble.Hide();
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
                 DeactivateGOs(gosToDeactivateWhenNotMoving);
-                colDetectArea.DeactivateCollider();
+                colDetectArea.DisableCollider();
 
                 if (destination.Occupation == HanakoDestination.OccupationMode.Unoccupied)
                 {
@@ -206,7 +226,7 @@ namespace Hanako.Hanako
 
             thoughtBubble.Hide();
             animator.SetInteger(int_motion, (int)PieceAnimationState.Pushed);
-            colDetectArea.DeactivateCollider();
+            colDetectArea.DisableCollider();
             DeactivateGOs(gosToDeactivateWhenNotMoving);
 
             StartCoroutine(Animating());
@@ -229,6 +249,48 @@ namespace Hanako.Hanako
                 transform.position = toilet.PostInteractPos.position;
                 transform.localScale = Vector2.zero;
             }
+        }
+
+        public void Highlight(HighlightMode highlightMode)
+        {
+            if (!hasInitialMove) return;
+
+            switch (highlightMode)
+            {
+                case HighlightMode.None:
+                    ResetColor();
+                    ResetFeedbackSign();
+                    break;
+                case HighlightMode.Detecting:
+                    ChangeColor(levelManager.Colors.DetectingColor);
+                    ChangeFeedbackSign(levelManager.WarningSign, levelManager.Colors.DetectingColor);
+                    break;
+                case HighlightMode.Attackable:
+                    ChangeColor(levelManager.Colors.AttackableColor);
+                    ChangeFeedbackSign(levelManager.OkCircleSign, levelManager.Colors.AttackableColor);
+                    break;
+            }
+        }
+
+        void ChangeColor(Color color)
+        {
+            colorSetter.ChangeColor(color);
+        }
+
+        void ResetColor()
+        {
+            colorSetter.ResetColorExceptAlpha();
+        }
+
+        void ChangeFeedbackSign(Sprite sprite, Color color)
+        {
+            highlightIcon.sprite = sprite;
+            highlightIcon.color = color.ChangeAlpha(highlightIcon.color.a);
+        }
+
+        void ResetFeedbackSign()
+        {
+            highlightIcon.sprite = null;
         }
     }
 }

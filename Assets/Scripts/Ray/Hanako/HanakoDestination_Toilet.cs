@@ -15,9 +15,17 @@ namespace Hanako.Hanako
         [SerializeField]
         Transform hanakoFront;
 
+        [Header("Action Icon: Attack")]
+        [SerializeField]
+        Sprite actionIcon_Attack;
+
+        [SerializeField]
+        ActionIconMode actionIconMode_Attack = ActionIconMode.Tilting;
+
         int tri_open, tri_attack, tri_attackFailed, boo_isPossessed, boo_hanakoPeeks;
         bool canAttack = false;
         HashSet<HanakoEnemy> enemiesInDetectArea = new();
+        bool isHighligthingEnemies = false;
 
         protected override void Awake()
         {
@@ -36,17 +44,13 @@ namespace Hanako.Hanako
                 void OnEnter(Collider2D col)
                 {
                     if (col.TryGetComponent<HanakoEnemy>(out var enemy))
-                    {
-                        enemiesInDetectArea.Add(enemy);
-                    }
+                        AddEnemyInDetectArea(enemy);
                 }
 
                 void OnExit(Collider2D col)
                 {
                     if (col.TryGetComponent<HanakoEnemy>(out var enemy))
-                    {
-                        enemiesInDetectArea.Remove(enemy);
-                    }
+                        RemoveEnemyInDetectArea(enemy);
                 }
 
             }
@@ -62,6 +66,21 @@ namespace Hanako.Hanako
         {
             base.WhenOccupationEnd(enemy);
             animator.SetTrigger(tri_open);
+        }
+
+        protected override void ShowActionIcon()
+        {
+            if (occupationMode == OccupationMode.Unoccupied)
+            {
+                base.ShowActionIcon();
+            }
+            else if (occupationMode == OccupationMode.Player)
+            {
+                actionIconSR.sprite = actionIcon_Attack;
+                actionIconSR.color = levelManager.Colors.AttackableColor;
+                actionIconAnimator.SetInteger(int_mode, (int)actionIconMode_Attack);
+                actionIconAnimator.SetTrigger(tri_transition);
+            }
         }
 
         public void OnAnimationToiletIsOpened()
@@ -87,8 +106,7 @@ namespace Hanako.Hanako
         public void Possess(float animationDuration, bool playAnimation = false)
         {
             occupationMode = OccupationMode.Player;
-            ChangeSRsColor(colors.PlayerColor);
-            isHovered = false;
+            ChangeColor(colors.PlayerColor);
             destinationUI.ShowPlayerHere();
             if (playAnimation)
             {
@@ -100,16 +118,21 @@ namespace Hanako.Hanako
             StartCoroutine(Delay(animationDuration));
             IEnumerator Delay(float delay)
             {
+                HideActionIcon();
                 yield return new WaitForSeconds(delay);
                 canAttack = true;
+                if (isHovered)
+                    ShowActionIcon();
             }
         }
 
         public void Dispossess(bool playAnimation = false)
         {
             occupationMode = OccupationMode.Unoccupied;
-            ResetSRsColor();
+            ResetColor();
             destinationUI.HidePlayerHere();
+            HideActionIcon();
+
             if (playAnimation)
             {
                 PlayAnimationUnpossessed();
@@ -137,16 +160,19 @@ namespace Hanako.Hanako
                 StartCoroutine(ResetCanAttack(cooldown));
                 IEnumerator ResetCanAttack(float delay)
                 {
+                    HideActionIcon();
                     yield return new WaitForSeconds(delay);
                     canAttack = true;
+                    if (isHovered)
+                        ShowActionIcon();
                 }
             }
 
 
             bool IsOuterEnemyDetecting()
             {
-                if (detectingEnemies.Count > 0)
-                    foreach (var detectingEnemy in detectingEnemies)
+                if (enemiesDetecting.Count > 0)
+                    foreach (var detectingEnemy in enemiesDetecting)
                         if (!enemiesInDetectArea.Contains(detectingEnemy))
                             return true;
 
@@ -157,10 +183,59 @@ namespace Hanako.Hanako
             {
                 animator.SetTrigger(tri_attackFailed);
                 PlayAnimationHanakoHides();
-                var isFacingRight = detectingEnemies.First().transform.position.x > transform.position.x;
+                var isFacingRight = enemiesDetecting.First().transform.position.x > transform.position.x;
                 hanakoFront.localEulerAngles = new Vector3(0, isFacingRight ? 0 : 180, 0);
                 levelManager.LostGame();
             }
+        }
+
+        public void AddEnemyInDetectArea(HanakoEnemy enemy)
+        {
+            enemiesInDetectArea.Add(enemy);
+            if (isHighligthingEnemies)
+                enemy.Highlight(HanakoEnemy.HighlightMode.Attackable);
+        }        
+        
+        public void RemoveEnemyInDetectArea(HanakoEnemy enemy)
+        {
+            enemiesInDetectArea.Remove(enemy);
+            if (isHighligthingEnemies)
+                enemy.Highlight(HanakoEnemy.HighlightMode.None);
+        }
+
+        public override void AddDetectedBy(HanakoEnemy enemy)
+        {
+            base.AddDetectedBy(enemy);
+            if (isHighligthingEnemies && !enemiesInDetectArea.Contains(enemy))
+                enemy.Highlight(HanakoEnemy.HighlightMode.Detecting);
+        }
+
+        public override void RemoveDetectedBy(HanakoEnemy enemy)
+        {
+            base.RemoveDetectedBy(enemy);
+            if (isHighligthingEnemies && !enemiesInDetectArea.Contains(enemy))
+                enemy.Highlight(HanakoEnemy.HighlightMode.None);
+        }
+
+        public void HighlightDetectingEnemies()
+        {
+            isHighligthingEnemies = true;
+            foreach (var enemy in enemiesDetecting)
+                enemy.Highlight(HanakoEnemy.HighlightMode.Detecting);
+
+            foreach (var enemy in enemiesInDetectArea)
+                enemy.Highlight(HanakoEnemy.HighlightMode.Attackable);
+                
+        }        
+        
+        public void ResetHighlightEnemies()
+        {
+            isHighligthingEnemies = false;
+            foreach (var enemy in enemiesDetecting)
+                enemy.Highlight(HanakoEnemy.HighlightMode.None);
+
+            foreach (var enemy in enemiesInDetectArea)
+                enemy.Highlight(HanakoEnemy.HighlightMode.None);
         }
 
         public void PlayAnimationPossessed()

@@ -1,4 +1,5 @@
 using Encore.Utility;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -45,6 +46,12 @@ namespace Hanako.Hanako
 
         [SerializeField]
         Image startBut;
+
+        [SerializeField]
+        Sprite warningSign;
+
+        [SerializeField]
+        Sprite okCircleSign;
 
         [Header("Player: Hanako Crawl")]
         [SerializeField]
@@ -95,6 +102,8 @@ namespace Hanako.Hanako
         public float HanakoMoveDuration { get => hanakoMoveDuration; }
         public float EnemyReceiveAttackDelay { get => enemyReceiveAttackDelay; }
         public HanakoGameState GameState { get => gameState;  }
+        public Sprite WarningSign { get => warningSign; }
+        public Sprite OkCircleSign { get => okCircleSign; }
 
         private void Awake()
         {
@@ -112,9 +121,6 @@ namespace Hanako.Hanako
             var initialToilet = GetInitialToilet();
             initHanako.transform.position = (Vector2)initialToilet.InteractablePos.position + new Vector2(-1, -1);
             initProtagonist.transform.position = (Vector2)initialToilet.InteractablePos.position + new Vector2(-1, -1);
-            initProtagonist.gameObject.SetActive(false);    
-            initHanako.gameObject.SetActive(false);
-            startBut.gameObject.SetActive(false);
 
 
 
@@ -168,6 +174,7 @@ namespace Hanako.Hanako
                     enemyGO.name = enemies.Count + "_" + enemyGO.name;
                     enemyGO.transform.localPosition = Vector3.zero;
                     var enemyComponent = enemyGO.GetComponent<HanakoEnemy>();
+                    enemyComponent.Init(this, enemy.DestinationSequence);
                     enemies.Add(enemyComponent);
                 }
 
@@ -183,6 +190,9 @@ namespace Hanako.Hanako
                 StartCoroutine(Delay(autoStartDuration));
                 IEnumerator Delay(float delay)
                 {
+                    enemyList.gameObject.SetActive(true);
+                    startBut.gameObject.SetActive(false);
+                    enemyList.Init(enemySequence, previewPanelCount);
                     yield return new WaitForSeconds(delay);
                     StartGame();
                 }
@@ -192,7 +202,10 @@ namespace Hanako.Hanako
                 StartCoroutine(Delay());
                 IEnumerator Delay()
                 {
+                    initProtagonist.gameObject.SetActive(true);
+                    enemyList.gameObject.SetActive(false);
                     yield return new WaitForSeconds(delayEnemyList);
+                    enemyList.gameObject.SetActive(true);
                     enemyList.Init(enemySequence, previewPanelCount);
                     yield return new WaitForSeconds(delayStartBut);
                     InitStartBut();
@@ -269,9 +282,9 @@ namespace Hanako.Hanako
                 int index = 0;
                 foreach (var enemy in enemySequence.Sequence)
                 {
+                    enemyList.StartLoadingBarOfFirstPanel(enemy.Delay, colors.LoadingBarColor);
                     yield return new WaitForSeconds(enemy.Delay);
-                    enemies[index].Init(this, enemy.DestinationSequence);
-                    enemies[index].MoveToCurrentDestination();
+                    enemies[index].StartInitialMove();
                     enemyList.RemoveFirstPanel();
                     index++;
                     if (index > previewPanelCount &&

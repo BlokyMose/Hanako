@@ -67,6 +67,11 @@ namespace Hanako.Hanako
             panels.RemoveAt(0);
         }
 
+        public void StartLoadingBarOfFirstPanel(float duration, Color color)
+        {
+            panels[0].FillLoadingBar(duration, color);
+        }
+
         public void AddPanel(HanakoEnemyID id, List<HanakoDestinationID> destinations, float? initScale = null)
         {
             var panel = Instantiate(panelPrefab, panelParent);

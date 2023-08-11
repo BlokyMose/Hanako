@@ -19,6 +19,9 @@ namespace Hanako.Hanako
         [SerializeField]
         Image destinationIconPrefab;
 
+        [SerializeField]
+        Image loadingBar;
+
         Animator animator;
         int boo_show;
         Coroutine corScaling;
@@ -27,6 +30,8 @@ namespace Hanako.Hanako
         {
             animator = GetComponent<Animator>();
             boo_show = Animator.StringToHash(nameof(boo_show));
+            loadingBar.fillAmount = 0f;
+            destinationParent.DestroyChildren();
         }
 
         public void Init(HanakoEnemyID id, List<HanakoDestinationID> destinations, float initScale)
@@ -77,6 +82,22 @@ namespace Hanako.Hanako
         public void Hide()
         {
             animator.SetBool(boo_show, false);
+        }
+
+        public void FillLoadingBar(float duration, Color color)
+        {
+            StartCoroutine(Update());
+            IEnumerator Update()
+            {
+                var time = 0f;
+                loadingBar.color = color;
+                while (time < duration)
+                {
+                    loadingBar.fillAmount = time / duration;
+                    time += Time.deltaTime;
+                    yield return null;
+                }
+            }
         }
     }
 }

@@ -19,13 +19,15 @@ namespace UnityUtility
             col = GetComponent<Collider2D>();
         }
 
-        public void ActivateCollider()
+        public void EnableCollider()
         {
+            if (col == null) Awake();
             col.enabled = true;
         }
 
-        public void DeactivateCollider()
+        public void DisableCollider()
         {
+            if (col == null) Awake();
             col.enabled = false;
         }
 
