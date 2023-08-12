@@ -61,9 +61,6 @@ namespace Hanako.Hanako
         [SerializeField]
         protected List<SpriteRenderer> coloredSRsByID = new();
 
-        [SerializeField]
-        protected HanakoLevelManager levelManager;
-
         [Header("Customizations")]
         [SerializeField]
         protected HanakoColors colors;
@@ -86,6 +83,7 @@ namespace Hanako.Hanako
         public event Action OnDurationEnd;
         public event Action OnOccupationStart;
         public event Action OnOccupationEnd;
+        public event Func<HanakoLevelManager.HanakoGameState> GetGameState;
 
 
         public HanakoDestinationID ID { get => id; }
@@ -128,10 +126,10 @@ namespace Hanako.Hanako
             }
         }
 
-        public void Init(HanakoLevelManager levelManager)
+        public void Init(HanakoColors colors, Func<HanakoLevelManager.HanakoGameState> getGameState)
         {
-            this.levelManager = levelManager;
-            this.colors = levelManager.Colors;
+            this.colors = colors;
+            this.GetGameState = getGameState;   
         }
 
         public virtual IEnumerator Occupy(HanakoEnemy enemy)
@@ -145,7 +143,7 @@ namespace Hanako.Hanako
 
             yield return StartCoroutine(DepletingDuration());
 
-            if (levelManager.GameState == HanakoLevelManager.HanakoGameState.Lost)
+            if (GetGameState() == HanakoLevelManager.HanakoGameState.Lost)
                 yield break;
 
             lastOccupant = currentOccupant;
@@ -207,7 +205,7 @@ namespace Hanako.Hanako
         protected virtual void ShowActionIcon()
         {
             actionIconSR.sprite = actionIcon;
-            actionIconSR.color = levelManager.Colors.PlayerColor;
+            actionIconSR.color = colors.PlayerColor;
             actionIconAnimator.SetInteger(int_mode, (int)actionIconMode);
             actionIconAnimator.SetTrigger(tri_transition);
         }

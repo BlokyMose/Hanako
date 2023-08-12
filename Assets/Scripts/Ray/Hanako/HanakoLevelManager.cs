@@ -35,7 +35,7 @@ namespace Hanako.Hanako
         Transform destinationsParent;
 
         [SerializeField]
-        HanakoDestination door;
+        HanakoDestination_ExitDoor exitDoor;
 
         [Header("UI")]
         [SerializeField]
@@ -85,9 +85,16 @@ namespace Hanako.Hanako
         [SerializeField]
         float initHanakoSpeed = 0.2f;
 
+        [Header("VFX")]
+        [SerializeField]
+        List<GameObject> bloodSplatters = new();
+
         [Header("Customization")]
         [SerializeField]
         HanakoColors colors;
+        
+        [SerializeField]
+        HanakoIcons icons;
 
         List<HanakoDestination> destinations = new();
         List<HanakoEnemy> enemies = new();
@@ -96,7 +103,7 @@ namespace Hanako.Hanako
         Coroutine corInitializingGame;
         HanakoGameState gameState = HanakoGameState.Init;
 
-        public HanakoDestination Door { get => door; }
+        public HanakoDestination Door { get => exitDoor; }
         public HanakoColors Colors { get => colors; }
         public float AttackCooldown { get => attackCooldown; }
         public float HanakoMoveDuration { get => hanakoMoveDuration; }
@@ -117,16 +124,18 @@ namespace Hanako.Hanako
             if (enemyList == null)
                 enemyList = FindAnyObjectByType<HanakoEnemyList>();
 
+            foreach (var bloodSplatter in bloodSplatters)
+                bloodSplatter.SetActive(false);
+
             tri_intoToilet = Animator.StringToHash(nameof(tri_intoToilet));
             var initialToilet = GetInitialToilet();
             initHanako.transform.position = (Vector2)initialToilet.InteractablePos.position + new Vector2(-1, -1);
             initProtagonist.transform.position = (Vector2)initialToilet.InteractablePos.position + new Vector2(-1, -1);
 
 
-
             List<HanakoDestination> InstantiateDestinations(HanakoDestinationSequence destinationSequence)
             {
-                door.Init(this);
+                exitDoor.Init(colors, () => GameState);
 
                 var destinations = new List<HanakoDestination>();
                 foreach (var destination in destinationSequence.Sequence)
@@ -136,7 +145,15 @@ namespace Hanako.Hanako
                     destinationGO.transform.localPosition = destination.Position;
 
                     var destinationComponent = destinationGO.GetComponent<HanakoDestination>();
-                    destinationComponent.Init(this);
+                    if (destinationComponent is HanakoDestination_Toilet)
+                    {
+                        var toilet = destinationComponent as HanakoDestination_Toilet;
+                        toilet.Init(colors, () => GameState, LostGame, PlayBloodSplatter);
+                    }
+                    else
+                    {
+                        destinationComponent.Init(colors, () => GameState);
+                    }
                     destinations.Add(destinationComponent);
                 }
                 return destinations;
@@ -174,7 +191,7 @@ namespace Hanako.Hanako
                     enemyGO.name = enemies.Count + "_" + enemyGO.name;
                     enemyGO.transform.localPosition = Vector3.zero;
                     var enemyComponent = enemyGO.GetComponent<HanakoEnemy>();
-                    enemyComponent.Init(this, enemy.DestinationSequence);
+                    enemyComponent.Init(enemy.DestinationSequence,exitDoor, GetUnoccupiedDestination,colors,icons);
                     enemies.Add(enemyComponent);
                 }
 
@@ -360,5 +377,17 @@ namespace Hanako.Hanako
             hanakoCrawl.Crawl(fromToilet, toToilet, hanakoMoveDuration);
         }
 
+        public void PlayBloodSplatter(float delay = 0.1f)
+        {
+            StartCoroutine(Delay());
+            IEnumerator Delay()
+            {
+                yield return new WaitForSeconds(delay);
+                var bloodSplatter = bloodSplatters.GetRandom();
+                bloodSplatter.SetActive(true);
+                yield return new WaitForSeconds(1.65f);
+                bloodSplatter.SetActive(false);
+            }
+        }
     }
 }

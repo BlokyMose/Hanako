@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.VFX;
 using UnityUtility;
 using static Hanako.Hanako.HanakoDestination;
 
@@ -22,10 +25,22 @@ namespace Hanako.Hanako
         [SerializeField]
         ActionIconMode actionIconMode_Attack = ActionIconMode.Tilting;
 
+        [Header("VFX")]
+        [SerializeField]
+        GameObject vfxSuccessfulAttack;
+
+        [SerializeField]
+        Transform vfxSuccessfulAttackParent;
+
+        event Action OnLostGame;
+        event Action<float> OnVFXSuccessfulAttack;
+
         int tri_open, tri_attack, tri_attackFailed, boo_isPossessed, boo_hanakoPeeks;
         bool canAttack = false;
         HashSet<HanakoEnemy> enemiesInDetectArea = new();
         bool isHighligthingEnemies = false;
+        bool canInstantiateVFXSuccessfulAttack = false;
+
 
         protected override void Awake()
         {
@@ -56,6 +71,13 @@ namespace Hanako.Hanako
             }
         }
 
+        public void Init(HanakoColors colors, Func<HanakoLevelManager.HanakoGameState> getGameState, Action onLostGame, Action<float> onVFXSuccessfulAttack)
+        {
+            base.Init(colors, getGameState);
+            this.OnLostGame += onLostGame;
+            this.OnVFXSuccessfulAttack += onVFXSuccessfulAttack;
+        }
+
         protected override void WhenOccupationStart(HanakoEnemy enemy)
         {
             base.WhenOccupationStart(enemy);
@@ -77,7 +99,7 @@ namespace Hanako.Hanako
             else if (occupationMode == OccupationMode.Player)
             {
                 actionIconSR.sprite = actionIcon_Attack;
-                actionIconSR.color = levelManager.Colors.AttackableColor;
+                actionIconSR.color = colors.AttackableColor;
                 actionIconAnimator.SetInteger(int_mode, (int)actionIconMode_Attack);
                 actionIconAnimator.SetTrigger(tri_transition);
             }
@@ -151,12 +173,16 @@ namespace Hanako.Hanako
             }
             else
             {
+                if (enemiesInDetectArea.Count > 0)
+                {
+                    foreach (var enemy in enemiesInDetectArea)
+                        enemy.ReceiveAttack(this, enemyReceiveAttackDelay, enemyReceiveAttackDelay / 2f);
+                    enemiesInDetectArea.Clear();
+                    canInstantiateVFXSuccessfulAttack = true;
+                }
+
                 animator.SetTrigger(tri_attack);
-                
-                foreach (var enemy in enemiesInDetectArea)
-                    enemy.ReceiveAttack(this, enemyReceiveAttackDelay, enemyReceiveAttackDelay / 2f);
-                enemiesInDetectArea.Clear();
-                
+
                 StartCoroutine(ResetCanAttack(cooldown));
                 IEnumerator ResetCanAttack(float delay)
                 {
@@ -185,13 +211,15 @@ namespace Hanako.Hanako
                 PlayAnimationHanakoHides();
                 var isFacingRight = enemiesDetecting.First().transform.position.x > transform.position.x;
                 hanakoFront.localEulerAngles = new Vector3(0, isFacingRight ? 0 : 180, 0);
-                levelManager.LostGame();
+                OnLostGame?.Invoke();
             }
         }
 
         public void AddEnemyInDetectArea(HanakoEnemy enemy)
         {
+            if (!enemy.IsAlive) return;
             enemiesInDetectArea.Add(enemy);
+
             if (isHighligthingEnemies)
                 enemy.Highlight(HanakoEnemy.HighlightMode.Attackable);
         }        
@@ -256,6 +284,16 @@ namespace Hanako.Hanako
         public void PlayAnimationHanakoHides()
         {
             animator.SetBool(boo_hanakoPeeks, false);
+        }
+
+        /// <summary>Should be called by the animation</summary>
+        public void InstantiateVFXIfSuccessfulAttack()
+        {
+            if (!canInstantiateVFXSuccessfulAttack) return;
+            canInstantiateVFXSuccessfulAttack = false;
+            var vfxGO = Instantiate(vfxSuccessfulAttack, vfxSuccessfulAttackParent);
+            OnVFXSuccessfulAttack?.Invoke(0.1f); //delay
+            Destroy(vfxGO, 2f);
         }
     }
 }

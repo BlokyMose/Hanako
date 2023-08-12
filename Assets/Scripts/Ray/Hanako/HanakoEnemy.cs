@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -43,7 +44,13 @@ namespace Hanako.Hanako
         [SerializeField]
         List<GameObject> gosToDeactivateWhenNotMoving = new();
 
-        HanakoLevelManager levelManager;
+        [Header("Customizations")]
+        [SerializeField]
+        HanakoColors colors;
+
+        [SerializeField]
+        HanakoIcons icons;
+
         SpriteRendererColorSetter colorSetter;
         HanakoDestination currentDestination;
         int currentDestinationPointIndex;
@@ -53,9 +60,13 @@ namespace Hanako.Hanako
         bool isAlive = true;
         bool hasInitialMove = false;
         HanakoThoughtBubble thoughtBubble;
+        HanakoDestination_ExitDoor exitDoor;
 
         public HanakoDestination CurrentDestinationPoint { get => currentDestination; }
         public bool IsKillable { get => isKillable; }
+        public bool IsAlive { get => isAlive; }
+        public List<HanakoDestinationID> DestinationSequence { get => destinationSequence; }
+        public event Func<HanakoDestinationID, Vector2, HanakoDestination> GetUnoccupiedDestination;
 
         void Awake()
         {
@@ -79,17 +90,25 @@ namespace Hanako.Hanako
                 colDetectArea.DisableCollider();
         }
 
-        public void Init(HanakoLevelManager levelManager, List<HanakoDestinationID> destinationSequence)
+        public void Init(
+            List<HanakoDestinationID> destinationSequence, 
+            HanakoDestination_ExitDoor exitDoor, 
+            Func<HanakoDestinationID, Vector2, HanakoDestination> getUnoccupiedDestination,
+            HanakoColors colors,
+            HanakoIcons icons)
         {
-            this.levelManager = levelManager;
             this.destinationSequence = destinationSequence;
+            this.exitDoor = exitDoor;
+            this.GetUnoccupiedDestination = getUnoccupiedDestination;
+            this.colors = colors;
+            this.icons = icons;
         }
 
         public void StartInitialMove()
         {
             hasInitialMove = true;
             currentDestinationPointIndex = 0;
-            currentDestination = levelManager.GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex], transform.position);
+            currentDestination = GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex], transform.position);
             MoveToCurrentDestination();
             if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
                 srEditor.BeOpaqueFromTransparent(0.33f);
@@ -128,16 +147,16 @@ namespace Hanako.Hanako
 
         public void MoveToNextDestination()
         {
-            if (currentDestination == levelManager.Door) // Prevent going to other destination once door has been reached
+            if (currentDestination == exitDoor) // Prevent going to other destination once door has been reached
                 return;
 
             currentDestinationPointIndex++;
             if (currentDestinationPointIndex < destinationSequence.Count)
-                currentDestination = levelManager.GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex], transform.position);
+                currentDestination = GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex], transform.position);
             else
             {
                 currentDestinationPointIndex = -1;
-                currentDestination = levelManager.Door;
+                currentDestination = exitDoor;
             }
 
             MoveToCurrentDestination();
@@ -262,12 +281,12 @@ namespace Hanako.Hanako
                     ResetFeedbackSign();
                     break;
                 case HighlightMode.Detecting:
-                    ChangeColor(levelManager.Colors.DetectingColor);
-                    ChangeFeedbackSign(levelManager.WarningSign, levelManager.Colors.DetectingColor);
+                    ChangeColor(colors.DetectingColor);
+                    ChangeFeedbackSign(icons.WarningIcon, colors.DetectingColor);
                     break;
                 case HighlightMode.Attackable:
-                    ChangeColor(levelManager.Colors.AttackableColor);
-                    ChangeFeedbackSign(levelManager.OkCircleSign, levelManager.Colors.AttackableColor);
+                    ChangeColor(colors.AttackableColor);
+                    ChangeFeedbackSign(icons.OkCircleIcon, colors.AttackableColor);
                     break;
             }
         }
