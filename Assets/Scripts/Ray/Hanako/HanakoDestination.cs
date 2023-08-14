@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityUtility;
+using static Hanako.Hanako.HanakoIcons;
 
 namespace Hanako.Hanako
 {
@@ -13,15 +14,29 @@ namespace Hanako.Hanako
     public class HanakoDestination : MonoBehaviour
     {
         public enum OccupationMode { Unoccupied, Enemy, Player }
-        public enum ActionIconMode { Hide, Tilting, Nodding }
 
         [SerializeField]
         private HanakoDestinationID id;
 
         [SerializeField]
+        int indexOfAllDestinations;
+
+        [SerializeField]
+        int indexOfSameID;
+
+        [SerializeField]
         protected float interactDuration = 1f;
 
         [Header("UI")]
+        [SerializeField]
+        GameObject actionIconPrefab;
+
+        [SerializeField, ShowIf("@"+nameof(actionIconPrefab))]
+        Vector2 actionIconOffset = new();
+
+        [SerializeField]
+        SpriteRenderer logoSR;
+
         [SerializeField]
         bool isDisplayUI = true;
 
@@ -31,18 +46,6 @@ namespace Hanako.Hanako
         [SerializeField, ShowIf(nameof(isDisplayUI))]
         protected Transform destinationUIParent;
 
-        [Header("Action Icon")]
-        [SerializeField]
-        protected SpriteRenderer actionIconSR;
-
-        [SerializeField]
-        protected Animator actionIconAnimator;
-
-        [SerializeField]
-        protected Sprite actionIcon;
-
-        [SerializeField]
-        protected ActionIconMode actionIconMode = ActionIconMode.Tilting;
 
         [Header("Interact")]
         [SerializeField]
@@ -65,8 +68,13 @@ namespace Hanako.Hanako
         [SerializeField]
         protected HanakoColors colors;
 
+        [SerializeField]
+        protected HanakoIcons icons;
 
-        protected Animator animator;    
+
+        protected Animator animator;
+        protected Animator actionIconAnimator;
+        protected SpriteRenderer actionIconSR;
         protected SpriteRendererColorSetter colorSetter;
         protected HanakoDestinationUI destinationUI;
         protected HanakoEnemy currentOccupant, lastOccupant;
@@ -92,6 +100,8 @@ namespace Hanako.Hanako
         public virtual OccupationMode Occupation { get => occupationMode; }
         public Transform PostInteractPos { get => postInteractPos;  }
         public Transform PostAttackPos { get => postAttackPos;  }
+        public int IndexOfAllDestinations { get => indexOfAllDestinations; }
+        public int IndexOfSameID { get => indexOfSameID; }
 
         protected virtual void Awake()
         {
@@ -116,6 +126,15 @@ namespace Hanako.Hanako
 
             if (postInteractPos == null)
                 postInteractPos = transform;
+
+            if (actionIconPrefab != null)
+            {
+                var actionIconGO = Instantiate(actionIconPrefab, transform);
+                actionIconGO.transform.localPosition = actionIconOffset;
+                actionIconAnimator = actionIconGO.GetComponent<Animator>();
+                actionIconSR = actionIconGO.GetComponentInFamily<SpriteRenderer>();
+                colorSetter.RemoveSR(actionIconSR);
+            }
         }
 
         protected virtual void OnDestroy()
@@ -126,10 +145,15 @@ namespace Hanako.Hanako
             }
         }
 
-        public void Init(HanakoColors colors, Func<HanakoLevelManager.HanakoGameState> getGameState)
+        public void Init(HanakoColors colors, HanakoIcons icons, Func<HanakoLevelManager.HanakoGameState> getGameState, int indexOfAllDestinations, int indexOfSameID)
         {
             this.colors = colors;
-            this.GetGameState = getGameState;   
+            this.icons = icons;
+            this.GetGameState = getGameState;
+            this.indexOfAllDestinations = indexOfAllDestinations;
+            this.indexOfSameID = indexOfSameID;
+            logoSR.sprite = id.GetLogo(indexOfSameID);
+            logoSR.color = id.Color.ChangeAlpha(logoSR.color.a);
         }
 
         public virtual IEnumerator Occupy(HanakoEnemy enemy)
@@ -204,15 +228,15 @@ namespace Hanako.Hanako
 
         protected virtual void ShowActionIcon()
         {
-            actionIconSR.sprite = actionIcon;
+            actionIconSR.sprite = icons.ArrownDownIcon;
             actionIconSR.color = colors.PlayerColor;
-            actionIconAnimator.SetInteger(int_mode, (int)actionIconMode);
+            actionIconAnimator.SetInteger(int_mode, (int)icons.ArrowDownAnimation);
             actionIconAnimator.SetTrigger(tri_transition);
         }
 
         protected void HideActionIcon()
         {
-            actionIconAnimator.SetInteger(int_mode, (int)ActionIconMode.Hide);
+            actionIconAnimator.SetInteger(int_mode, (int)icons.HideAnimation);
             actionIconAnimator.SetTrigger(tri_transition);
         }
 

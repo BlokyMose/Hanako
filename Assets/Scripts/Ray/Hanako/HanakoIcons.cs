@@ -10,17 +10,48 @@ namespace Hanako.Hanako
 
     public class HanakoIcons : ScriptableObject
     {
+        public enum ActionIconMode { Hide, Tilting, Nodding }
+
+        [SerializeField, PreviewField]
+        Sprite arrownDownIcon;
+
+        [SerializeField]
+        ActionIconMode arrowDownAnimation = ActionIconMode.Nodding;
+
         [SerializeField, PreviewField]
         Sprite warningIcon;
 
+        [SerializeField]
+        ActionIconMode warningAnimation = ActionIconMode.Tilting;
+        
         [SerializeField, PreviewField]
         Sprite skullIcon;
+
+        [SerializeField]
+        ActionIconMode skullAnimation = ActionIconMode.Tilting;
+        
+        [SerializeField, PreviewField]
+        Sprite attackIcon;
+
+        [SerializeField]
+        ActionIconMode attackAnimation = ActionIconMode.Tilting;
 
         [SerializeField, PreviewField]
         Sprite okCircleIcon;
 
+        [SerializeField]
+        ActionIconMode okCircleAnimation = ActionIconMode.Tilting;
+
+        public Sprite ArrownDownIcon { get => arrownDownIcon; }
+        public ActionIconMode ArrowDownAnimation { get => arrowDownAnimation; }
         public Sprite WarningIcon { get => warningIcon; }
+        public ActionIconMode WarningAnimation { get => warningAnimation; }
         public Sprite SkullIcon { get => skullIcon; }
+        public ActionIconMode SkullAnimation { get => skullAnimation; }
+        public Sprite AttackIcon { get => attackIcon; }
+        public ActionIconMode AttackAnimation { get => attackAnimation; }
         public Sprite OkCircleIcon { get => okCircleIcon; }
+        public ActionIconMode OkCircleAnimation { get => okCircleAnimation; }
+        public ActionIconMode HideAnimation => ActionIconMode.Hide;
     }
 }

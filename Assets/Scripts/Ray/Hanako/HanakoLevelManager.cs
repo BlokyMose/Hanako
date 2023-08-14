@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static Hanako.Hanako.HanakoEnemySequence;
 
 namespace Hanako.Hanako
 {
@@ -135,9 +136,10 @@ namespace Hanako.Hanako
 
             List<HanakoDestination> InstantiateDestinations(HanakoDestinationSequence destinationSequence)
             {
-                exitDoor.Init(colors, () => GameState);
+                exitDoor.Init(colors,icons, () => GameState,0,0);
 
                 var destinations = new List<HanakoDestination>();
+                var destinationIDCounter = new Dictionary<HanakoDestinationID, int>();
                 foreach (var destination in destinationSequence.Sequence)
                 {
                     var destinationGO = Instantiate(destination.Prefab, destinationsParent);
@@ -145,15 +147,23 @@ namespace Hanako.Hanako
                     destinationGO.transform.localPosition = destination.Position;
 
                     var destinationComponent = destinationGO.GetComponent<HanakoDestination>();
+
+                    if (destinationIDCounter.ContainsKey(destinationComponent.ID))
+                        destinationIDCounter[destinationComponent.ID]++;
+                    else
+                        destinationIDCounter.Add(destinationComponent.ID, 0);
+
                     if (destinationComponent is HanakoDestination_Toilet)
                     {
                         var toilet = destinationComponent as HanakoDestination_Toilet;
-                        toilet.Init(colors, () => GameState, LostGame, PlayBloodSplatter);
+                        toilet.Init(colors, icons, () => GameState, destinations.Count, destinationIDCounter[destinationComponent.ID], LostGame, PlayBloodSplatter);
                     }
                     else
                     {
-                        destinationComponent.Init(colors, () => GameState);
+                        destinationComponent.Init(colors,icons, () => GameState, destinations.Count, destinationIDCounter[destinationComponent.ID]);
                     }
+
+
                     destinations.Add(destinationComponent);
                 }
                 return destinations;
@@ -191,7 +201,7 @@ namespace Hanako.Hanako
                     enemyGO.name = enemies.Count + "_" + enemyGO.name;
                     enemyGO.transform.localPosition = Vector3.zero;
                     var enemyComponent = enemyGO.GetComponent<HanakoEnemy>();
-                    enemyComponent.Init(enemy.DestinationSequence,exitDoor, GetUnoccupiedDestination,colors,icons);
+                    enemyComponent.Init(enemy.DestinationSequence,exitDoor, GetDestinationByIDAndIndexOfSameID,colors,icons);
                     enemies.Add(enemyComponent);
                 }
 
@@ -345,31 +355,15 @@ namespace Hanako.Hanako
             return initialToilet;
         }
 
-        public HanakoDestination GetUnoccupiedDestination(HanakoDestinationID id, Vector2 enemyPos)
+        public List<HanakoDestination> GetDestinationsByID(HanakoDestinationID id)
         {
-            HanakoDestination closestDestination = null;
-            float closestDistance = 0f;
+            return destinations.FindAll(x => x.ID == id);
+        }
 
-            foreach (var destination in destinations)
-                if (destination.ID == id && destination.Occupation == HanakoDestination.OccupationMode.Unoccupied)
-                {
-                    if (closestDestination == null)
-                    {
-                        closestDestination = destination;
-                        closestDistance = Vector2.Distance(closestDestination.transform.position, enemyPos);
-                    }
-                    else 
-                    {
-                        var distance = Vector2.Distance(destination.transform.position, enemyPos);
-                        if (distance < closestDistance)
-                        {
-                            closestDestination = destination;
-                            closestDistance = distance;
-                        }
-                    }
-                }
-
-            return closestDestination;
+        public HanakoDestination GetDestinationByIDAndIndexOfSameID(HanakoDestinationID id, int indexOfSameID)
+        {
+            var foundDestinations = GetDestinationsByID(id);
+            return foundDestinations.Find(x=>x.IndexOfSameID == indexOfSameID);
         }
 
         public void SetHanakoCrawl(HanakoDestination_Toilet fromToilet, HanakoDestination_Toilet toToilet)

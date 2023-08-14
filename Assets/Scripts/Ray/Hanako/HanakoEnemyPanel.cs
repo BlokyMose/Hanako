@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityUtility;
+using static Hanako.Hanako.HanakoEnemySequence;
 
 namespace Hanako.Hanako
 {
@@ -34,14 +35,14 @@ namespace Hanako.Hanako
             destinationParent.DestroyChildren();
         }
 
-        public void Init(HanakoEnemyID id, List<HanakoDestinationID> destinations, float initScale)
+        public void Init(HanakoEnemyID id, List<DestinationProperties> destinations, float initScale)
         {
             icon.sprite = id.Logo;
             foreach (var destination in destinations)
             {
                 var destinationIcon = Instantiate(destinationIconPrefab, destinationParent);
-                destinationIcon.sprite = destination.Logo;
-                destinationIcon.color = destination.Color;
+                destinationIcon.sprite = destination.ID.GetLogo(destination.Index);
+                destinationIcon.color = destination.ID.Color;
             }
             transform.localScale = new(initScale, initScale, initScale);
         }

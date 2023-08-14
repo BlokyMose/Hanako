@@ -429,7 +429,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: {fileID: 11400000, guid: 675f4ae44c2fc244883f683538491bab, type: 2}
+  indexOfAllDestinations: 0
+  indexOfSameID: 0
   interactDuration: 3
+  logoSR: {fileID: 9211277124350771062}
   isDisplayUI: 1
   destinationUIPrefab: {fileID: 5820015688587343391, guid: 86424fdd2775feb49b6c282531f54b7b, type: 3}
   destinationUIParent: {fileID: 228566283139743725}
@@ -442,7 +445,6 @@ MonoBehaviour:
   postAttackPos: {fileID: 0}
   durationToPostInteractPos: 0.1
   coloredSRsByID: []
-  levelManager: {fileID: 0}
   colors: {fileID: 0}
 --- !u!114 &7721893342779395478
 MonoBehaviour:

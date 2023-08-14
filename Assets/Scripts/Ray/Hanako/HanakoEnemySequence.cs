@@ -11,19 +11,32 @@ namespace Hanako.Hanako
     public class HanakoEnemySequence : ScriptableObject
     {
         [Serializable]
+        public class DestinationProperties
+        {
+            [SerializeField, HorizontalGroup(0.75f), LabelWidth(0.1f)]
+            HanakoDestinationID destinationID;
+
+            [SerializeField, HorizontalGroup, LabelWidth(0.1f)]
+            int index;
+
+            public HanakoDestinationID ID { get => destinationID; }
+            public int Index { get => index; }
+        }
+
+        [Serializable]
         public class Enemy
         {
             [SerializeField]
             HanakoEnemyID id;
 
             [SerializeField]
-            List<HanakoDestinationID> destinationSequence = new();
+            List<DestinationProperties> destinationSequence = new();
 
             [SerializeField]
             float delay = 2f;
 
             public HanakoEnemyID ID { get => id; }
-            public List<HanakoDestinationID> DestinationSequence { get => destinationSequence; }
+            public List<DestinationProperties> DestinationSequence { get => destinationSequence; }
             public float Delay { get => delay; }
         }
 

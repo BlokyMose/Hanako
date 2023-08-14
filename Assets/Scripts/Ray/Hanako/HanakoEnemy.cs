@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityUtility;
+using static Hanako.Hanako.HanakoEnemySequence;
+using static Hanako.Hanako.HanakoLevelManager;
 
 namespace Hanako.Hanako
 {
@@ -23,7 +25,7 @@ namespace Hanako.Hanako
         float moveSpeed = 1;
 
         [SerializeField]
-        List<HanakoDestinationID> destinationSequence = new();
+        List<DestinationProperties> destinationSequence = new();
 
         [Header("Components")]
         [SerializeField]
@@ -65,8 +67,8 @@ namespace Hanako.Hanako
         public HanakoDestination CurrentDestinationPoint { get => currentDestination; }
         public bool IsKillable { get => isKillable; }
         public bool IsAlive { get => isAlive; }
-        public List<HanakoDestinationID> DestinationSequence { get => destinationSequence; }
-        public event Func<HanakoDestinationID, Vector2, HanakoDestination> GetUnoccupiedDestination;
+        public List<DestinationProperties> DestinationSequence { get => destinationSequence; }
+        public event Func<HanakoDestinationID, int, HanakoDestination> GetDestinationByID;
 
         void Awake()
         {
@@ -91,15 +93,15 @@ namespace Hanako.Hanako
         }
 
         public void Init(
-            List<HanakoDestinationID> destinationSequence, 
+            List<DestinationProperties> destinationSequence, 
             HanakoDestination_ExitDoor exitDoor, 
-            Func<HanakoDestinationID, Vector2, HanakoDestination> getUnoccupiedDestination,
+            Func<HanakoDestinationID,int, HanakoDestination> getDestinationByID,
             HanakoColors colors,
             HanakoIcons icons)
         {
             this.destinationSequence = destinationSequence;
             this.exitDoor = exitDoor;
-            this.GetUnoccupiedDestination = getUnoccupiedDestination;
+            this.GetDestinationByID = getDestinationByID;
             this.colors = colors;
             this.icons = icons;
         }
@@ -108,7 +110,7 @@ namespace Hanako.Hanako
         {
             hasInitialMove = true;
             currentDestinationPointIndex = 0;
-            currentDestination = GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex], transform.position);
+            currentDestination = GetDestinationByID(destinationSequence[currentDestinationPointIndex].ID, destinationSequence[currentDestinationPointIndex].Index);
             MoveToCurrentDestination();
             if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
                 srEditor.BeOpaqueFromTransparent(0.33f);
@@ -152,7 +154,7 @@ namespace Hanako.Hanako
 
             currentDestinationPointIndex++;
             if (currentDestinationPointIndex < destinationSequence.Count)
-                currentDestination = GetUnoccupiedDestination(destinationSequence[currentDestinationPointIndex], transform.position);
+                currentDestination = GetDestinationByID(destinationSequence[currentDestinationPointIndex].ID, destinationSequence[currentDestinationPointIndex].Index);
             else
             {
                 currentDestinationPointIndex = -1;
@@ -168,7 +170,7 @@ namespace Hanako.Hanako
             IEnumerator Moving()
             {
                 isKillable = true;
-                thoughtBubble.Show(destination.ID.Logo, destination.ID.Color);
+                thoughtBubble.Show(destination.ID.GetLogo(destination.IndexOfSameID), destination.ID.Color);
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
                 ActivateGOs(gosToDeactivateWhenNotMoving);
                 colDetectArea.EnableCollider();
@@ -278,15 +280,15 @@ namespace Hanako.Hanako
             {
                 case HighlightMode.None:
                     ResetColor();
-                    ResetFeedbackSign();
+                    ResetHighlightIcon();
                     break;
                 case HighlightMode.Detecting:
                     ChangeColor(colors.DetectingColor);
-                    ChangeFeedbackSign(icons.WarningIcon, colors.DetectingColor);
+                    ChangeHighlightIcon(icons.WarningIcon, colors.DetectingColor);
                     break;
                 case HighlightMode.Attackable:
                     ChangeColor(colors.AttackableColor);
-                    ChangeFeedbackSign(icons.OkCircleIcon, colors.AttackableColor);
+                    ChangeHighlightIcon(icons.AttackIcon, colors.AttackableColor);
                     break;
             }
         }
@@ -301,13 +303,13 @@ namespace Hanako.Hanako
             colorSetter.ResetColorExceptAlpha();
         }
 
-        void ChangeFeedbackSign(Sprite sprite, Color color)
+        void ChangeHighlightIcon(Sprite sprite, Color color)
         {
             highlightIcon.sprite = sprite;
             highlightIcon.color = color.ChangeAlpha(highlightIcon.color.a);
         }
 
-        void ResetFeedbackSign()
+        void ResetHighlightIcon()
         {
             highlightIcon.sprite = null;
         }

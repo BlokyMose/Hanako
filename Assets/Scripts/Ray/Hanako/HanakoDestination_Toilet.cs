@@ -6,7 +6,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
 using UnityUtility;
-using static Hanako.Hanako.HanakoDestination;
 
 namespace Hanako.Hanako
 {
@@ -17,13 +16,6 @@ namespace Hanako.Hanako
 
         [SerializeField]
         Transform hanakoFront;
-
-        [Header("Action Icon: Attack")]
-        [SerializeField]
-        Sprite actionIcon_Attack;
-
-        [SerializeField]
-        ActionIconMode actionIconMode_Attack = ActionIconMode.Tilting;
 
         [Header("VFX")]
         [SerializeField]
@@ -71,9 +63,9 @@ namespace Hanako.Hanako
             }
         }
 
-        public void Init(HanakoColors colors, Func<HanakoLevelManager.HanakoGameState> getGameState, Action onLostGame, Action<float> onVFXSuccessfulAttack)
+        public void Init(HanakoColors colors, HanakoIcons icons, Func<HanakoLevelManager.HanakoGameState> getGameState, int indexOfAllDestinations, int indexOfSameID, Action onLostGame, Action<float> onVFXSuccessfulAttack)
         {
-            base.Init(colors, getGameState);
+            base.Init(colors, icons, getGameState, indexOfAllDestinations,indexOfSameID);
             this.OnLostGame += onLostGame;
             this.OnVFXSuccessfulAttack += onVFXSuccessfulAttack;
         }
@@ -94,13 +86,13 @@ namespace Hanako.Hanako
         {
             if (occupationMode == OccupationMode.Unoccupied)
             {
-                base.ShowActionIcon();
+                base.ShowActionIcon(); // Arrow down icon & animation
             }
             else if (occupationMode == OccupationMode.Player)
             {
-                actionIconSR.sprite = actionIcon_Attack;
+                actionIconSR.sprite = icons.AttackIcon;
                 actionIconSR.color = colors.AttackableColor;
-                actionIconAnimator.SetInteger(int_mode, (int)actionIconMode_Attack);
+                actionIconAnimator.SetInteger(int_mode, (int)icons.AttackAnimation);
                 actionIconAnimator.SetTrigger(tri_transition);
             }
         }
@@ -141,6 +133,7 @@ namespace Hanako.Hanako
             IEnumerator Delay(float delay)
             {
                 HideActionIcon();
+                canAttack = false;
                 yield return new WaitForSeconds(delay);
                 canAttack = true;
                 if (isHovered)
