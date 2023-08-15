@@ -25,6 +25,9 @@ namespace Hanako.Hanako
         [SerializeField]
         HanakoDestinationSequence destinationSequence;
 
+        [SerializeField]
+        HanakoDistractionSequence distractionSequence;
+
         [Header("Components")]
         [SerializeField]
         HanakoCursor cursor;
@@ -90,6 +93,9 @@ namespace Hanako.Hanako
         [SerializeField]
         List<GameObject> bloodSplatters = new();
 
+        [SerializeField]
+        List<GameObject> bloodSplattersBig = new();
+
         [Header("Customization")]
         [SerializeField]
         HanakoColors colors;
@@ -98,6 +104,7 @@ namespace Hanako.Hanako
         HanakoIcons icons;
 
         List<HanakoDestination> destinations = new();
+        List<HanakoDistraction> distractions= new();
         List<HanakoEnemy> enemies = new();
         int tri_intoToilet;
         bool isPlayerMoving = false;
@@ -117,6 +124,7 @@ namespace Hanako.Hanako
         {
             destinations = InstantiateDestinations(destinationSequence);
             destinations = SortDestinations(destinations);
+            //distractions = InstantiateDistractions(distractionSequence);
             enemies = InstantiateEnemies(enemySequence);
 
             if (cursor == null)
@@ -126,6 +134,9 @@ namespace Hanako.Hanako
                 enemyList = FindAnyObjectByType<HanakoEnemyList>();
 
             foreach (var bloodSplatter in bloodSplatters)
+                bloodSplatter.SetActive(false);
+
+            foreach (var bloodSplatter in bloodSplattersBig)
                 bloodSplatter.SetActive(false);
 
             tri_intoToilet = Animator.StringToHash(nameof(tri_intoToilet));
@@ -192,6 +203,23 @@ namespace Hanako.Hanako
                 return sortedDestinations;
             }
 
+            List<HanakoDistraction> InstantiateDistractions(HanakoDistractionSequence distractionSequence)
+            {
+                var distractions = new List<HanakoDistraction>();
+                foreach (var distraction in distractionSequence.Sequence)
+                {
+                    var distractionGO = Instantiate(distraction.Prefab, destinationsParent);
+                    distractionGO.name = distractions.Count + "_" + distractionGO.name;
+                    distractionGO.transform.localPosition = distraction.Position;
+
+                    var distractionComponent = distractionGO.GetComponent<HanakoDistraction>();
+                    distractionComponent.Init(colors, icons, () => GameState);
+
+                    distractions.Add(distractionComponent);
+                }
+                return distractions;
+            }
+
             List<HanakoEnemy> InstantiateEnemies(HanakoEnemySequence enemySequence)
             {
                 var enemies = new List<HanakoEnemy>();
@@ -201,7 +229,7 @@ namespace Hanako.Hanako
                     enemyGO.name = enemies.Count + "_" + enemyGO.name;
                     enemyGO.transform.localPosition = Vector3.zero;
                     var enemyComponent = enemyGO.GetComponent<HanakoEnemy>();
-                    enemyComponent.Init(enemy.DestinationSequence,exitDoor, GetDestinationByIDAndIndexOfSameID,colors,icons);
+                    enemyComponent.Init(enemy.DestinationSequence,exitDoor, GetDestinationByIDAndIndexOfSameID,()=>GameState, colors,icons);
                     enemies.Add(enemyComponent);
                 }
 
@@ -314,9 +342,12 @@ namespace Hanako.Hanako
                     enemies[index].StartInitialMove();
                     enemyList.RemoveFirstPanel();
                     index++;
-                    if (index > previewPanelCount &&
-                        index < enemySequence.Sequence.Count)
+
+                    // Add panel of the rest of the enemies
+                    if (index <= enemySequence.Sequence.Count - previewPanelCount)
                         enemyList.AddPanel(enemy.ID, enemy.DestinationSequence);
+                    else
+                        enemyList.IncrementPanelScale();
                 }
             }
         }
@@ -371,15 +402,15 @@ namespace Hanako.Hanako
             hanakoCrawl.Crawl(fromToilet, toToilet, hanakoMoveDuration);
         }
 
-        public void PlayBloodSplatter(float delay = 0.1f)
+        public void PlayBloodSplatter(int killedEnemiesCount = 1, float delay = 0.1f)
         {
             StartCoroutine(Delay());
             IEnumerator Delay()
             {
                 yield return new WaitForSeconds(delay);
-                var bloodSplatter = bloodSplatters.GetRandom();
+                var bloodSplatter = killedEnemiesCount > 1 ? bloodSplattersBig.GetRandom() : bloodSplatters.GetRandom();
                 bloodSplatter.SetActive(true);
-                yield return new WaitForSeconds(1.65f);
+                yield return new WaitForSeconds(2.15f);
                 bloodSplatter.SetActive(false);
             }
         }

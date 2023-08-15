@@ -19,7 +19,7 @@ namespace Hanako.Hanako
         float maxScale = 1f;
 
         [SerializeField]
-        float scaleSpeed = 0.1f;
+        float scaleSpeed = 0.5f;
 
         [Header("Components")]
         [SerializeField]
@@ -63,7 +63,7 @@ namespace Hanako.Hanako
         public void RemoveFirstPanel()
         {
             if (panels.Count == 0) return;
-            panels[0].Hide();
+            panels[0].HideAndDestroy();
             panels.RemoveAt(0);
         }
 
@@ -83,13 +83,13 @@ namespace Hanako.Hanako
 
         public void IncrementPanelScale()
         {
-            var actualPanelCount = previewPanelCount;
-            if (panels.Count < actualPanelCount)
-                actualPanelCount = panels.Count;
+            var actualPreviewPanelCount = previewPanelCount;
+            if (panels.Count < actualPreviewPanelCount)
+                actualPreviewPanelCount = panels.Count;
 
-            var incrementScale = (maxScale - minScale) / actualPanelCount;
-            for (int i = 0; i < actualPanelCount; i++)
-                panels[i].SetScale(minScale + incrementScale * (actualPanelCount-i), scaleSpeed);
+            var incrementScale = (maxScale - minScale) / actualPreviewPanelCount;
+            for (int i = 0; i < actualPreviewPanelCount; i++)
+                panels[i].SetScale(minScale + incrementScale * (actualPreviewPanelCount-i), scaleSpeed);
         }
     }
 }

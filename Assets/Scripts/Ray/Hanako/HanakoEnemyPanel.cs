@@ -10,6 +10,9 @@ namespace Hanako.Hanako
     [RequireComponent(typeof(Animator))]
     public class HanakoEnemyPanel : MonoBehaviour
     {
+        [SerializeField]
+        float hideAnimationDuration = 0.65f;
+
         [Header("Components")]
         [SerializeField]
         Image icon;
@@ -49,7 +52,8 @@ namespace Hanako.Hanako
 
         public void SetScale(float scale, float speed)
         {
-            corScaling = this.RestartCoroutine(Scaling(),corScaling);
+            StartCoroutine(Scaling());
+            //corScaling = this.RestartCoroutine(Scaling(),corScaling);
             IEnumerator Scaling()
             {
                 if (transform.localScale.x < scale)
@@ -80,9 +84,10 @@ namespace Hanako.Hanako
             }
         }
 
-        public void Hide()
+        public void HideAndDestroy()
         {
             animator.SetBool(boo_show, false);
+            Destroy(gameObject, hideAnimationDuration);
         }
 
         public void FillLoadingBar(float duration, Color color)

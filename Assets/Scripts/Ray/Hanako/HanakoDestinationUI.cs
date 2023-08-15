@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityUtility;
 
 namespace Hanako.Hanako
 {
@@ -15,8 +16,11 @@ namespace Hanako.Hanako
         [SerializeField]
         Animator fillAnimator;
 
+        bool hasPreAnimation; // example FromEmptyToFull animation will have FullToEmpty animation first for some seconds
+        const float preAnimationDuration = 0.33f;
         int int_mode, flo_speed, boo_show;
         Animator animator;
+        Coroutine corFilling;
 
         private void Awake()
         {
@@ -27,17 +31,20 @@ namespace Hanako.Hanako
             Hide();
         }
 
-        public void Init(ref Action<float> onStartFill, ref Action onShow, ref Action onHide)
+        public void Init(bool hasPreAnimation, ref Action<float> onFullToEmpy, ref Action<float> onEmptyToFull, ref Action onShow, ref Action onHide)
         {
-            onStartFill += StartFullToIdle;
+            this.hasPreAnimation = hasPreAnimation;
+            onFullToEmpy += StartFullToEmpty;
+            onEmptyToFull += StartEmptyToFull;
             onShow += Show;
             onHide += Hide;
         }
 
 
-        public void Exit(ref Action<float> onStartFill, ref Action onShow, ref Action onHide)
+        public void Exit(ref Action<float> onFullToEmpty, ref Action<float> onEmptyToFull, ref Action onShow, ref Action onHide)
         {
-            onStartFill -= StartFullToIdle;
+            onFullToEmpty -= StartFullToEmpty;
+            onEmptyToFull -= StartEmptyToFull;
             onShow -= Show;
             onHide -= Hide;
         }
@@ -52,21 +59,51 @@ namespace Hanako.Hanako
             animator.SetBool(boo_show, false);
         }
 
-        public void StartFullToIdle(float duration)
+        public void StartFullToEmpty(float duration)
         {
-            const float durationToFull = 0.33f;
-            StartCoroutine(Delay());
-            IEnumerator Delay()
+            if (hasPreAnimation)
             {
-                fillAnimator.SetInteger(int_mode, (int)FillMode.Full);
-                fillAnimator.SetFloat(flo_speed, 1f/durationToFull);
+                corFilling = this.RestartCoroutine(Delay(), corFilling);
+                IEnumerator Delay()
+                {
+                    fillAnimator.SetInteger(int_mode, (int)FillMode.Full);
+                    fillAnimator.SetFloat(flo_speed, 1f / preAnimationDuration);
 
-                yield return new WaitForSeconds(durationToFull);
+                    yield return new WaitForSeconds(preAnimationDuration);
 
+                    fillAnimator.SetInteger(int_mode, (int)FillMode.Idle);
+                    fillAnimator.SetFloat(flo_speed, 1f / (duration - preAnimationDuration));
+                }
+            }
+            else
+            {
                 fillAnimator.SetInteger(int_mode, (int)FillMode.Idle);
-                fillAnimator.SetFloat(flo_speed, 1f/(duration-durationToFull));
+                fillAnimator.SetFloat(flo_speed, 1f / duration);
             }
 
+        }
+
+        public void StartEmptyToFull(float duration)
+        {
+            if (hasPreAnimation)
+            {
+                corFilling = this.RestartCoroutine(Delay(), corFilling);
+                IEnumerator Delay()
+                {
+                    fillAnimator.SetInteger(int_mode, (int)FillMode.Idle);
+                    fillAnimator.SetFloat(flo_speed, 1f / preAnimationDuration);
+
+                    yield return new WaitForSeconds(preAnimationDuration);
+
+                    fillAnimator.SetInteger(int_mode, (int)FillMode.Full);
+                    fillAnimator.SetFloat(flo_speed, 1f / (duration - preAnimationDuration));
+                }
+            }
+            else
+            {
+                fillAnimator.SetInteger(int_mode, (int)FillMode.Full);
+                fillAnimator.SetFloat(flo_speed, 1f / duration);
+            }
         }
 
         public void HideFill()

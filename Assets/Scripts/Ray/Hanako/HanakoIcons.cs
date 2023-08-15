@@ -10,7 +10,7 @@ namespace Hanako.Hanako
 
     public class HanakoIcons : ScriptableObject
     {
-        public enum ActionIconMode { Hide, Tilting, Nodding }
+        public enum ActionIconMode { Hide, Tilting, Nodding, Beating }
 
         [SerializeField, PreviewField]
         Sprite arrownDownIcon;
@@ -42,6 +42,12 @@ namespace Hanako.Hanako
         [SerializeField]
         ActionIconMode okCircleAnimation = ActionIconMode.Tilting;
 
+        [SerializeField, PreviewField]
+        Sprite distractionIcon;
+
+        [SerializeField]
+        ActionIconMode distractionAnimation = ActionIconMode.Beating;
+
         public Sprite ArrownDownIcon { get => arrownDownIcon; }
         public ActionIconMode ArrowDownAnimation { get => arrowDownAnimation; }
         public Sprite WarningIcon { get => warningIcon; }
@@ -53,5 +59,8 @@ namespace Hanako.Hanako
         public Sprite OkCircleIcon { get => okCircleIcon; }
         public ActionIconMode OkCircleAnimation { get => okCircleAnimation; }
         public ActionIconMode HideAnimation => ActionIconMode.Hide;
+
+        public Sprite DistractionIcon { get => distractionIcon; }
+        public ActionIconMode DistractionAnimation { get => distractionAnimation; }
     }
 }

@@ -17,9 +17,8 @@ namespace Hanako.Hanako
         protected override void WhenOccupationStart(HanakoEnemy enemy)
         {
             base.WhenOccupationStart(enemy);
-            if (enemy.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
-                srEditor.BeTransparent(fadeOutDuration);
             StartCoroutine(MoveOccupant(currentOccupant, extraRunPosition.position, fadeOutDuration));
+            enemy.ReachedExitDoor(fadeOutDuration);
         }
     }
 }

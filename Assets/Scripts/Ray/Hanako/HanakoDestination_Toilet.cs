@@ -9,7 +9,7 @@ using UnityUtility;
 
 namespace Hanako.Hanako
 {
-    public class HanakoDestination_Toilet : HanakoDestination
+    public class HanakoDestination_Toilet : HanakoDestination, IHanakoInteractableByCursor
     {
         [SerializeField]
         ColliderProxy detectArea;
@@ -25,13 +25,14 @@ namespace Hanako.Hanako
         Transform vfxSuccessfulAttackParent;
 
         event Action OnLostGame;
-        event Action<float> OnVFXSuccessfulAttack;
+        event Action<int, float> OnVFXSuccessfulAttack; // killedEnemies, delay
 
         int tri_open, tri_attack, tri_attackFailed, boo_isPossessed, boo_hanakoPeeks;
         bool canAttack = false;
         HashSet<HanakoEnemy> enemiesInDetectArea = new();
         bool isHighligthingEnemies = false;
         bool canInstantiateVFXSuccessfulAttack = false;
+        int killedEnemiesInLastAttack = 0;
 
 
         protected override void Awake()
@@ -63,7 +64,7 @@ namespace Hanako.Hanako
             }
         }
 
-        public void Init(HanakoColors colors, HanakoIcons icons, Func<HanakoLevelManager.HanakoGameState> getGameState, int indexOfAllDestinations, int indexOfSameID, Action onLostGame, Action<float> onVFXSuccessfulAttack)
+        public void Init(HanakoColors colors, HanakoIcons icons, Func<HanakoLevelManager.HanakoGameState> getGameState, int indexOfAllDestinations, int indexOfSameID, Action onLostGame, Action<int, float> onVFXSuccessfulAttack)
         {
             base.Init(colors, icons, getGameState, indexOfAllDestinations,indexOfSameID);
             this.OnLostGame += onLostGame;
@@ -137,7 +138,10 @@ namespace Hanako.Hanako
                 yield return new WaitForSeconds(delay);
                 canAttack = true;
                 if (isHovered)
+                {
+                    Hover();
                     ShowActionIcon();
+                }
             }
         }
 
@@ -170,8 +174,9 @@ namespace Hanako.Hanako
                 {
                     foreach (var enemy in enemiesInDetectArea)
                         enemy.ReceiveAttack(this, enemyReceiveAttackDelay, enemyReceiveAttackDelay / 2f);
-                    enemiesInDetectArea.Clear();
+                    killedEnemiesInLastAttack = enemiesInDetectArea.Count;
                     canInstantiateVFXSuccessfulAttack = true;
+                    enemiesInDetectArea.Clear();
                 }
 
                 animator.SetTrigger(tri_attack);
@@ -183,7 +188,10 @@ namespace Hanako.Hanako
                     yield return new WaitForSeconds(delay);
                     canAttack = true;
                     if (isHovered)
+                    {
                         ShowActionIcon();
+                        Hover();
+                    }
                 }
             }
 
@@ -210,7 +218,7 @@ namespace Hanako.Hanako
 
         public void AddEnemyInDetectArea(HanakoEnemy enemy)
         {
-            if (!enemy.IsAlive) return;
+            if (!enemy.IsAlive || !enemy.IsKillable) return;
             enemiesInDetectArea.Add(enemy);
 
             if (isHighligthingEnemies)
@@ -238,19 +246,23 @@ namespace Hanako.Hanako
                 enemy.Highlight(HanakoEnemy.HighlightMode.None);
         }
 
-        public void HighlightDetectingEnemies()
+        public override void Hover()
         {
+            base.Hover();
+
+            if (occupationMode != OccupationMode.Player) return;
             isHighligthingEnemies = true;
             foreach (var enemy in enemiesDetecting)
                 enemy.Highlight(HanakoEnemy.HighlightMode.Detecting);
 
             foreach (var enemy in enemiesInDetectArea)
                 enemy.Highlight(HanakoEnemy.HighlightMode.Attackable);
-                
-        }        
-        
-        public void ResetHighlightEnemies()
+        }
+
+        public override void Unhover()
         {
+            base.Unhover();
+            if (occupationMode != OccupationMode.Player) return;
             isHighligthingEnemies = false;
             foreach (var enemy in enemiesDetecting)
                 enemy.Highlight(HanakoEnemy.HighlightMode.None);
@@ -285,7 +297,7 @@ namespace Hanako.Hanako
             if (!canInstantiateVFXSuccessfulAttack) return;
             canInstantiateVFXSuccessfulAttack = false;
             var vfxGO = Instantiate(vfxSuccessfulAttack, vfxSuccessfulAttackParent);
-            OnVFXSuccessfulAttack?.Invoke(0.1f); //delay
+            OnVFXSuccessfulAttack?.Invoke(killedEnemiesInLastAttack, 0.1f); //delay
             Destroy(vfxGO, 2f);
         }
     }

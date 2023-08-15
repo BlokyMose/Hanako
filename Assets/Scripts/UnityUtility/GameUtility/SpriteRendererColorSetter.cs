@@ -33,7 +33,7 @@ namespace Hanako
             }
 
             foreach (var sr in srs)
-                initialColors.Add(sr, sr.color);
+                initialColors.AddIfHasnt(sr, sr.color);
         }
 
         public void ChangeColor(Color color)

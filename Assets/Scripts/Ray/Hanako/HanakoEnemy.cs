@@ -1,7 +1,7 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityUtility;
 using static Hanako.Hanako.HanakoEnemySequence;
@@ -10,11 +10,12 @@ using static Hanako.Hanako.HanakoLevelManager;
 namespace Hanako.Hanako
 {
     [RequireComponent(typeof(SpriteRendererColorSetter))]
+    [RequireComponent(typeof(Collider2D))]
     public class HanakoEnemy : MonoBehaviour
     {
-        public enum PieceAnimationState { Die = -1, Idle, Run, Attack, Pushed, Scared = 11 }
+        public enum PieceAnimationState { Die = -1, Idle, Run, Attack, Pushed, Scared = 11, Stiffed = 12, PointingScared = 13 }
 
-        public enum HighlightMode { None, Detecting, Attackable }
+        public enum HighlightMode { None, Detecting, Attackable, Distractable }
 
         [Header("Initialization")]
         [SerializeField]
@@ -43,6 +44,16 @@ namespace Hanako.Hanako
         [SerializeField]
         Animator animator;
 
+        [Header("Rig: Flashlight")]
+        [SerializeField]
+        Transform flashlight;
+
+        [SerializeField, ShowIf("@"+nameof(flashlight))]
+        Transform flashlightTarget;
+
+        [SerializeField, ShowIf("@" + nameof(flashlight))]
+        Transform flashlightPointingPos;
+
         [SerializeField]
         List<GameObject> gosToDeactivateWhenNotMoving = new();
 
@@ -53,6 +64,7 @@ namespace Hanako.Hanako
         [SerializeField]
         HanakoIcons icons;
 
+        Collider2D col;
         SpriteRendererColorSetter colorSetter;
         HanakoDestination currentDestination;
         int currentDestinationPointIndex;
@@ -63,15 +75,22 @@ namespace Hanako.Hanako
         bool hasInitialMove = false;
         HanakoThoughtBubble thoughtBubble;
         HanakoDestination_ExitDoor exitDoor;
+        Vector2 flashlightAimOriginLocalPos, flashlightOriginLocalPos;
 
         public HanakoDestination CurrentDestinationPoint { get => currentDestination; }
         public bool IsKillable { get => isKillable; }
         public bool IsAlive { get => isAlive; }
         public List<DestinationProperties> DestinationSequence { get => destinationSequence; }
         public event Func<HanakoDestinationID, int, HanakoDestination> GetDestinationByID;
+        public event Func<HanakoGameState> GetGameState;
 
         void Awake()
         {
+            flashlightAimOriginLocalPos = flashlightTarget.localPosition;
+            flashlightOriginLocalPos = flashlight.localPosition;
+            col = GetComponent<Collider2D>();
+            col.enabled = false;
+
             colorSetter = GetComponent<SpriteRendererColorSetter>();
             if (animator == null)
                 animator = gameObject.GetComponentInFamily<Animator>();
@@ -93,21 +112,24 @@ namespace Hanako.Hanako
         }
 
         public void Init(
-            List<DestinationProperties> destinationSequence, 
-            HanakoDestination_ExitDoor exitDoor, 
-            Func<HanakoDestinationID,int, HanakoDestination> getDestinationByID,
+            List<DestinationProperties> destinationSequence,
+            HanakoDestination_ExitDoor exitDoor,
+            Func<HanakoDestinationID, int, HanakoDestination> getDestinationByID,
+            Func<HanakoGameState> getGameState,
             HanakoColors colors,
             HanakoIcons icons)
         {
             this.destinationSequence = destinationSequence;
             this.exitDoor = exitDoor;
             this.GetDestinationByID = getDestinationByID;
+            this.GetGameState = getGameState;
             this.colors = colors;
             this.icons = icons;
         }
 
         public void StartInitialMove()
         {
+            col.enabled = true;
             hasInitialMove = true;
             currentDestinationPointIndex = 0;
             currentDestination = GetDestinationByID(destinationSequence[currentDestinationPointIndex].ID, destinationSequence[currentDestinationPointIndex].Index);
@@ -166,14 +188,21 @@ namespace Hanako.Hanako
 
         public void MoveTo(HanakoDestination destination)
         {
+            if (!isAlive || (GetGameState !=null && GetGameState() != HanakoGameState.Play)) return;
+
+            flashlightTarget.localPosition = flashlightAimOriginLocalPos;
+            flashlight.localPosition = flashlightOriginLocalPos;
             corMoving = this.RestartCoroutine(Moving(), corMoving);
             IEnumerator Moving()
             {
-                isKillable = true;
+                col.enabled = true;
                 thoughtBubble.Show(destination.ID.GetLogo(destination.IndexOfSameID), destination.ID.Color);
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
                 ActivateGOs(gosToDeactivateWhenNotMoving);
                 colDetectArea.EnableCollider();
+                isKillable = true;
+
+                // Moving
                 while (true)
                 {
                     var destinationX = destination.InteractablePos.position.x;
@@ -191,35 +220,32 @@ namespace Hanako.Hanako
 
                 if (!isAlive) yield break;
 
-                thoughtBubble.Hide();
-                animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
-                DeactivateGOs(gosToDeactivateWhenNotMoving);
-                colDetectArea.DisableCollider();
-
                 if (destination.Occupation == HanakoDestination.OccupationMode.Unoccupied)
                 {
+                    col.enabled = false;
+                    Highlight(HighlightMode.None); // in case RemoveEnemyInDetectArea not called because "isKillable = false" below executed first
+                    thoughtBubble.Hide();
+                    animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+                    DeactivateGOs(gosToDeactivateWhenNotMoving);
+                    colDetectArea.DisableCollider();
                     isKillable = false;
+
+
                     yield return StartCoroutine(destination.Occupy(this));
-                    isKillable = true;
-
-                    MoveToNextDestination();
-                }
-                else
-                {
-                    MoveToNextDestination();
                 }
 
-
+                MoveToNextDestination();
             }
         }
 
         public void DetectHanako(Vector2 hanakoPos)
         {
             this.StopCoroutineIfExists(corMoving);
-            animator.SetInteger(int_motion, (int)PieceAnimationState.Scared);
+            animator.SetInteger(int_motion, (int)PieceAnimationState.PointingScared);
             var isFacingRight = hanakoPos.x > transform.position.x;
             transform.localEulerAngles = new(0, isFacingRight ? 0 : 180, 0);
             thoughtBubble.Hide();
+            flashlightTarget.position = hanakoPos;
         }
 
         public void PlayAnimation(PieceAnimationState state)
@@ -274,26 +300,30 @@ namespace Hanako.Hanako
 
         public void Highlight(HighlightMode highlightMode)
         {
-            if (!hasInitialMove) return;
+            if (!hasInitialMove || !isAlive || !isKillable) return;
 
             switch (highlightMode)
             {
                 case HighlightMode.None:
                     ResetColor();
-                    ResetHighlightIcon();
+                    HideHighlightIcon();
                     break;
                 case HighlightMode.Detecting:
-                    ChangeColor(colors.DetectingColor);
-                    ChangeHighlightIcon(icons.WarningIcon, colors.DetectingColor);
+                    SetColor(colors.DetectingColor);
+                    SetHighlightIcon(icons.WarningIcon, colors.DetectingColor);
                     break;
                 case HighlightMode.Attackable:
-                    ChangeColor(colors.AttackableColor);
-                    ChangeHighlightIcon(icons.AttackIcon, colors.AttackableColor);
+                    SetColor(colors.AttackableColor);
+                    SetHighlightIcon(icons.AttackIcon, colors.AttackableColor);
+                    break;                
+                case HighlightMode.Distractable:
+                    SetColor(colors.AttackableColor);
+                    SetHighlightIcon(icons.DistractionIcon, colors.AttackableColor);
                     break;
             }
         }
 
-        void ChangeColor(Color color)
+        void SetColor(Color color)
         {
             colorSetter.ChangeColor(color);
         }
@@ -303,15 +333,40 @@ namespace Hanako.Hanako
             colorSetter.ResetColorExceptAlpha();
         }
 
-        void ChangeHighlightIcon(Sprite sprite, Color color)
+        void SetHighlightIcon(Sprite sprite, Color color)
         {
             highlightIcon.sprite = sprite;
             highlightIcon.color = color.ChangeAlpha(highlightIcon.color.a);
         }
 
-        void ResetHighlightIcon()
+        void HideHighlightIcon()
         {
             highlightIcon.sprite = null;
+        }
+
+        public void ReceiveDistraction(Vector2 distractionPos)
+        {
+            if (!isAlive || !IsKillable) return;
+            this.StopCoroutineIfExists(corMoving);
+            var isFacingRight = transform.position.x < distractionPos.x;
+            transform.localEulerAngles = new(0, isFacingRight ? 0 : 180, 0);
+            animator.SetInteger(int_motion, (int)PieceAnimationState.Stiffed);
+
+            if (flashlight != null)
+            {
+                flashlight.position = flashlightPointingPos.position;
+                flashlightTarget.position = distractionPos;
+            }
+        }
+
+        public void ReachedExitDoor(float fadeOutDuration)
+        {
+            isAlive = false;
+            isKillable = false;
+            HideHighlightIcon();
+            DeactivateGOs(gosToDeactivateWhenNotMoving);
+            if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
+                srEditor.BeTransparent(fadeOutDuration);
         }
     }
 }
