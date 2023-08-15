@@ -98,6 +98,7 @@ namespace Hanako.Hanako
             }
         }
 
+        // Should be called by animation
         public void OnAnimationToiletIsOpened()
         {
             if (occupationMode == OccupationMode.Enemy) // enemy enters
@@ -105,15 +106,15 @@ namespace Hanako.Hanako
                 if (currentOccupant != null)
                 {
                     currentOccupant.transform.parent = postInteractPos;
-                }
-                else
-                {
-                    Debug.LogWarning($"{gameObject.name}   ERROR !!! NULL currentOccu");
+
+                    // in case this function not called when two enemies enter & exit at the same time
+                    if (lastOccupant != null && lastOccupant.transform.parent == postInteractPos)
+                        lastOccupant.transform.parent = null;
                 }
             }
             else // enemy exits
             {
-                if (lastOccupant!=null)
+                if (lastOccupant != null)
                     lastOccupant.transform.parent = null;
             }
         }
@@ -128,7 +129,6 @@ namespace Hanako.Hanako
                 PlayAnimationPossessed();
                 PlayAnimationHanakoPeeks();
             }
-
 
             StartCoroutine(Delay(animationDuration));
             IEnumerator Delay(float delay)

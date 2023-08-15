@@ -28,7 +28,6 @@ namespace Hanako.Hanako
 
         Animator animator;
         int boo_show;
-        Coroutine corScaling;
 
         private void Awake()
         {
@@ -50,10 +49,9 @@ namespace Hanako.Hanako
             transform.localScale = new(initScale, initScale, initScale);
         }
 
-        public void SetScale(float scale, float speed)
+        public void PlayScaleAnmation(float scale, float speed)
         {
             StartCoroutine(Scaling());
-            //corScaling = this.RestartCoroutine(Scaling(),corScaling);
             IEnumerator Scaling()
             {
                 if (transform.localScale.x < scale)
@@ -82,6 +80,11 @@ namespace Hanako.Hanako
 
                 transform.localScale = new(scale, scale, scale);
             }
+        }
+
+        public void SetScale(float scale)
+        {
+            transform.localScale = new(scale, scale, scale);
         }
 
         public void HideAndDestroy()

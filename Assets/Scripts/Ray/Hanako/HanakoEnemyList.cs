@@ -57,7 +57,7 @@ namespace Hanako.Hanako
                 AddPanel(enemy.ID, enemy.DestinationSequence, minScale + incrementScale * (actualPanelCount - i));
             }
 
-            panels[0].SetScale(maxScale, scaleSpeed);
+            panels[0].PlayScaleAnmation(maxScale, scaleSpeed);
         }
 
         public void RemoveFirstPanel()
@@ -78,10 +78,9 @@ namespace Hanako.Hanako
             panel.Init(id, destinations, (float)(initScale != null ? initScale : this.minScale)) ;
             panels.Add(panel);
             panel.transform.SetAsFirstSibling();
-            IncrementPanelScale();
         }
 
-        public void IncrementPanelScale()
+        public void IncrementPanelsScale()
         {
             var actualPreviewPanelCount = previewPanelCount;
             if (panels.Count < actualPreviewPanelCount)
@@ -89,7 +88,7 @@ namespace Hanako.Hanako
 
             var incrementScale = (maxScale - minScale) / actualPreviewPanelCount;
             for (int i = 0; i < actualPreviewPanelCount; i++)
-                panels[i].SetScale(minScale + incrementScale * (actualPreviewPanelCount-i), scaleSpeed);
+                panels[i].PlayScaleAnmation(minScale + incrementScale * (actualPreviewPanelCount-i), scaleSpeed);
         }
     }
 }

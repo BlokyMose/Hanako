@@ -169,9 +169,9 @@ namespace Hanako.Hanako
 
         public virtual IEnumerator Occupy(HanakoEnemy enemy)
         {
+            occupationMode = OccupationMode.Enemy;
             currentOccupant = enemy;
             occupantLastPos = enemy.transform.position;
-            occupationMode = OccupationMode.Enemy;
             ChangeColor(colors.OccupiedColor);
             StartCoroutine(MoveOccupant(enemy, postInteractPos.position, durationToPostInteractPos));
             WhenOccupationStart(enemy);
@@ -183,10 +183,10 @@ namespace Hanako.Hanako
 
             lastOccupant = currentOccupant;
             currentOccupant = null;
-            occupationMode = OccupationMode.Unoccupied;
             ResetColor();
             StartCoroutine(MoveOccupant(enemy, occupantLastPos, durationToPostInteractPos));
             WhenOccupationEnd(enemy);
+            occupationMode = OccupationMode.Unoccupied;
 
             IEnumerator DepletingDuration()
             {
@@ -267,8 +267,6 @@ namespace Hanako.Hanako
             actionIconAnimator.SetInteger(int_mode, (int)icons.HideAnimation);
             actionIconAnimator.SetTrigger(tri_transition);
         }
-
-
 
         public void ChangeColor(Color color)
         {

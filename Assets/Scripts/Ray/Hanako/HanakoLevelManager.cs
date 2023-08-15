@@ -346,8 +346,7 @@ namespace Hanako.Hanako
                     // Add panel of the rest of the enemies
                     if (index <= enemySequence.Sequence.Count - previewPanelCount)
                         enemyList.AddPanel(enemy.ID, enemy.DestinationSequence);
-                    else
-                        enemyList.IncrementPanelScale();
+                    enemyList.IncrementPanelsScale();
                 }
             }
         }

@@ -230,7 +230,6 @@ namespace Hanako.Hanako
                     colDetectArea.DisableCollider();
                     isKillable = false;
 
-
                     yield return StartCoroutine(destination.Occupy(this));
                 }
 
