@@ -83,6 +83,7 @@ namespace Hanako.Hanako
         public List<DestinationProperties> DestinationSequence { get => destinationSequence; }
         public event Func<HanakoDestinationID, int, HanakoDestination> GetDestinationByID;
         public event Func<HanakoGameState> GetGameState;
+        public event Action OnDie;
 
         void Awake()
         {
@@ -117,7 +118,8 @@ namespace Hanako.Hanako
             Func<HanakoDestinationID, int, HanakoDestination> getDestinationByID,
             Func<HanakoGameState> getGameState,
             HanakoColors colors,
-            HanakoIcons icons)
+            HanakoIcons icons,
+            Action onDie)
         {
             this.destinationSequence = destinationSequence;
             this.exitDoor = exitDoor;
@@ -125,6 +127,7 @@ namespace Hanako.Hanako
             this.GetGameState = getGameState;
             this.colors = colors;
             this.icons = icons;
+            this.OnDie += onDie;
         }
 
         public void StartInitialMove()
@@ -280,6 +283,7 @@ namespace Hanako.Hanako
             {
                 yield return new WaitForSeconds(delayScalingAnimation);
                 this.StopCoroutineIfExists(corMoving);
+                OnDie?.Invoke();
 
                 var time = 0f;
                 var originPos = transform.position;

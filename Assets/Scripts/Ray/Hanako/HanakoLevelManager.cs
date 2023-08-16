@@ -1,10 +1,13 @@
 using Encore.Utility;
+using Hanako.Knife;
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityUtility;
 using static Hanako.Hanako.HanakoEnemySequence;
 
 namespace Hanako.Hanako
@@ -20,12 +23,15 @@ namespace Hanako.Hanako
         float autoStartDuration = 2.5f;
 
         [SerializeField]
+        HanakoLevel level;
+
+        [SerializeField, ShowIf("@!"+nameof(level))]
         HanakoEnemySequence enemySequence;
 
-        [SerializeField]
+        [SerializeField, ShowIf("@!"+nameof(level))]
         HanakoDestinationSequence destinationSequence;
 
-        [SerializeField]
+        [SerializeField, ShowIf("@!"+nameof(level))]
         HanakoDistractionSequence distractionSequence;
 
         [Header("Components")]
@@ -37,6 +43,9 @@ namespace Hanako.Hanako
 
         [SerializeField]
         Transform destinationsParent;
+
+        [SerializeField]
+        Transform distractionsParent;
 
         [SerializeField]
         HanakoDestination_ExitDoor exitDoor;
@@ -52,11 +61,11 @@ namespace Hanako.Hanako
         Image startBut;
 
         [SerializeField]
-        Sprite warningSign;
+        HanakoGameInfoCanvas gameInfoCanvas;
 
         [SerializeField]
-        Sprite okCircleSign;
-
+        HanakoGameOverCanvas gameOverCanvas;
+        
         [Header("Player: Hanako Crawl")]
         [SerializeField]
         float attackCooldown = 0.8f;
@@ -110,6 +119,9 @@ namespace Hanako.Hanako
         bool isPlayerMoving = false;
         Coroutine corInitializingGame;
         HanakoGameState gameState = HanakoGameState.Init;
+        int killCount = 0;
+        float gameTime;
+        public event Action<int, int> OnAddKillCount;
 
         public HanakoDestination Door { get => exitDoor; }
         public HanakoColors Colors { get => colors; }
@@ -117,15 +129,21 @@ namespace Hanako.Hanako
         public float HanakoMoveDuration { get => hanakoMoveDuration; }
         public float EnemyReceiveAttackDelay { get => enemyReceiveAttackDelay; }
         public HanakoGameState GameState { get => gameState;  }
-        public Sprite WarningSign { get => warningSign; }
-        public Sprite OkCircleSign { get => okCircleSign; }
 
         private void Awake()
         {
+            if (level != null)
+            {
+                destinationSequence = level.DestinationSequence;
+                enemySequence = level.EnemySequence;
+                distractionSequence = level.DistractionSequence;
+            }
+
             destinations = InstantiateDestinations(destinationSequence);
             destinations = SortDestinations(destinations);
-            //distractions = InstantiateDistractions(distractionSequence);
+            distractions = InstantiateDistractions(distractionSequence);
             enemies = InstantiateEnemies(enemySequence);
+            gameInfoCanvas.Init(enemies.Count, ref OnAddKillCount);
 
             if (cursor == null)
                 cursor = FindAnyObjectByType<HanakoCursor>();
@@ -147,6 +165,7 @@ namespace Hanako.Hanako
 
             List<HanakoDestination> InstantiateDestinations(HanakoDestinationSequence destinationSequence)
             {
+                destinationsParent.DestroyChildren();
                 exitDoor.Init(colors,icons, () => GameState,0,0);
 
                 var destinations = new List<HanakoDestination>();
@@ -205,10 +224,12 @@ namespace Hanako.Hanako
 
             List<HanakoDistraction> InstantiateDistractions(HanakoDistractionSequence distractionSequence)
             {
+                distractionsParent.DestroyChildren();
+
                 var distractions = new List<HanakoDistraction>();
                 foreach (var distraction in distractionSequence.Sequence)
                 {
-                    var distractionGO = Instantiate(distraction.Prefab, destinationsParent);
+                    var distractionGO = Instantiate(distraction.Prefab, distractionsParent);
                     distractionGO.name = distractions.Count + "_" + distractionGO.name;
                     distractionGO.transform.localPosition = distraction.Position;
 
@@ -229,7 +250,7 @@ namespace Hanako.Hanako
                     enemyGO.name = enemies.Count + "_" + enemyGO.name;
                     enemyGO.transform.localPosition = Vector3.zero;
                     var enemyComponent = enemyGO.GetComponent<HanakoEnemy>();
-                    enemyComponent.Init(enemy.DestinationSequence,exitDoor, GetDestinationByIDAndIndexOfSameID,()=>GameState, colors,icons);
+                    enemyComponent.Init(enemy.DestinationSequence,exitDoor, GetDestinationByIDAndIndexOfSameID,()=>GameState, colors,icons, AddKillCount);
                     enemies.Add(enemyComponent);
                 }
 
@@ -309,6 +330,7 @@ namespace Hanako.Hanako
             gameState = HanakoGameState.Play;
             StartCoroutine(AnimatingInitHanako());
             corInitializingGame = StartCoroutine(InitializingGame());
+            StartCoroutine(CountingGameTime());
 
             IEnumerator AnimatingInitHanako()
             {
@@ -349,6 +371,15 @@ namespace Hanako.Hanako
                     enemyList.IncrementPanelsScale();
                 }
             }
+
+            IEnumerator CountingGameTime()
+            {
+                while (true)
+                {
+                    gameTime += Time.deltaTime;
+                    yield return null;
+                }
+            }   
         }
 
         public void LostGame()
@@ -356,14 +387,28 @@ namespace Hanako.Hanako
             gameState = HanakoGameState.Lost;
             StopCoroutine(corInitializingGame);
             foreach (var enemy in enemies)
-            {
                 enemy.DetectHanako(cursor.PossessedToilet.transform.position);
+            StopAllCoroutines();
+
+            StartCoroutine(Delay(1f));
+            IEnumerator Delay(float delay)
+            {
+                yield return new WaitForSeconds(delay);
+                gameOverCanvas.Init(false, level, killCount, enemies.Count, gameTime);
             }
         }
 
         public void WonGame()
         {
             gameState = HanakoGameState.Won;
+            StopAllCoroutines();
+
+            StartCoroutine(Delay(1f));
+            IEnumerator Delay(float delay)
+            {
+                yield return new WaitForSeconds(delay);
+                gameOverCanvas.Init(true, level, killCount, enemies.Count, gameTime);
+            }
         }
 
         private HanakoDestination_Toilet GetInitialToilet()
@@ -412,6 +457,14 @@ namespace Hanako.Hanako
                 yield return new WaitForSeconds(2.15f);
                 bloodSplatter.SetActive(false);
             }
+        }
+
+        void AddKillCount()
+        {
+            killCount++;
+            OnAddKillCount(killCount,enemies.Count);
+            if (killCount >= enemies.Count)
+                WonGame();
         }
     }
 }

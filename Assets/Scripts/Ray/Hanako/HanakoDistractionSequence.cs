@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,8 +6,8 @@ using UnityEngine;
 
 namespace Hanako.Hanako
 {
+    [InlineEditor]
     [CreateAssetMenu(fileName ="DistractionSeq_", menuName ="SO/Hanako/Distraction Sequence")]
-
     public class HanakoDistractionSequence : ScriptableObject
     {
         [Serializable]

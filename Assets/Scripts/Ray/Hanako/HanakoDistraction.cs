@@ -12,7 +12,7 @@ namespace Hanako.Hanako
     [RequireComponent(typeof(SpriteRendererColorSetter))]
     public class HanakoDistraction : MonoBehaviour, IHanakoInteractableByCursor
     {
-        public enum AnimationState { Idle, Distract }
+        public enum AnimationState { Idle, Distract, Cooldown }
 
         [SerializeField]
         float duration = 2f;
@@ -135,10 +135,10 @@ namespace Hanako.Hanako
         public void Hover()
         {
             isHovering = true;
+            if (currentCooldown > 0f) return; // Hover() is called by DepletingCooldown once cooldown is done
             colorSetter.ChangeColor(colors.HoverColor);
             HighlightEnemies();
             ShowActionIcon();
-
         }
 
         public void Unhover()
@@ -152,16 +152,16 @@ namespace Hanako.Hanako
         IEnumerator DepletingCooldown()
         {
             OnCooldownDurationStart?.Invoke(cooldown);
+            animator.SetInteger(int_mode, (int)AnimationState.Cooldown);
             while (currentCooldown > -0.1f)
             {
                 currentCooldown -= Time.deltaTime;
                 yield return null;
             }
+            animator.SetInteger(int_mode, (int)AnimationState.Idle);
+
             if (isHovering)
-            {
-                ShowActionIcon();
-                HighlightEnemies();
-            }
+                Hover();
             OnHideDestinationUI?.Invoke();
         }
 
@@ -171,6 +171,7 @@ namespace Hanako.Hanako
             this.StopCoroutineIfExists(corDepletingCooldown);
             ResetHighlightEnemies();
             HideActionIcon();
+            colorSetter.ResetColor();
             OnShowDestinationUI?.Invoke();
             OnDistractDurationStart?.Invoke(duration);
             currentCooldown = cooldown;
@@ -195,7 +196,6 @@ namespace Hanako.Hanako
                     enemy.MoveToCurrentDestination();
 
                 corDepletingCooldown = this.RestartCoroutine(DepletingCooldown(), corDepletingCooldown);
-                animator.SetInteger(int_mode, (int)AnimationState.Idle);
                 foreach (var vfx in distractVFXs)
                     vfx.SetBool("isPlaying", false);
             }
