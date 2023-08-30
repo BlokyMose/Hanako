@@ -8,6 +8,9 @@ namespace UnityUtility
     public class RandomSprite : MonoBehaviour
     {
         [SerializeField]
+        bool isActive = true;
+
+        [SerializeField]
         SpriteRenderer sr;
 
         [SerializeField]
@@ -15,6 +18,8 @@ namespace UnityUtility
 
         void Awake()
         {
+            if (!isActive) return;
+
             if (sr == null)
                 sr = this.GetComponentInFamily<SpriteRenderer>();
 
