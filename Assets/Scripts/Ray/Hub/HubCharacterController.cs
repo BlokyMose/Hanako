@@ -1,7 +1,9 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityUtility;
 
 namespace Hanako.Hub
@@ -11,22 +13,39 @@ namespace Hanako.Hub
     public class HubCharacterController : MonoBehaviour
     {
         public enum PieceAnimationState { Die = -1, Idle, Run, Attack }
+        public enum HandsScaleState { One, Double }
+
+        [SerializeField, SuffixLabel("x1000")]
+        float walkSpeed = 2f;
+        const float WALK_SPEED_MULTIPLIER = 1000;
+
+        [Header("Rigs")]
+        [SerializeField]
+        string handsAnimatorLayerName = "hands";
 
         [SerializeField]
-        float speed = 1f;
+        Transform handsUpTarget;
+
+        [SerializeField]
+        Rig handsUpRig;
 
         Animator animator;
-        int int_motion;
+        int int_motion, int_hands;
         Vector2 moveDirection;
         Rigidbody2D rb;
         Collider2D col;
+
 
         private void Awake()
         {
             animator = gameObject.GetComponentInFamily<Animator>();
             int_motion = Animator.StringToHash(nameof(int_motion));
+            int_hands = Animator.StringToHash(nameof(int_hands));
+            animator.SetLayerWeight(animator.GetLayerIndex(handsAnimatorLayerName), 1f);
+
             rb = gameObject.GetComponent<Rigidbody2D>();
             col = gameObject.GetComponent<Collider2D>();
+            handsUpRig.weight = 0;
         }
 
         public void Init(HubCharacterBrain_Player brain)
@@ -36,7 +55,7 @@ namespace Hanako.Hub
 
         private void Update()
         {
-            rb.AddForce(moveDirection * speed * Time.deltaTime);
+            rb.AddForce(moveDirection * walkSpeed * WALK_SPEED_MULTIPLIER * Time.deltaTime);
         }
 
         void Move(Vector2 direction)
@@ -55,6 +74,56 @@ namespace Hanako.Hub
             {
                 animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
             }
+        }
+
+        public Transform test;
+        [Button]
+        public void Test()
+        {
+            HoldUp(test);
+        }
+
+        Transform heldObject;
+        public void HoldUp(Transform target)
+        {
+            heldObject = target;
+            target.parent = handsUpTarget;
+            target.localPosition = Vector2.zero;
+            target.localEulerAngles = Vector2.zero;
+            animator.SetInteger(int_hands, (int)HandsScaleState.Double);
+
+            if (target.TryGetComponentInFamily<Collider2D>(out var targetCol))
+            {
+                targetCol.enabled = false;
+            }            
+            
+            if (target.TryGetComponentInFamily<Rigidbody2D>(out var targetRB))
+            {
+                targetRB.isKinematic = true;
+            }
+
+            handsUpRig.weight = 1;
+        }
+
+        [Button]
+        public void Throw()
+        {
+            heldObject.parent = null;
+            heldObject.localEulerAngles = Vector2.zero;
+            animator.SetInteger(int_hands, (int)HandsScaleState.One);
+
+
+            if (heldObject.TryGetComponentInFamily<Collider2D>(out var targetCol))
+            {
+                targetCol.enabled = true;
+            }
+
+            if (heldObject.TryGetComponentInFamily<Rigidbody2D>(out var targetRB))
+            {
+                targetRB.isKinematic = false;
+            }
+
+            handsUpRig.weight = 0f;
         }
 
     }
