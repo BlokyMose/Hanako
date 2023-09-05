@@ -1,4 +1,5 @@
 using Encore.Utility;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -8,13 +9,14 @@ using UnityUtility;
 
 namespace Hanako.Hub
 {
+    [RequireComponent(typeof(CanvasGroup), typeof(Animator))]
     public class HubLevelCanvas : MonoBehaviour
     {
-        enum SoulIconState { Dead, Alive }
-        enum PlayButState { Pressed, Idle, Hover }
+        public enum SoulIconState { Dead, Alive }
+        public enum PlayButState { Pressed, Idle, Hover }
 
         [SerializeField]
-        LevelScore levelScoreToPreview;
+        LevelInfo levelScoreToPreview;
 
         [Header("Components")]
         [SerializeField]
@@ -35,43 +37,69 @@ namespace Hanako.Hub
         [SerializeField]
         Image playBut;
 
-        List<Animator> soulIcons = new();
-        int int_mode;
+        int int_mode, boo_show;
         bool isLoadingScene = false;
+        CanvasGroup canvasGroup;
+        Animator animator, playButAnimator;
+        Action<LevelInfo> OnLoadScene;
+        LevelInfo currentLevelInfo;
 
         void Awake()
         {
+            canvasGroup = GetComponent<CanvasGroup>();
+            animator = GetComponent<Animator>();
             int_mode = Animator.StringToHash(nameof(int_mode));
+            boo_show = Animator.StringToHash(nameof(boo_show));
 
             if (levelScoreToPreview != null)
                 Show(levelScoreToPreview);
+            else
+                Hide();
 
-            var playbutAnimator = playBut.GetComponent<Animator>();
-            playbutAnimator.SetInteger(int_mode, (int)PlayButState.Idle);
+            playButAnimator = playBut.GetComponent<Animator>();
+            playButAnimator.SetInteger(int_mode, (int)PlayButState.Idle);
             playBut.AddEventTriggers(
-                onClick: () => { playbutAnimator.SetInteger(int_mode,(int)PlayButState.Pressed); PlayLevel(); },
-                onEnter: () => { if (!isLoadingScene) playbutAnimator.SetInteger(int_mode,(int)PlayButState.Hover); },
-                onExit: () => { if (!isLoadingScene) playbutAnimator.SetInteger(int_mode,(int)PlayButState.Idle); }
+                onClick: () => { playButAnimator.SetInteger(int_mode,(int)PlayButState.Pressed); PlayLevel(); },
+                onEnter: () => { if (!isLoadingScene) playButAnimator.SetInteger(int_mode,(int)PlayButState.Hover); },
+                onExit: () => { if (!isLoadingScene) playButAnimator.SetInteger(int_mode,(int)PlayButState.Idle); }
                 );
         }
 
-        public void Show(LevelScore levelScore)
+        public void Init(Action<LevelInfo> onLoadScene)
         {
-            titleLogo.sprite = levelScore.GameInfo.TitleLogo;
-            levelNameText.text = levelScore.LevelName;
+            this.OnLoadScene = onLoadScene;
+        }
+
+        public void Show(LevelInfo levelInfo)
+        {
+            currentLevelInfo = levelInfo;
+
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
+            animator.SetBool(boo_show, true);
+
+            titleLogo.sprite = levelInfo.GameInfo.TitleLogo;
+            levelNameText.text = levelInfo.LevelName;
             soulIconParent.DestroyChildren();
-            for (int i = 0; i < levelScore.MaxSoulCount; i++)
+            for (int i = 0; i < levelInfo.MaxSoulCount; i++)
             {
                 var soulIconAnimator = Instantiate(soulIconPrefab, soulIconParent);
-                if (i <= levelScore.CurrentSoulCount - 1)
+                if (i <= levelInfo.CurrentSoulCount - 1)
                     soulIconAnimator.SetInteger(int_mode, (int)SoulIconState.Alive);
-                soulIcons.Add(soulIconAnimator);
             }
-            playTimeText.text = MathUtility.SecondsToTimeString(levelScore.PlayTime);
+
+            playTimeText.text = levelInfo.PlayTime > 0f 
+                ? MathUtility.SecondsToTimeString(levelInfo.PlayTime)
+                : "";
+
+            playButAnimator.SetInteger(int_mode, (int)PlayButState.Idle);
         }
 
         public void Hide()
         {
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+            animator.SetBool(boo_show, false);
 
         }
 
@@ -79,6 +107,7 @@ namespace Hanako.Hub
         {
             if (isLoadingScene) return;
             isLoadingScene = true;
+            OnLoadScene?.Invoke(currentLevelInfo);
         }
     }
 }

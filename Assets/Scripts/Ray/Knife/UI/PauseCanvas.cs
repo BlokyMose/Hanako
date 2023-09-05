@@ -35,9 +35,12 @@ namespace Hanako.Knife
         [Header("Exit")]
         [SerializeField]
         Image exitBut;
-        
+
         [SerializeField]
         TextMeshProUGUI exitText;
+
+        [SerializeField]
+        LevelInfo hubLevelInfo;
 
         List<Animator> functionalButs = new();
         int int_mode, tri_click;
@@ -134,7 +137,9 @@ namespace Hanako.Knife
 
         public void ExitGame()
         {
-
+            var sceneLoadingManager = FindObjectOfType<SceneLoadingManager>();
+            if (sceneLoadingManager != null)
+                sceneLoadingManager.LoadScene(hubLevelInfo);
         }
     }
 }
