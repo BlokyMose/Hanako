@@ -29,6 +29,8 @@ namespace Hanako.Hub
         Action OnHideLevelCanvas;
         HubLevelInfoPreview currentLevelInfoPreview;
 
+        public LevelInfo LevelInfo { get => levelInfo; }
+
         void Awake()
         {
             levelInfoPreviewParent.DestroyChildren();

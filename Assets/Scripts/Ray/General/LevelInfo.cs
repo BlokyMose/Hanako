@@ -25,13 +25,13 @@ namespace Hanako
         [SerializeField, ShowIf("@" + nameof(gameType) + "==" + nameof(GameType) + "." + nameof(GameType.Knife))]
         KnifeLevel knifeLevel;
 
+        [SerializeField]
+        int maxSoulCount = 3;
+
         [Header("Runtime Data")]
 
         [SerializeField]
         int currentSoulCount;
-
-        [SerializeField]
-        int maxSoulCount = 3;
 
         [SerializeField]
         int score;
@@ -50,5 +50,14 @@ namespace Hanako
         public float PlayTime { get => playTime; }
         public int CurrentSoulCount { get => currentSoulCount; }
         public int MaxSoulCount { get => maxSoulCount; }
+
+        public void ResetRuntimeData()
+        {
+            currentSoulCount = 0;
+            score = 0;
+            playTime = 0;
+        }
+
+        // TODO: make scoring rule, and evaluate it to set new currentSoulCount
     }
 }

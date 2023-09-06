@@ -18,6 +18,9 @@ namespace Hanako.Hub
         [SerializeField]
         LevelInfo levelScoreToPreview;
 
+        [SerializeField]
+        string levelNamePrefix = "Level: ";
+
         [Header("Components")]
         [SerializeField]
         Image titleLogo;
@@ -79,7 +82,8 @@ namespace Hanako.Hub
             animator.SetBool(boo_show, true);
 
             titleLogo.sprite = levelInfo.GameInfo.TitleLogo;
-            levelNameText.text = levelInfo.LevelName;
+            levelNameText.text = levelNamePrefix + levelInfo.LevelName;
+
             soulIconParent.DestroyChildren();
             for (int i = 0; i < levelInfo.MaxSoulCount; i++)
             {
