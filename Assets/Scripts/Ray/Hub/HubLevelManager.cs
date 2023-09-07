@@ -9,6 +9,9 @@ namespace Hanako.Hub
         [SerializeField]
         SceneLoadingManager sceneLoadingManager;
 
+        [SerializeField]
+        HubColors colors;
+
         [Header("UI")]
         [SerializeField]
         HubCursor playerCursor;
@@ -16,11 +19,13 @@ namespace Hanako.Hub
         [SerializeField]
         HubLevelCanvas levelCanvas;
 
+        public HubColors Colors { get => colors; }
+
         void Awake()
         {
             var levelDoors = new List<HubLevelDoor>(FindObjectsByType<HubLevelDoor>(FindObjectsSortMode.None));
             foreach (var levelDoor in levelDoors)
-                levelDoor.Init(ShowLevelCanvas,HideLevelCanvas);
+                levelDoor.Init(ShowLevelCanvas,HideLevelCanvas, colors);
 
             levelCanvas.Init(LoadScene);
             levelCanvas.gameObject.SetActive(true);

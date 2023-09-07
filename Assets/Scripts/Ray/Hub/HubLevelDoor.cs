@@ -25,6 +25,12 @@ namespace Hanako.Hub
         [SerializeField]
         HubLevelInfoPreview levelInfoPreviewPrefab;
 
+        [SerializeField]
+        HubMinimapIcon minimapIconPrefab;
+
+        [SerializeField]
+        HubColors colors;
+
         Action<LevelInfo> OnShowLevelCanvas;
         Action OnHideLevelCanvas;
         HubLevelInfoPreview currentLevelInfoPreview;
@@ -42,10 +48,20 @@ namespace Hanako.Hub
             detectAreaOfLevelPreview.OnExit += (exittedCol) => { if (exittedCol.TryGetComponent<HubCharacterBrain_Player>(out var player)) HideLevelInfoPreview(); };
         }
 
-        public void Init(Action<LevelInfo> onShowLevelCanvas, Action onHideLevelCanvas)
+        void Start()
+        {
+            Color? glowColor = null;
+            if (colors!=null)
+                glowColor = levelInfo.CurrentSoulCount >= levelInfo.MaxSoulCount ? colors.CompletedLevel : colors.IncompleteLevel;
+            var minimapIcon = Instantiate(minimapIconPrefab, transform);
+            minimapIcon.Init(levelInfo.GameInfo.TitleIcon, glowColor);
+        }
+
+        public void Init(Action<LevelInfo> onShowLevelCanvas, Action onHideLevelCanvas, HubColors colors)
         {
             this.OnShowLevelCanvas = onShowLevelCanvas;
             this.OnHideLevelCanvas = onHideLevelCanvas;
+            this.colors = colors;
         }
 
         public void ShowLevelCanvas()
