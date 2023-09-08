@@ -62,7 +62,6 @@ namespace Hanako
                     playerInput.OnCursorInput += Move;
                     playerInput.SetMouseCursorToCenter();
                 }
-
             }
             else
             {
