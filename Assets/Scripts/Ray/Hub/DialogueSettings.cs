@@ -33,6 +33,9 @@ namespace Hanako.Dialogue
         [SerializeField, PreviewField]
         Sprite bubbleShape_RectangleBlack;
 
+        [SerializeField, PreviewField]
+        Sprite bubbleShape_Epiphany;
+
         public Sprite BubbleShape_Round { get => bubbleShape_Round; }
         public Sprite BubbleShape_Rectangle { get => bubbleShape_Rectangle; }
         public Sprite BubbleShape_Spiky { get => bubbleShape_Spiky; }
@@ -48,6 +51,7 @@ namespace Hanako.Dialogue
                 BubbleShape.Wiggly => bubbleShape_Wiggly,
                 BubbleShape.Grumpy => bubbleShape_Grumpy,
                 BubbleShape.RectangleBlack => bubbleShape_RectangleBlack,
+                BubbleShape.Epiphany => bubbleShape_Epiphany,
                 _ => bubbleShape_Round
             };
 
