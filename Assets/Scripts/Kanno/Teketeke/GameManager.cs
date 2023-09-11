@@ -72,12 +72,12 @@ namespace Hanako
             //ˆÖŽq‚É“–‚½‚Á‚½Žž
             if (other.gameObject.CompareTag("chair"))
             {
-                countdownSeconds -= 15;
+                countdownSeconds -= 10;
             }
             //‹³‘ì‚É“–‚½‚Á‚½Žž
             if (other.gameObject.CompareTag("lectern"))
             {
-                countdownSeconds -= 20;
+                countdownSeconds -= 10;
             }
         }
     }

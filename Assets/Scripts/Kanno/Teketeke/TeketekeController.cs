@@ -9,6 +9,8 @@ namespace Hanako
         [SerializeField] private float speed;//プレイヤーの移動速度
         [SerializeField] private float maxY, minY; //移動範囲の制限
 
+       
+
         void Start()
         {
 
@@ -18,6 +20,8 @@ namespace Hanako
         void Update()
         {
             MovePlayer(); //プレイヤーを動かすメソッドを呼び出す
+
+            
         }
 
         void MovePlayer()
@@ -52,6 +56,14 @@ namespace Hanako
             }
         }
 
-       
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (collision.CompareTag("desk") || collision.CompareTag("chair") || collision.CompareTag("lectern"))
+            {
+                collision.gameObject.SetActive(false);
+            }
+        }
+
     }
 }
