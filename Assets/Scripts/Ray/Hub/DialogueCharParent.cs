@@ -12,6 +12,14 @@ namespace Hanako.Dialogue
     [RequireComponent(typeof(SortingGroup))]
     public class DialogueCharParent : MonoBehaviour
     {
+        [Header("Animation Layers")]
+        [SerializeField]
+        string faceLayerName = "dialogue_face";
+
+        [SerializeField]
+        string bodyLayerName = "dialogue_body";
+
+        [Header("Components")]
         [SerializeField]
         DialogueBubble bubble_R;
 
@@ -21,13 +29,15 @@ namespace Hanako.Dialogue
         Animator animator, charAnimator;
         DialogueBubble currentBubble;
         SortingGroup sortingGroup;
-        int int_mode;
+        int int_mode, int_d_face, int_d_body;
 
         void Awake()
         {
             sortingGroup = GetComponent<SortingGroup>();
             animator = GetComponent<Animator>();
             int_mode = Animator.StringToHash(nameof(int_mode));
+            int_d_face = Animator.StringToHash(nameof(int_d_face));
+            int_d_body = Animator.StringToHash(nameof(int_d_body));
             bubble_L.gameObject.SetActive(false);
             bubble_R.gameObject.SetActive(false);
         }
@@ -41,6 +51,11 @@ namespace Hanako.Dialogue
             charGO.transform.localEulerAngles = new(0, isFacingRight ? 0 : 180, 0);
             
             charAnimator = charGO.GetComponent<Animator>();
+            for (int i = 0; i < charAnimator.layerCount; i++)
+                charAnimator.SetLayerWeight(i, 0);
+            charAnimator.SetLayerWeight(charAnimator.GetLayerIndex(faceLayerName), 1);
+            charAnimator.SetLayerWeight(charAnimator.GetLayerIndex(bodyLayerName), 1);
+
 
             currentBubble = isFacingRight ? bubble_R : bubble_L;
             currentBubble.gameObject.SetActive(true);
@@ -59,6 +74,7 @@ namespace Hanako.Dialogue
         {
             currentBubble.SetText(textLine, settings);
             sortingGroup.sortingOrder = sortingOrder;
+            charAnimator.SetInteger(int_d_face, (int)textLine.FaceAnimation);
         }
 
         public void ResetAll(int sortingOrder)

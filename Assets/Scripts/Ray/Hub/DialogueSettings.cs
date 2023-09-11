@@ -15,6 +15,8 @@ namespace Hanako.Dialogue
 
         [Header("Sprites")]
 
+        #region [Bubble Shapes]
+
         [SerializeField, PreviewField]
         Sprite bubbleShape_Round;
 
@@ -36,9 +38,8 @@ namespace Hanako.Dialogue
         [SerializeField, PreviewField]
         Sprite bubbleShape_Epiphany;
 
-        public Sprite BubbleShape_Round { get => bubbleShape_Round; }
-        public Sprite BubbleShape_Rectangle { get => bubbleShape_Rectangle; }
-        public Sprite BubbleShape_Spiky { get => bubbleShape_Spiky; }
+        #endregion
+
         public float CharScale { get => charScale; }
 
         public Sprite GetBubbleShape(BubbleShape bubbleShape)

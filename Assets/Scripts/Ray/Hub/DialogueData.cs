@@ -30,6 +30,9 @@ namespace Hanako.Dialogue
             string text;
 
             [SerializeField]
+            FaceAnimation faceAnimation;
+
+            [SerializeField]
             BubbleShape bubbleShape = BubbleShape.Round;
 
             [SerializeField]
@@ -40,6 +43,7 @@ namespace Hanako.Dialogue
 
             public CharID CharID { get => charID; }
             public string Text { get => text; }
+            public FaceAnimation FaceAnimation { get => faceAnimation;  }
             public BubbleShape BubbleShape { get => bubbleShape; }
             public BubbleAnimation BubbleAnimation { get => bubbleAnimation; }
             public Color TextColor { get => textColor; }
