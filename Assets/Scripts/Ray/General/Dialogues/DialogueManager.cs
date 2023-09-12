@@ -1,5 +1,6 @@
 using JetBrains.Annotations;
 using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -78,6 +79,7 @@ namespace Hanako.Dialogue
         DialogueData currentDialogueData;
         DialogueSettings currentDialogueSettings;   
         CanvasGroup canvasGroup;
+        public event Action OnDialogueEnd;
 
         void Awake()
         {
@@ -149,6 +151,7 @@ namespace Hanako.Dialogue
             currentDialogueData = null;
             HideBG();
             DeactivateCanvasGroup();
+            OnDialogueEnd?.Invoke();
         }
 
         void ActivateCanvasGroup()
@@ -164,7 +167,6 @@ namespace Hanako.Dialogue
             canvasGroup.blocksRaycasts = false;
             canvasGroup.alpha = 0;
         }
-
 
         void HideBG()
         {

@@ -16,9 +16,6 @@ namespace Hanako.Hub
         public enum PlayButState { Pressed, Idle, Hover }
 
         [SerializeField]
-        LevelInfo levelScoreToPreview;
-
-        [SerializeField]
         string levelNamePrefix = "Level: ";
 
         [Header("Components")]
@@ -54,16 +51,12 @@ namespace Hanako.Hub
             int_mode = Animator.StringToHash(nameof(int_mode));
             boo_show = Animator.StringToHash(nameof(boo_show));
 
-            if (levelScoreToPreview != null)
-                Show(levelScoreToPreview);
-            else
-                Hide();
-
             playButAnimator = playBut.GetComponent<Animator>();
             playButAnimator.SetInteger(int_mode, (int)PlayButState.Idle);
             playBut.AddEventTriggers(
-                onClick: () => { playButAnimator.SetInteger(int_mode,(int)PlayButState.Pressed); PlayLevel(); },
+                onClick: () => { if (!isLoadingScene) PlayLevel(); },
                 onEnter: () => { if (!isLoadingScene) playButAnimator.SetInteger(int_mode,(int)PlayButState.Hover); },
+                onDown: () => { if (!isLoadingScene) playButAnimator.SetInteger(int_mode,(int)PlayButState.Pressed); },
                 onExit: () => { if (!isLoadingScene) playButAnimator.SetInteger(int_mode,(int)PlayButState.Idle); }
                 );
         }
@@ -96,7 +89,13 @@ namespace Hanako.Hub
                 ? MathUtility.SecondsToTimeString(levelInfo.PlayTime)
                 : "";
 
-            playButAnimator.SetInteger(int_mode, (int)PlayButState.Idle);
+
+            StartCoroutine(Delay(0.5f));
+            IEnumerator Delay(float delay)
+            {
+                yield return new WaitForSeconds(delay);
+                playButAnimator.SetInteger(int_mode, (int)PlayButState.Idle);
+            }
         }
 
         public void Hide()
@@ -104,7 +103,7 @@ namespace Hanako.Hub
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
             animator.SetBool(boo_show, false);
-
+            playButAnimator.SetInteger(int_mode, (int)PlayButState.Pressed);
         }
 
         void PlayLevel()

@@ -1,3 +1,4 @@
+using Hanako.Dialogue;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,6 +28,8 @@ namespace Hanako.Hub
             foreach (var levelDoor in levelDoors)
                 levelDoor.Init(ShowLevelCanvas,HideLevelCanvas, colors);
 
+
+
             levelCanvas.Init(LoadScene);
             levelCanvas.gameObject.SetActive(true);
         }
@@ -39,6 +42,16 @@ namespace Hanako.Hub
         public void HideLevelCanvas()
         {
             levelCanvas.Hide();
+        }
+
+        public void ShowDialogueTriggerCanvas(DialogueData dialogueData)
+        {
+
+        }
+
+        public void HideDialogueTriggerCanvas()
+        {
+
         }
 
         public void LoadScene(LevelInfo levelInfo)
