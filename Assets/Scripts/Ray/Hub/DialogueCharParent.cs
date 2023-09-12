@@ -75,6 +75,7 @@ namespace Hanako.Dialogue
             currentBubble.SetText(textLine, settings);
             sortingGroup.sortingOrder = sortingOrder;
             charAnimator.SetInteger(int_d_face, (int)textLine.FaceAnimation);
+            charAnimator.SetInteger(int_d_body, (int)textLine.BodyAnimation);
         }
 
         public void ResetAll(int sortingOrder)
