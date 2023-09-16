@@ -37,6 +37,22 @@ namespace Hanako.Hub
         [SerializeField]
         Image playBut;
 
+        [Header("SFX")]
+        [SerializeField]
+        AudioSourceRandom showAudioSource;
+
+        [SerializeField]
+        AudioSourceRandom playButAudioSource;
+
+        [SerializeField]
+        string sfxShowName = "sfxShow";
+
+        [SerializeField]
+        string sfxHover = "sfxHover";
+
+        [SerializeField]
+        string sfxClick = "sfxClick";
+
         int int_mode, boo_show;
         bool isLoadingScene = false;
         CanvasGroup canvasGroup;
@@ -54,11 +70,40 @@ namespace Hanako.Hub
             playButAnimator = playBut.GetComponent<Animator>();
             playButAnimator.SetInteger(int_mode, (int)PlayButState.Idle);
             playBut.AddEventTriggers(
-                onClick: () => { if (!isLoadingScene) PlayLevel(); },
-                onEnter: () => { if (!isLoadingScene) playButAnimator.SetInteger(int_mode,(int)PlayButState.Hover); },
-                onDown: () => { if (!isLoadingScene) playButAnimator.SetInteger(int_mode,(int)PlayButState.Pressed); },
-                onExit: () => { if (!isLoadingScene) playButAnimator.SetInteger(int_mode,(int)PlayButState.Idle); }
+                onClick: OnClickPlayBut,
+                onEnter: OnEnterPlayBut,
+                onDown: OnDownPlayBut,
+                onExit: OnExitPlayBut
                 );
+
+            Hide();
+
+            void OnClickPlayBut()
+            {
+                if (isLoadingScene) return;
+                PlayLevel();
+            }
+
+            void OnEnterPlayBut()
+            {
+                if (isLoadingScene) return;
+                playButAudioSource.PlayOneClipFromPack(sfxHover);
+                playButAnimator.SetInteger(int_mode, (int)PlayButState.Hover);
+            }
+
+            void OnDownPlayBut()
+            {
+                if (isLoadingScene) return;
+                playButAudioSource.PlayOneClipFromPack(sfxClick);
+                playButAnimator.SetInteger(int_mode, (int)PlayButState.Pressed);
+            }
+
+            void OnExitPlayBut()
+            {
+                if (isLoadingScene) return;
+                playButAudioSource.PlayOneClipFromPack(sfxHover);
+                playButAnimator.SetInteger(int_mode, (int)PlayButState.Idle);
+            }
         }
 
         public void Init(Action<LevelInfo> onLoadScene)
@@ -89,6 +134,7 @@ namespace Hanako.Hub
                 ? MathUtility.SecondsToTimeString(levelInfo.PlayTime)
                 : "";
 
+            showAudioSource.PlayAllClipsFromPack(sfxShowName);
 
             StartCoroutine(Delay(0.5f));
             IEnumerator Delay(float delay)

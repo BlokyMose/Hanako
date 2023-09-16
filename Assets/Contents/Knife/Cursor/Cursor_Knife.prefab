@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8647266300600105463}
   - component: {fileID: 8647266300600105449}
   - component: {fileID: 8647266300600105448}
+  - component: {fileID: 8647266301436357149}
   m_Layer: 0
   m_Name: BloodVFX
   m_TagString: Untagged
@@ -113,6 +114,102 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!82 &8647266301436357149
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8647266300600105462}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 5068630072952715055, guid: b35615dfb3ecc5a45a908b57b20e9b34, type: 2}
+  m_audioClip: {fileID: 8300000, guid: a54a54b5024005e47ad3edc9c8472664, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.33
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &8647266300687171492
 GameObject:
   m_ObjectHideFlags: 0
@@ -326,6 +423,8 @@ GameObject:
   - component: {fileID: 8647266301505463441}
   - component: {fileID: 8647266301505463440}
   - component: {fileID: 8647266301505463445}
+  - component: {fileID: 8647266301436357147}
+  - component: {fileID: 8647266301436357146}
   m_Layer: 0
   m_Name: Cursor_Knife
   m_TagString: Untagged
@@ -361,7 +460,7 @@ SortingGroup:
   m_GameObject: {fileID: 8647266301505463455}
   m_Enabled: 1
   m_SortingLayerID: 1485844215
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 111
 --- !u!58 &8647266301505463442
 CircleCollider2D:
@@ -415,10 +514,13 @@ MonoBehaviour:
   cursorInputMode: 0
   cursorSpeed: 12
   isFollowingMouse: 1
+  bloodBurst: {fileID: 8647266300600105449}
+  audioSource: {fileID: 0}
+  sfxClickName: sfxClick
+  bloodBurstAudioSource: {fileID: 0}
   infoCanvas: {fileID: 0}
   gameCamera: {fileID: 0}
   colors: {fileID: 11400000, guid: 669e38f1ae0f85e40b934299b1ceb8f5, type: 2}
-  bloodBurst: {fileID: 8647266300600105449}
 --- !u!95 &8647266301505463445
 Animator:
   serializedVersion: 5
@@ -439,6 +541,143 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+--- !u!82 &8647266301436357147
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8647266301505463455}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &8647266301436357146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8647266301505463455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbbeca6bbfcc23f41b9ff54c8facbf9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playProbability: 1
+  audioPacks:
+  - packName: sfxClick
+    clips:
+    - {fileID: 8300000, guid: fd4876dafb79b924fb1b691fd83b8b59, type: 3}
+    - {fileID: 8300000, guid: 4807a72ac1993f048af3f3e1eb4b45bb, type: 3}
+    - {fileID: 8300000, guid: a040d47fae64b304e8916642f42b7410, type: 3}
+    volume: 0.33
+    volumeRandomRange: 0
+    pitch: 1
+    pitchRandomRange: 0.15
+    delay: 0
+    delayRandomRange: 0
+  audioClip: {fileID: 0}
+  output: {fileID: 5068630072952715055, guid: b35615dfb3ecc5a45a908b57b20e9b34, type: 2}
+  mute: 0
+  bypassEffect: 0
+  bypassListenerEffect: 0
+  bypassReverbZones: 0
+  playOnAwake: 0
+  invokeIn: 0
+  loop: 0
+  loopPeriod: 3
+  priority: 128
+  volume: 1
+  pitch: 1
+  stereoPan: 0
+  spatialBlend: 0
+  reverbZoneMix: 1
 --- !u!1 &8647266301549193850
 GameObject:
   m_ObjectHideFlags: 0

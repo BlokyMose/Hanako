@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.VFX;
+using UnityUtility;
 using static Hanako.Knife.KnifeCursor;
 
 namespace Hanako
@@ -24,6 +25,16 @@ namespace Hanako
         [SerializeField]
         protected VisualEffect bloodBurst;
 
+        [Header("SFX")]
+        [SerializeField]
+        protected AudioSourceRandom audioSource;
+
+        [SerializeField]
+        string sfxClickName = "sfxClick";
+
+        [SerializeField]
+        protected AudioSource bloodBurstAudioSource;
+
         protected Animator animator;
 
         protected Rigidbody2D rb;
@@ -37,6 +48,8 @@ namespace Hanako
             animator = GetComponent<Animator>();
             col = GetComponent<Collider2D>();
             col.isTrigger = true;
+            audioSource = audioSource == null ? GetComponent<AudioSourceRandom>() : audioSource;
+            bloodBurstAudioSource = bloodBurstAudioSource == null ? bloodBurst.GetComponent<AudioSource>() : bloodBurstAudioSource;
 
             boo_isClick = Animator.StringToHash(nameof(boo_isClick));
             flo_moveByX = Animator.StringToHash(nameof(flo_moveByX));
@@ -115,7 +128,7 @@ namespace Hanako
 
         public virtual void Click()
         {
-
+            audioSource.PlayOneClipFromPack(sfxClickName);
         }
 
         public virtual void ClickState(bool isClicking)
@@ -123,7 +136,10 @@ namespace Hanako
             this.isClicking = isClicking;
             animator.SetBool(boo_isClick, isClicking);
             bloodBurst.SetBool("isPlaying", isClicking);
-           
+            if (isClicking)
+                bloodBurstAudioSource.Play();
+            else
+                bloodBurstAudioSource.Stop();
         }
 
 

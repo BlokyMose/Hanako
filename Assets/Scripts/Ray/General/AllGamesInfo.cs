@@ -1,8 +1,11 @@
 using Encore.Utility;
 using Hanako.Hub;
 using Sirenix.OdinInspector;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
+using UnityUtility;
 
 namespace Hanako
 {
@@ -10,6 +13,20 @@ namespace Hanako
 
     public class AllGamesInfo : ScriptableObject
     {
+        public enum AudioVolume { Mute, Low, Mid, High , Full }
+        public static float GetAudioVolumeValue(AudioVolume audioVolume)
+        {
+            return audioVolume switch
+            {
+                AudioVolume.Mute => 0f,
+                AudioVolume.Low => 0.25f,
+                AudioVolume.Mid => 0.5f,
+                AudioVolume.High => 0.75f,
+                AudioVolume.Full => 1f,
+                _ => 0f
+            };
+        }
+
         [SerializeField]
         List<GameInfo> gameInfos = new();
 
@@ -19,9 +36,34 @@ namespace Hanako
         [SerializeField]
         float playTime;
 
+        [Header("Audio Settings")]
+        [SerializeField]
+        AudioMixer audioMixer;
+
+        [SerializeField]
+        string sfxVolumeName = "SFX_VOLUME";
+
+        [SerializeField]
+        string bgmVolumeName = "BGM_VOLUME";
+
+        [SerializeField]
+        string ambienceVolumeName = "AMBIENCE_VOLUME";
+
+        [SerializeField]
+        AudioVolume sfxVolume = AudioVolume.Mid;
+
+        [SerializeField]
+        AudioVolume bgmVolume = AudioVolume.Mid;
+
+        [SerializeField]
+        AudioVolume ambienceVolume = AudioVolume.Mid;
+
         public List<GameInfo> GameInfos { get => gameInfos; }
         public List<LevelInfo> LevelInfos { get => levelInfos; }
         public float PlayTime { get => playTime; }
+        public AudioVolume SFXVolume { get => sfxVolume; }
+        public AudioVolume BGMVolume { get => bgmVolume; }
+        public AudioVolume AmbienceVolume { get => ambienceVolume; }
 
         public int CurrentSoulCount
         {
@@ -45,6 +87,7 @@ namespace Hanako
             }
         }
 
+
         public void AddPlayTime(float increment) => playTime += increment;
 
         public void ResetAllRuntimeData()
@@ -63,6 +106,27 @@ namespace Hanako
                 levelInfos.AddIfHasnt(levelDoor.LevelInfo);
                 gameInfos.AddIfHasnt(levelDoor.LevelInfo.GameInfo);
             }
+        }
+
+        public AudioVolume SpinSFXVolume()
+        {
+            sfxVolume = (AudioVolume)(((int)(sfxVolume + 1)) % Enum.GetNames(typeof(AudioVolume)).Length);
+            audioMixer.SetFloatLog(sfxVolumeName, GetAudioVolumeValue(sfxVolume));
+            return sfxVolume;
+        }
+
+        public AudioVolume SpinBGMVolume()
+        {
+            bgmVolume = (AudioVolume)(((int)(bgmVolume + 1)) % Enum.GetNames(typeof(AudioVolume)).Length);
+            audioMixer.SetFloatLog(bgmVolumeName, GetAudioVolumeValue(bgmVolume));
+            return bgmVolume;
+        }
+
+        public AudioVolume SpinAmbienceVolume()
+        {
+            ambienceVolume = (AudioVolume)(((int)(ambienceVolume + 1)) % Enum.GetNames(typeof(AudioVolume)).Length);
+            audioMixer.SetFloatLog(ambienceVolumeName, GetAudioVolumeValue(ambienceVolume));
+            return ambienceVolume;
         }
     }
 }
