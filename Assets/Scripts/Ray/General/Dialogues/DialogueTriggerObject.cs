@@ -34,6 +34,13 @@ namespace Hanako.Dialogue
         [SerializeField]
         Animator characterAnimator;
 
+        [Header("Minimap")]
+        [SerializeField]
+        HubMinimapIcon minimapIconPrefab;
+
+        [SerializeField]
+        Transform minimapIconParent;
+
         DialoguePreviewCanvas currentDialoguePreviewCanvas;
         Action<DialogueData> OnShowDialogueTriggerCanvas;
         Action OnHideDialogueTriggerCanvas;
@@ -53,6 +60,12 @@ namespace Hanako.Dialogue
             { if (enteredCol.TryGetComponent<HubCharacterBrain_Player>(out var player)) ShowDialoguePreviewCanvas(); };
             detectAreaOfPreview.OnExit += (enteredCol) =>
             { if (enteredCol.TryGetComponent<HubCharacterBrain_Player>(out var player)) HideDialoguePreviewCanvas(); };
+
+            if (minimapIconPrefab != null)
+            {
+                var minimapIcon = Instantiate(minimapIconPrefab, minimapIconParent);
+                minimapIcon.Init(charID.Icon);
+            }
 
         }
 

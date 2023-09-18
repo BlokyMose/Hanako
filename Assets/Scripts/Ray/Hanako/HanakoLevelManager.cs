@@ -120,6 +120,7 @@ namespace Hanako.Hanako
         Coroutine corInitializingGame;
         HanakoGameState gameState = HanakoGameState.Init;
         int killCount = 0;
+        int exitCount = 0;
         float gameTime;
         public event Action<int, int> OnAddKillCount;
 
@@ -186,7 +187,13 @@ namespace Hanako.Hanako
                     if (destinationComponent is HanakoDestination_Toilet)
                     {
                         var toilet = destinationComponent as HanakoDestination_Toilet;
-                        toilet.Init(colors, icons, () => GameState, destinations.Count, destinationIDCounter[destinationComponent.ID], LostGame, PlayBloodSplatter);
+                        toilet.Init(colors, 
+                            icons, 
+                            () => GameState, 
+                            destinations.Count, 
+                            destinationIDCounter[destinationComponent.ID], 
+                            LostGame, 
+                            PlayBloodSplatter);
                     }
                     else
                     {
@@ -250,13 +257,12 @@ namespace Hanako.Hanako
                     enemyGO.name = enemies.Count + "_" + enemyGO.name;
                     enemyGO.transform.localPosition = Vector3.zero;
                     var enemyComponent = enemyGO.GetComponent<HanakoEnemy>();
-                    enemyComponent.Init(enemy.DestinationSequence,exitDoor, GetDestinationByIDAndIndexOfSameID,()=>GameState, colors,icons, AddKillCount);
+                    enemyComponent.Init(enemy.DestinationSequence,exitDoor, GetDestinationByIDAndIndexOfSameID,()=>GameState, colors,icons, AddKillCount, AddExitCount);
                     enemies.Add(enemyComponent);
                 }
 
                 return enemies;
             }
-
         }
 
         private void Start()
@@ -291,6 +297,7 @@ namespace Hanako.Hanako
                         startBut.gameObject.SetActive(true);
 
                         var startButAnimator = startBut.GetComponent<Animator>();
+                        var startButAudio = startBut.GetComponent<AudioSourceRandom>();
                         int boo_hover, boo_show;
                         boo_hover = Animator.StringToHash(nameof(boo_hover));
                         boo_show = Animator.StringToHash(nameof(boo_show));
@@ -301,6 +308,7 @@ namespace Hanako.Hanako
                         startBut_entry_enter.callback.AddListener((data) =>
                         {
                             startButAnimator.SetBool(boo_hover, true);
+                            startButAudio.PlayOneClipFromPack("sfxHover");
                         });
                         startBut_et.triggers.Add(startBut_entry_enter);
 
@@ -309,6 +317,7 @@ namespace Hanako.Hanako
                         startBut_entry_exit.callback.AddListener((data) =>
                         {
                             startButAnimator.SetBool(boo_hover, false);
+                            startButAudio.PlayOneClipFromPack("sfxHover");
                         });
                         startBut_et.triggers.Add(startBut_entry_exit);
 
@@ -318,6 +327,7 @@ namespace Hanako.Hanako
                         {
                             StartGame();
                             startButAnimator.SetBool(boo_show, false);
+                            startButAudio.PlayAllClipsFromPack("sfxClick");
                         });
                         startBut_et.triggers.Add(startBut_entry_click);
                     }
@@ -463,7 +473,18 @@ namespace Hanako.Hanako
         {
             killCount++;
             OnAddKillCount(killCount,enemies.Count);
-            if (killCount >= enemies.Count)
+            CheckWinningCondition();
+        }
+
+        void AddExitCount()
+        {
+            exitCount++;
+            CheckWinningCondition();
+        }
+
+        void CheckWinningCondition()
+        {
+            if (killCount + exitCount >= enemies.Count)
                 WonGame();
         }
     }

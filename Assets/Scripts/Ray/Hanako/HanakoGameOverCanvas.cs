@@ -140,7 +140,12 @@ namespace Hanako.Hanako
 
         public void GoToHub()
         {
-
+            var sceneLoadingManager = FindObjectOfType<SceneLoadingManager>();
+            var allGamesInfoManager = FindObjectOfType<AllGamesInfoManager>();
+            if (sceneLoadingManager != null && allGamesInfoManager != null)
+            {
+                sceneLoadingManager.LoadScene(allGamesInfoManager.AllGamesInfo.HubLevelInfo);
+            }
         }
     }
 }

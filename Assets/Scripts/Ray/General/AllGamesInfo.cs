@@ -28,6 +28,9 @@ namespace Hanako
         }
 
         [SerializeField]
+        LevelInfo hubLevelInfo;
+
+        [SerializeField]
         List<GameInfo> gameInfos = new();
 
         [SerializeField]
@@ -58,6 +61,7 @@ namespace Hanako
         [SerializeField]
         AudioVolume ambienceVolume = AudioVolume.Mid;
 
+        public LevelInfo HubLevelInfo { get => hubLevelInfo; }
         public List<GameInfo> GameInfos { get => gameInfos; }
         public List<LevelInfo> LevelInfos { get => levelInfos; }
         public float PlayTime { get => playTime; }

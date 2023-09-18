@@ -19,6 +19,25 @@ namespace Hanako.Dialogue
         [SerializeField]
         Image talkBut;
 
+        [Header("SFX")]
+        [SerializeField]
+        AudioSourceRandom audioSource;
+
+        [SerializeField]
+        AudioSourceRandom buttonAudioSource;
+
+        [SerializeField]
+        string sfxShowName = "sfxShow";
+        
+        [SerializeField]
+        string sfxHideName = "sfxHide";
+        
+        [SerializeField]
+        string sfxHoverName = "sfxHover";
+
+        [SerializeField]
+        string sfxClickName = "sfxClick";
+
         int int_mode, boo_show;
         bool isInDialogue;
 
@@ -50,12 +69,14 @@ namespace Hanako.Dialogue
             {
                 if (isInDialogue) return;
                 talkButAnimator.SetInteger(int_mode, (int)TalkButState.Hover);
+                buttonAudioSource.PlayOneClipFromPack(sfxHoverName);
             }
 
             void OnTalkButExit()
             {
                 if (isInDialogue) return;
                 talkButAnimator.SetInteger(int_mode, (int)TalkButState.Idle);
+                buttonAudioSource.PlayOneClipFromPack(sfxHoverName);
             }
                         
             
@@ -63,6 +84,7 @@ namespace Hanako.Dialogue
             {
                 if (isInDialogue) return;
                 talkButAnimator.SetInteger(int_mode, (int)TalkButState.Pressed);
+                buttonAudioSource.PlayOneClipFromPack(sfxClickName);
             }
 
             void OnTalkButClick()
@@ -92,6 +114,7 @@ namespace Hanako.Dialogue
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
             animator.SetBool(boo_show, true);
+            audioSource.PlayOneClipFromPack(sfxShowName);
 
             StartCoroutine(Delay(0.5f));
             IEnumerator Delay(float delay)
@@ -109,6 +132,7 @@ namespace Hanako.Dialogue
             canvasGroup.blocksRaycasts = false;
             animator.SetBool(boo_show, false);
             talkButAnimator.SetInteger(int_mode, (int)TalkButState.Pressed);
+            audioSource.PlayOneClipFromPack(sfxHideName);
         }
 
         void StartDialogue()

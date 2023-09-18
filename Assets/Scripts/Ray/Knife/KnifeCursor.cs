@@ -46,9 +46,9 @@ namespace Hanako.Knife
             levelManager.OnGameOver += (isPlayerDead) => { canHover = false; canPan = false; };
         }
 
-        protected override void Update()
+        protected override void FixedUpdate()
         {
-            base.Update();
+            base.FixedUpdate();
             Pan();
 
             void Pan()

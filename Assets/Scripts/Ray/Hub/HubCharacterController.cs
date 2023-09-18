@@ -15,9 +15,11 @@ namespace Hanako.Hub
         public enum PieceAnimationState { Die = -1, Idle, Run, Attack }
         public enum HandsScaleState { One, Double }
 
+        [SerializeField]
+        CharID charID;
+
         [SerializeField, SuffixLabel("x1000")]
         float walkSpeed = 2f;
-        const float WALK_SPEED_MULTIPLIER = 1000;
 
         [Header("Rigs")]
         [SerializeField]
@@ -29,8 +31,17 @@ namespace Hanako.Hub
         [SerializeField]
         Rig handsUpRig;
 
+        [Header("Minimap")]
+        [SerializeField]
+        HubMinimapIcon minimapIconPrefab;
+
+        [SerializeField]
+        Transform minimapIconParent;
+
+
         Animator animator;
         int int_motion, int_hands;
+        const float WALK_SPEED_MULTIPLIER = 1000;
         Vector2 moveDirection;
         Rigidbody2D rb;
         Collider2D col;
@@ -46,6 +57,9 @@ namespace Hanako.Hub
             rb = gameObject.GetComponent<Rigidbody2D>();
             col = gameObject.GetComponent<Collider2D>();
             handsUpRig.weight = 0;
+
+            var minimapIcon = Instantiate(minimapIconPrefab, minimapIconParent);
+            minimapIcon.Init(charID.Icon);
         }
 
         public void Init(HubCharacterBrain_Player brain)

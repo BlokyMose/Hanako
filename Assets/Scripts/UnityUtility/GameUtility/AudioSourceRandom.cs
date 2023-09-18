@@ -216,15 +216,19 @@ namespace UnityUtility
 
         public void PlayOneClipFromPack(string packName)
         {
+            bool isPlayed = false;
             foreach (var pack in audioPacks)
             {
                 if(pack.packName == packName)
                 {
                     StartCoroutine(pack.Play(audioSource));
+                    isPlayed = true;
                     break;
                 }
 
             }
+
+            if (!isPlayed) Debug.LogWarning($"Failed to play audio: {packName}");
         }
 
         public void PlayAllClipsFromPack(string packName)
@@ -238,6 +242,11 @@ namespace UnityUtility
                 }
 
             }
+        }
+
+        public void Stop()
+        {
+            audioSource.Stop();
         }
     }
 }

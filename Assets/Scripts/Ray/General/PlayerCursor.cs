@@ -113,7 +113,7 @@ namespace Hanako
             }
         }
 
-        protected virtual void Update()
+        protected virtual void FixedUpdate()
         {
             if (cursorInputMode == CursorInputMode.MousePosition && isFollowingMouse)
             {

@@ -81,8 +81,10 @@ namespace Hanako.Hanako
         public bool IsKillable { get => isKillable; }
         public bool IsAlive { get => isAlive; }
         public List<DestinationProperties> DestinationSequence { get => destinationSequence; }
+
         public event Func<HanakoDestinationID, int, HanakoDestination> GetDestinationByID;
         public event Func<HanakoGameState> GetGameState;
+        public event Action OnReachedExitDoor;
         public event Action OnDie;
 
         void Awake()
@@ -119,7 +121,8 @@ namespace Hanako.Hanako
             Func<HanakoGameState> getGameState,
             HanakoColors colors,
             HanakoIcons icons,
-            Action onDie)
+            Action onDie,
+            Action onReachedExitDoor)
         {
             this.destinationSequence = destinationSequence;
             this.exitDoor = exitDoor;
@@ -128,6 +131,7 @@ namespace Hanako.Hanako
             this.colors = colors;
             this.icons = icons;
             this.OnDie += onDie;
+            this.OnReachedExitDoor += onReachedExitDoor;
         }
 
         public void StartInitialMove()
@@ -370,6 +374,15 @@ namespace Hanako.Hanako
             DeactivateGOs(gosToDeactivateWhenNotMoving);
             if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
                 srEditor.BeTransparent(fadeOutDuration);
+            OnReachedExitDoor?.Invoke();
+
+            StartCoroutine(Delay(fadeOutDuration));
+            IEnumerator Delay(float delay)
+            {
+                yield return new WaitForSeconds(delay);
+                animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+                gameObject.SetActive(false);
+            }
         }
     }
 }

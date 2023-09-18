@@ -18,6 +18,8 @@ namespace Hanako
         [SerializeField, ShowIf(nameof(autoGetAllSRs))]
         List<SpriteRenderer> excludeSRs = new();
 
+
+
         Dictionary<SpriteRenderer, Color> initialColors = new();
 
         public void Awake()

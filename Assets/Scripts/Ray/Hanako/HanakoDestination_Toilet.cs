@@ -24,6 +24,43 @@ namespace Hanako.Hanako
         [SerializeField]
         Transform vfxSuccessfulAttackParent;
 
+        [Header("SFX")]
+        [SerializeField]
+        AudioSourceRandom uiAudioSource;
+
+        [SerializeField]
+        AudioSourceRandom doorAudioSource;
+
+        [SerializeField]
+        AudioSourceRandom hanakoAudioSource;
+
+        [SerializeField]
+        string sfxHoverName = "sfxHover";
+
+        [SerializeField]
+        string sfxClickName = "sfxClick";
+        
+        [SerializeField]
+        string sfxDoorOpenName = "sfxDoorOpen";
+        
+        [SerializeField]
+        string sfxDoorCloseName = "sfxDoorClose";
+
+        [SerializeField]
+        string sfxFlushName = "sfxFlush";
+
+        [SerializeField]
+        string sfxScreamName = "sfxScream";
+
+        [SerializeField]
+        string sfxKillName = "sfxKill";
+
+        [SerializeField]
+        string sfxKillBigName = "sfxKillBig";
+
+        [SerializeField]
+        string sfxLostName = "sfxLost";
+
         event Action OnLostGame;
         event Action<int, float> OnVFXSuccessfulAttack; // killedEnemies, delay
 
@@ -75,6 +112,7 @@ namespace Hanako.Hanako
         {
             base.WhenOccupationStart(enemy);
             animator.SetTrigger(tri_open);
+            doorAudioSource.PlayOneClipFromPack(sfxFlushName);
         }
 
         protected override void WhenOccupationEnd(HanakoEnemy enemy)
@@ -110,12 +148,14 @@ namespace Hanako.Hanako
                     // in case this function not called when two enemies enter & exit at the same time
                     if (lastOccupant != null && lastOccupant.transform.parent == postInteractPos)
                         lastOccupant.transform.parent = null;
+                    doorAudioSource.PlayOneClipFromPack(sfxDoorOpenName);
                 }
             }
             else // enemy exits
             {
                 if (lastOccupant != null)
                     lastOccupant.transform.parent = null;
+                doorAudioSource.PlayOneClipFromPack(sfxDoorCloseName);
             }
         }
 
@@ -129,6 +169,7 @@ namespace Hanako.Hanako
                 PlayAnimationPossessed();
                 PlayAnimationHanakoPeeks();
             }
+            uiAudioSource.PlayOneClipFromPack(sfxClickName);
 
             StartCoroutine(Delay(animationDuration));
             IEnumerator Delay(float delay)
@@ -163,6 +204,7 @@ namespace Hanako.Hanako
         {
             if (!canAttack) return;
             canAttack = false;
+            hanakoAudioSource.PlayOneClipFromPack(sfxScreamName);
 
             if (IsOuterEnemyDetecting())
             {
@@ -174,9 +216,19 @@ namespace Hanako.Hanako
                 {
                     foreach (var enemy in enemiesInDetectArea)
                         enemy.ReceiveAttack(this, enemyReceiveAttackDelay, enemyReceiveAttackDelay / 2f);
+                    StartCoroutine(PlaySFX(enemyReceiveAttackDelay, enemiesInDetectArea.Count));
                     killedEnemiesInLastAttack = enemiesInDetectArea.Count;
                     canInstantiateVFXSuccessfulAttack = true;
                     enemiesInDetectArea.Clear();
+
+                    IEnumerator PlaySFX(float delay, int killCount)
+                    {
+                        yield return new WaitForSeconds(delay);
+                        if (killCount == 1)
+                            hanakoAudioSource.PlayOneClipFromPack(sfxKillName);
+                        else
+                            hanakoAudioSource.PlayOneClipFromPack(sfxKillBigName);
+                    }
                 }
 
                 animator.SetTrigger(tri_attack);
@@ -212,6 +264,7 @@ namespace Hanako.Hanako
                 PlayAnimationHanakoHides();
                 var isFacingRight = enemiesDetecting.First().transform.position.x > transform.position.x;
                 hanakoFront.localEulerAngles = new Vector3(0, isFacingRight ? 0 : 180, 0);
+                hanakoAudioSource.PlayOneClipFromPack(sfxLostName);
                 OnLostGame?.Invoke();
             }
         }
@@ -250,25 +303,33 @@ namespace Hanako.Hanako
         {
             base.Hover();
 
+            uiAudioSource.PlayOneClipFromPack(sfxHoverName);
+
             if (occupationMode != OccupationMode.Player) return;
+
             isHighligthingEnemies = true;
             foreach (var enemy in enemiesDetecting)
                 enemy.Highlight(HanakoEnemy.HighlightMode.Detecting);
 
             foreach (var enemy in enemiesInDetectArea)
                 enemy.Highlight(HanakoEnemy.HighlightMode.Attackable);
+
+
         }
 
         public override void Unhover()
         {
             base.Unhover();
+            uiAudioSource.PlayOneClipFromPack(sfxHoverName);
             if (occupationMode != OccupationMode.Player) return;
+
             isHighligthingEnemies = false;
             foreach (var enemy in enemiesDetecting)
                 enemy.Highlight(HanakoEnemy.HighlightMode.None);
 
             foreach (var enemy in enemiesInDetectArea)
                 enemy.Highlight(HanakoEnemy.HighlightMode.None);
+
         }
 
         public void PlayAnimationPossessed()

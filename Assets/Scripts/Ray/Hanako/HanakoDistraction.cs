@@ -52,6 +52,23 @@ namespace Hanako.Hanako
         [SerializeField]
         HanakoIcons icons;
 
+
+        [Header("SFX")]
+        [SerializeField]
+        AudioSourceRandom uiAudioSource;
+
+        [SerializeField]
+        AudioSourceRandom fanAudioSource;
+
+        [SerializeField]
+        string sfxHoverName = "sfxHover";
+
+        [SerializeField]
+        string sfxClickName = "sfxClick";
+
+        [SerializeField]
+        string sfxFanSpinName = "sfxFanSpin";
+
         HashSet<HanakoEnemy> enemiesInDetectArea = new();
         float currentCooldown = -1f;
         protected int int_mode, tri_transition;
@@ -134,8 +151,10 @@ namespace Hanako.Hanako
 
         public void Hover()
         {
+            if (isHovering) return;
             isHovering = true;
             if (currentCooldown > 0f) return; // Hover() is called by DepletingCooldown once cooldown is done
+            uiAudioSource.PlayOneClipFromPack(sfxHoverName);
             colorSetter.ChangeColor(colors.HoverColor);
             HighlightEnemies();
             ShowActionIcon();
@@ -143,7 +162,9 @@ namespace Hanako.Hanako
 
         public void Unhover()
         {
+            if (!isHovering) return;
             isHovering = false;
+            uiAudioSource.PlayOneClipFromPack(sfxHoverName);
             colorSetter.ResetColor();
             ResetHighlightEnemies();
             HideActionIcon();
@@ -189,8 +210,10 @@ namespace Hanako.Hanako
                         enemy.ReceiveDistraction(transform.position);
                         distractedEnemies.Add(enemy);
                     }
-                
+
+                fanAudioSource.PlayOneClipFromPack(sfxFanSpinName);
                 yield return new WaitForSeconds(duration);
+                fanAudioSource.Stop();
 
                 foreach (var enemy in distractedEnemies)
                     enemy.MoveToCurrentDestination();
