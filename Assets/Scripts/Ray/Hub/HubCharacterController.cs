@@ -12,7 +12,6 @@ namespace Hanako.Hub
     [RequireComponent(typeof(Collider2D))]
     public class HubCharacterController : MonoBehaviour
     {
-        public enum PieceAnimationState { Die = -1, Idle, Run, Attack }
         public enum HandsScaleState { One, Double }
 
         [SerializeField]
@@ -82,11 +81,11 @@ namespace Hanako.Hub
 
             if (direction == Vector2.zero)
             {
-                animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+                animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
             }
             else
             {
-                animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
+                animator.SetInteger(int_motion, (int)CharacterMotion.Run);
             }
         }
 

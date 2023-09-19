@@ -63,6 +63,7 @@ namespace Hanako.Hanako
 
         event Action OnLostGame;
         event Action<int, float> OnVFXSuccessfulAttack; // killedEnemies, delay
+        event Action<int> OnEnemiesKilled; 
 
         int tri_open, tri_attack, tri_attackFailed, boo_isPossessed, boo_hanakoPeeks;
         bool canAttack = false;
@@ -101,11 +102,20 @@ namespace Hanako.Hanako
             }
         }
 
-        public void Init(HanakoColors colors, HanakoIcons icons, Func<HanakoLevelManager.HanakoGameState> getGameState, int indexOfAllDestinations, int indexOfSameID, Action onLostGame, Action<int, float> onVFXSuccessfulAttack)
+        public void Init(
+            HanakoColors colors, 
+            HanakoIcons icons, 
+            Func<HanakoLevelManager.HanakoGameState> getGameState, 
+            int indexOfAllDestinations, 
+            int indexOfSameID, 
+            Action onLostGame, 
+            Action<int, float> onVFXSuccessfulAttack,
+            Action<int> onEnemiesKilled)
         {
             base.Init(colors, icons, getGameState, indexOfAllDestinations,indexOfSameID);
             this.OnLostGame += onLostGame;
             this.OnVFXSuccessfulAttack += onVFXSuccessfulAttack;
+            this.OnEnemiesKilled += onEnemiesKilled;
         }
 
         protected override void WhenOccupationStart(HanakoEnemy enemy)
@@ -218,6 +228,7 @@ namespace Hanako.Hanako
                         enemy.ReceiveAttack(this, enemyReceiveAttackDelay, enemyReceiveAttackDelay / 2f);
                     StartCoroutine(PlaySFX(enemyReceiveAttackDelay, enemiesInDetectArea.Count));
                     killedEnemiesInLastAttack = enemiesInDetectArea.Count;
+                    OnEnemiesKilled?.Invoke(killedEnemiesInLastAttack);
                     canInstantiateVFXSuccessfulAttack = true;
                     enemiesInDetectArea.Clear();
 

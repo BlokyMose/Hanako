@@ -15,8 +15,6 @@ namespace Hanako.Knife
 
         public enum PieceActingState { Idling, PreActing, Acting, PostActing }
 
-        public enum PieceAnimationState { Die = -1, Idle, Run, Attack }
-
         [System.Serializable]
         public class VFXProperties
         {
@@ -164,7 +162,7 @@ namespace Hanako.Knife
 
         IEnumerator Moving(Vector2 destination)
         {
-            animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
+            animator.SetInteger(int_motion, (int)CharacterMotion.Run);
             yield return new WaitForSeconds(0.1f);
                 
             if (destination.x > transform.position.x)
@@ -186,7 +184,7 @@ namespace Hanako.Knife
                 transform.position = Vector2.Lerp(originPos, destination, tScale);
 
                 if (time > moveDuration-0.1f)
-                    animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+                    animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
                     
                 if (time >= moveDuration)
                 {
@@ -201,7 +199,7 @@ namespace Hanako.Knife
         public virtual void Attack(bool returnToCurrentStateAfterAttack = false)
         {
             var currentState = animator.GetInteger(int_motion);
-            animator.SetInteger(int_motion, (int)PieceAnimationState.Attack);
+            animator.SetInteger(int_motion, (int)CharacterMotion.Attack);
 
             StartCoroutine(Delay(attackDuration - 0.05f));
             IEnumerator Delay(float delay)
@@ -210,7 +208,7 @@ namespace Hanako.Knife
                 if (returnToCurrentStateAfterAttack)
                     animator.SetInteger(int_motion, currentState);
                 else
-                    animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+                    animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
             }
         }
         
@@ -224,7 +222,7 @@ namespace Hanako.Knife
             else if (otherPiece.Piece.transform.position.x < transform.position.x)
                 transform.localEulerAngles = new(transform.localEulerAngles.x, 180, transform.localEulerAngles.z);
 
-            animator.SetInteger(int_motion, (int) PieceAnimationState.Die);
+            animator.SetInteger(int_motion, (int) CharacterMotion.Die);
 
             if (vfxDie.VFX != null)
                 StartCoroutine(vfxDie.Play());
@@ -233,7 +231,7 @@ namespace Hanako.Knife
         public virtual void Resurrect(TileCache targetTile)
         {
             isAlive = true;
-            animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+            animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
             levelManager.ResurrectLivingPiece(this);
         }
 

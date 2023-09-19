@@ -39,6 +39,9 @@ namespace Hanako
         [SerializeField]
         float playTime;
 
+        [SerializeField]
+        LevelInfo currentLevel;
+
         [Header("Audio Settings")]
         [SerializeField]
         AudioMixer audioMixer;
@@ -91,6 +94,9 @@ namespace Hanako
             }
         }
 
+        public LevelInfo CurrentLevel { get => currentLevel; }
+
+        public void SetCurrentLevel(LevelInfo levelInfo) => this.currentLevel = levelInfo;
 
         public void AddPlayTime(float increment) => playTime += increment;
 

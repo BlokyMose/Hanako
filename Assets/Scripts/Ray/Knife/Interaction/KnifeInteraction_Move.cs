@@ -5,7 +5,6 @@ using UnityUtility;
 using static Hanako.Knife.KnifeLevel;
 using static Hanako.Knife.KnifeLevelManager;
 using static Hanako.Knife.KnifePiece_Living;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 namespace Hanako.Knife
 {
@@ -71,7 +70,7 @@ namespace Hanako.Knife
                 int int_motion;
                 int_motion = Animator.StringToHash(nameof(int_motion));
                 if (animator != null) 
-                    animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
+                    animator.SetInteger(int_motion, (int)CharacterMotion.Run);
 
                 yield return new WaitForSeconds(0.1f);
 
@@ -95,7 +94,7 @@ namespace Hanako.Knife
 
                     if (time > moveDuration - 0.1f)
                         if (animator != null) 
-                            animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+                            animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
 
                     if (time >= moveDuration)
                     {

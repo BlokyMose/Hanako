@@ -214,7 +214,7 @@ namespace Hanako.Hanako
 
         protected IEnumerator MoveOccupant(HanakoEnemy occupant, Vector2 targetPos, float duration)
         {
-            occupant.PlayAnimation(HanakoEnemy.PieceAnimationState.Run);
+            occupant.PlayAnimation(CharacterMotion.Run);
             var speed = Vector2.Distance(transform.position, targetPos) / duration;
             var time = 0f;
             while (time < duration)
@@ -224,7 +224,7 @@ namespace Hanako.Hanako
                 yield return null;
             }
             if (this.currentOccupant == occupant)
-                occupant.PlayAnimation(HanakoEnemy.PieceAnimationState.Idle);
+                occupant.PlayAnimation(CharacterMotion.Idle);
         }
 
 

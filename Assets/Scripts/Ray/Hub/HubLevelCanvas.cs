@@ -12,9 +12,6 @@ namespace Hanako.Hub
     [RequireComponent(typeof(CanvasGroup), typeof(Animator))]
     public class HubLevelCanvas : MonoBehaviour
     {
-        public enum SoulIconState { Dead, Alive }
-        public enum PlayButState { Pressed, Idle, Hover }
-
         [SerializeField]
         string levelNamePrefix = "Level: ";
 
@@ -68,7 +65,7 @@ namespace Hanako.Hub
             boo_show = Animator.StringToHash(nameof(boo_show));
 
             playButAnimator = playBut.GetComponent<Animator>();
-            playButAnimator.SetInteger(int_mode, (int)PlayButState.Idle);
+            playButAnimator.SetInteger(int_mode, (int)SolidButtonState.Idle);
             playBut.AddEventTriggers(
                 onClick: OnClickPlayBut,
                 onEnter: OnEnterPlayBut,
@@ -88,21 +85,21 @@ namespace Hanako.Hub
             {
                 if (isLoadingScene) return;
                 playButAudioSource.PlayOneClipFromPack(sfxHover);
-                playButAnimator.SetInteger(int_mode, (int)PlayButState.Hover);
+                playButAnimator.SetInteger(int_mode, (int)SolidButtonState.Hover);
             }
 
             void OnDownPlayBut()
             {
                 if (isLoadingScene) return;
                 playButAudioSource.PlayOneClipFromPack(sfxClick);
-                playButAnimator.SetInteger(int_mode, (int)PlayButState.Pressed);
+                playButAnimator.SetInteger(int_mode, (int)SolidButtonState.Pressed);
             }
 
             void OnExitPlayBut()
             {
                 if (isLoadingScene) return;
                 playButAudioSource.PlayOneClipFromPack(sfxHover);
-                playButAnimator.SetInteger(int_mode, (int)PlayButState.Idle);
+                playButAnimator.SetInteger(int_mode, (int)SolidButtonState.Idle);
             }
         }
 
@@ -140,7 +137,7 @@ namespace Hanako.Hub
             IEnumerator Delay(float delay)
             {
                 yield return new WaitForSeconds(delay);
-                playButAnimator.SetInteger(int_mode, (int)PlayButState.Idle);
+                playButAnimator.SetInteger(int_mode, (int)SolidButtonState.Idle);
             }
         }
 
@@ -149,7 +146,7 @@ namespace Hanako.Hub
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
             animator.SetBool(boo_show, false);
-            playButAnimator.SetInteger(int_mode, (int)PlayButState.Pressed);
+            playButAnimator.SetInteger(int_mode, (int)SolidButtonState.Pressed);
         }
 
         void PlayLevel()

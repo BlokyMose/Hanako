@@ -13,8 +13,6 @@ namespace Hanako.Hanako
     [RequireComponent(typeof(Collider2D))]
     public class HanakoEnemy : MonoBehaviour
     {
-        public enum PieceAnimationState { Die = -1, Idle, Run, Attack, Pushed, Scared = 11, Stiffed = 12, PointingScared = 13 }
-
         public enum HighlightMode { None, Detecting, Attackable, Distractable }
 
         [Header("Initialization")]
@@ -204,7 +202,7 @@ namespace Hanako.Hanako
             {
                 col.enabled = true;
                 thoughtBubble.Show(destination.ID.GetLogo(destination.IndexOfSameID), destination.ID.Color);
-                animator.SetInteger(int_motion, (int)PieceAnimationState.Run);
+                animator.SetInteger(int_motion, (int)CharacterMotion.Run);
                 ActivateGOs(gosToDeactivateWhenNotMoving);
                 colDetectArea.EnableCollider();
                 isKillable = true;
@@ -232,7 +230,7 @@ namespace Hanako.Hanako
                     col.enabled = false;
                     Highlight(HighlightMode.None); // in case RemoveEnemyInDetectArea not called because "isKillable = false" below executed first
                     thoughtBubble.Hide();
-                    animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+                    animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
                     DeactivateGOs(gosToDeactivateWhenNotMoving);
                     colDetectArea.DisableCollider();
                     isKillable = false;
@@ -247,14 +245,14 @@ namespace Hanako.Hanako
         public void DetectHanako(Vector2 hanakoPos)
         {
             this.StopCoroutineIfExists(corMoving);
-            animator.SetInteger(int_motion, (int)PieceAnimationState.PointingScared);
+            animator.SetInteger(int_motion, (int)CharacterMotion.PointingScared);
             var isFacingRight = hanakoPos.x > transform.position.x;
             transform.localEulerAngles = new(0, isFacingRight ? 0 : 180, 0);
             thoughtBubble.Hide();
             flashlightTarget.position = hanakoPos;
         }
 
-        public void PlayAnimation(PieceAnimationState state)
+        public void PlayAnimation(CharacterMotion state)
         {
             animator.SetInteger(int_motion, (int)state);
         }
@@ -278,7 +276,7 @@ namespace Hanako.Hanako
             isAlive = false; // this will prevent corMoving from entering a destination
 
             thoughtBubble.Hide();
-            animator.SetInteger(int_motion, (int)PieceAnimationState.Pushed);
+            animator.SetInteger(int_motion, (int)CharacterMotion.Pushed);
             colDetectArea.DisableCollider();
             DeactivateGOs(gosToDeactivateWhenNotMoving);
 
@@ -357,7 +355,7 @@ namespace Hanako.Hanako
             this.StopCoroutineIfExists(corMoving);
             var isFacingRight = transform.position.x < distractionPos.x;
             transform.localEulerAngles = new(0, isFacingRight ? 0 : 180, 0);
-            animator.SetInteger(int_motion, (int)PieceAnimationState.Stiffed);
+            animator.SetInteger(int_motion, (int)CharacterMotion.Stiffed);
 
             if (flashlight != null)
             {
@@ -380,7 +378,7 @@ namespace Hanako.Hanako
             IEnumerator Delay(float delay)
             {
                 yield return new WaitForSeconds(delay);
-                animator.SetInteger(int_motion, (int)PieceAnimationState.Idle);
+                animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
                 gameObject.SetActive(false);
             }
         }

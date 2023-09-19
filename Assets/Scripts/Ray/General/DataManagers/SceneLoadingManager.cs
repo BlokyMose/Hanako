@@ -28,6 +28,9 @@ namespace Hanako
         int boo_show;
         bool isLoading;
 
+        public bool IsUsingLevelInfo { get => isUsingLevelInfo; }
+        public SceneLoadingData SceneLoadingData { get => sceneLoadingData;  }
+
         void Awake()
         {
             canvasGroup = GetComponent<CanvasGroup>();

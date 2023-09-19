@@ -26,7 +26,10 @@ namespace Hanako
         KnifeLevel knifeLevel;
 
         [SerializeField]
-        int maxSoulCount = 3;
+        ScoreRule scoreRule;
+
+        [SerializeField, ListDrawerSettings(Expanded = true)]
+        List<int> scoreThresholds = new() { 100, 200, 300 };
 
         [Header("Runtime Data")]
 
@@ -42,14 +45,18 @@ namespace Hanako
         public GameInfo GameInfo { get => gameInfo; }
         public string LevelName { get => gameType switch {
             GameType.Hub => "To Hub",
-            GameType.Hanako => hanakoLevel.LevelName,
-            GameType.Knife => knifeLevel.LevelName,
+            GameType.Hanako => HanakoLevel.LevelName,
+            GameType.Knife => KnifeLevel.LevelName,
             _=> ""
         }; }
         public int Score { get => score; }
         public float PlayTime { get => playTime; }
         public int CurrentSoulCount { get => currentSoulCount; }
-        public int MaxSoulCount { get => maxSoulCount; }
+        public int MaxSoulCount { get => scoreThresholds.Count; }
+        public ScoreRule ScoreRule { get => scoreRule; }
+        public HanakoLevel HanakoLevel { get => hanakoLevel; }
+        public KnifeLevel KnifeLevel { get => knifeLevel; }
+        public List<int> ScoreThresholds { get => scoreThresholds;  }
 
         public void ResetRuntimeData()
         {

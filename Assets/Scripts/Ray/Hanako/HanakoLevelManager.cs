@@ -22,6 +22,10 @@ namespace Hanako.Hanako
         [SerializeField]
         float autoStartDuration = 2.5f;
 
+
+        [SerializeField]
+        LevelInfo levelInfo;
+
         [SerializeField]
         HanakoLevel level;
 
@@ -33,6 +37,16 @@ namespace Hanako.Hanako
 
         [SerializeField, ShowIf("@!"+nameof(level))]
         HanakoDistractionSequence distractionSequence;
+
+        [Header("Score")]
+        [SerializeField]
+        string killCountParamName = "kill";
+        
+        [SerializeField]
+        string multiKillCountParamName = "multiKill";
+
+        [SerializeField]
+        string playTimeParamName = "playTime";
 
         [Header("Components")]
         [SerializeField]
@@ -64,7 +78,7 @@ namespace Hanako.Hanako
         HanakoGameInfoCanvas gameInfoCanvas;
 
         [SerializeField]
-        HanakoGameOverCanvas gameOverCanvas;
+        ScoreCanvas scoreCanvas;
         
         [Header("Player: Hanako Crawl")]
         [SerializeField]
@@ -121,7 +135,8 @@ namespace Hanako.Hanako
         HanakoGameState gameState = HanakoGameState.Init;
         int killCount = 0;
         int exitCount = 0;
-        float gameTime;
+        int multiKillCount = 0;
+        float playTime;
         public event Action<int, int> OnAddKillCount;
 
         public HanakoDestination Door { get => exitDoor; }
@@ -131,7 +146,19 @@ namespace Hanako.Hanako
         public float EnemyReceiveAttackDelay { get => enemyReceiveAttackDelay; }
         public HanakoGameState GameState { get => gameState;  }
 
-        private void Awake()
+        void Awake()
+        {
+            var sceneLoading = FindObjectOfType<SceneLoadingManager>();
+            if (sceneLoading != null && sceneLoading.IsUsingLevelInfo)
+            {
+                levelInfo = sceneLoading.SceneLoadingData.LevelInfo;
+                level = levelInfo.HanakoLevel;
+            }
+
+           Init(level);
+        }
+
+        void Init(HanakoLevel level)
         {
             if (level != null)
             {
@@ -193,7 +220,8 @@ namespace Hanako.Hanako
                             destinations.Count, 
                             destinationIDCounter[destinationComponent.ID], 
                             LostGame, 
-                            PlayBloodSplatter);
+                            PlayBloodSplatter,
+                            AddMultiKillCount);
                     }
                     else
                     {
@@ -257,7 +285,14 @@ namespace Hanako.Hanako
                     enemyGO.name = enemies.Count + "_" + enemyGO.name;
                     enemyGO.transform.localPosition = Vector3.zero;
                     var enemyComponent = enemyGO.GetComponent<HanakoEnemy>();
-                    enemyComponent.Init(enemy.DestinationSequence,exitDoor, GetDestinationByIDAndIndexOfSameID,()=>GameState, colors,icons, AddKillCount, AddExitCount);
+                    enemyComponent.Init(
+                        enemy.DestinationSequence,
+                        exitDoor, 
+                        GetDestinationByIDAndIndexOfSameID,
+                        ()=>GameState, 
+                        colors,icons, 
+                        AddKillCount, 
+                        AddExitCount);
                     enemies.Add(enemyComponent);
                 }
 
@@ -386,7 +421,7 @@ namespace Hanako.Hanako
             {
                 while (true)
                 {
-                    gameTime += Time.deltaTime;
+                    playTime += Time.deltaTime;
                     yield return null;
                 }
             }   
@@ -404,7 +439,8 @@ namespace Hanako.Hanako
             IEnumerator Delay(float delay)
             {
                 yield return new WaitForSeconds(delay);
-                gameOverCanvas.Init(false, level, killCount, enemies.Count, gameTime);
+                Debug.LogWarning("Make LOST canvas");
+                //scoreCanvas.Init();
             }
         }
 
@@ -417,7 +453,12 @@ namespace Hanako.Hanako
             IEnumerator Delay(float delay)
             {
                 yield return new WaitForSeconds(delay);
-                gameOverCanvas.Init(true, level, killCount, enemies.Count, gameTime);
+                scoreCanvas.Init(levelInfo, new List<ScoreDetail>()
+                {
+                    new(killCountParamName,killCount),
+                    new(multiKillCountParamName,multiKillCount),
+                    new(playTimeParamName,(int)playTime)
+                });
             }
         }
 
@@ -474,6 +515,11 @@ namespace Hanako.Hanako
             killCount++;
             OnAddKillCount(killCount,enemies.Count);
             CheckWinningCondition();
+        }
+
+        void AddMultiKillCount(int enemiesKilledCount)
+        {
+            multiKillCount++;
         }
 
         void AddExitCount()
