@@ -26,7 +26,7 @@ namespace Hanako
         KnifeLevel knifeLevel;
 
         [SerializeField]
-        ScoreRule scoreRule;
+        ScoreRules scoreRules;
 
         [SerializeField, ListDrawerSettings(Expanded = true)]
         List<int> scoreThresholds = new() { 100, 200, 300 };
@@ -53,7 +53,7 @@ namespace Hanako
         public float PlayTime { get => playTime; }
         public int CurrentSoulCount { get => currentSoulCount; }
         public int MaxSoulCount { get => scoreThresholds.Count; }
-        public ScoreRule ScoreRule { get => scoreRule; }
+        public ScoreRules ScoreRules { get => scoreRules; }
         public HanakoLevel HanakoLevel { get => hanakoLevel; }
         public KnifeLevel KnifeLevel { get => knifeLevel; }
         public List<int> ScoreThresholds { get => scoreThresholds;  }

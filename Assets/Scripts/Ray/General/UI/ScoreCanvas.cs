@@ -1,3 +1,4 @@
+using Encore.Utility;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,25 +9,37 @@ using UnityUtility;
 
 namespace Hanako
 {
+    [RequireComponent(typeof(Animator))]
     public class ScoreCanvas : MonoBehaviour
     {
+        enum ThresholdTextAnimation { Idle, Active}
+
         [System.Serializable]
         public class ScoreTower
         {
-            public Animator soulIcon;
-            public Image fill;
-            public TextMeshProUGUI threshold;
+            [SerializeField]
+            Animator soulIcon;
 
-            public ScoreTower(Animator soulIcon, Image fill, TextMeshProUGUI threshold)
-            {
-                this.soulIcon = soulIcon;
-                this.fill = fill;
-                this.threshold = threshold;
-            }
+            [SerializeField]
+            Image fill;
+
+            [SerializeField]
+            TextMeshProUGUI threshold;
+
+            [SerializeField]
+            Animator thresholdAnimator;
+
+            public Animator SoulIcon { get => soulIcon; }
+            public Image Fill { get => fill; }
+            public TextMeshProUGUI Threshold { get => threshold; }
+            public Animator ThresholdAnimator { get => thresholdAnimator; }
         }
 
         [SerializeField]
         LevelInfo levelInfo;
+
+        [SerializeField]
+        float ruleAnimationDuration = 1f;
 
         [Header("Components")]
         [SerializeField]
@@ -44,20 +57,52 @@ namespace Hanako
         [SerializeField]
         List<ScoreTower> scoreTowers = new();
 
+
         [Header("Buttons")]
         [SerializeField]
-        Image againBut;
-
+        Image againBut;  
+        
         [SerializeField]
         Image hubBut;
 
-        int int_mode;
+        [Header("SFX")]
+        [SerializeField]
+        AudioSourceRandom audioSource;
+        
+        [SerializeField]
+        AudioSourceRandom audioSourceButton;
+
+        [SerializeField]
+        string sfxRiser = "sfxRiser";
+
+        [SerializeField]
+        string sfxConfirmName = "sfxConfirm";
+
+        [SerializeField]
+        string sfxHoverName = "sfxHover";
+
+        [SerializeField]
+        string sfxClickName = "sfxClick";
+
+        int int_mode, tri_confirm, boo_overScore;
+        Animator animator, againButAnimator, hubButAnimator;
+
+        [Header("Debug")]
+        [SerializeField]
+        int killCount = 1;
+        [SerializeField]
+        int multiKillCount = 1;
+        [SerializeField]
+        int playTime = 1;
 
         void Awake()
         {
+            animator = GetComponent<Animator>();
             int_mode = Animator.StringToHash(nameof(int_mode));
+            tri_confirm = Animator.StringToHash(nameof(tri_confirm));
+            boo_overScore = Animator.StringToHash(nameof(boo_overScore));
 
-            var againButAnimator = againBut.GetComponent<Animator>();
+            againButAnimator = againBut.GetComponent<Animator>();
             againBut.AddEventTriggers(
                 onEnter:OnEnterAgainBut,
                 onExit:OnExitAgainBut,
@@ -65,7 +110,7 @@ namespace Hanako
                 onClick:OnClickAgainBut
                 );
 
-            var hubButAnimator = hubBut.GetComponent<Animator>();
+            hubButAnimator = hubBut.GetComponent<Animator>();
             hubBut.AddEventTriggers(
                 onEnter: OnEnterHubBut,
                 onExit: OnExitHubBut,
@@ -73,41 +118,25 @@ namespace Hanako
                 onClick: OnClickHubBut
                 );
 
-
-            StartCoroutine(Delay(1f));
-            IEnumerator Delay(float delay)
-            {
-                yield return new WaitForSeconds(delay);
-                againButAnimator.SetInteger(int_mode, (int)SolidButtonState.Idle);
-                hubButAnimator.SetInteger(int_mode, (int)SolidButtonState.Idle);
-            }
-
-            Init(levelInfo, new List<ScoreDetail>()
-            {
-                new ("kill",1),
-                new ("multiKill",1),
-                new ("playTime",10)
-            });
-
-
             #region [Methods: Again But]
 
 
             void OnEnterAgainBut()
             {
                 againButAnimator.SetInteger(int_mode, (int)SolidButtonState.Hover);
+                audioSourceButton.PlayOneClipFromPack(sfxHoverName);
             }
 
             void OnExitAgainBut()
             {
                 againButAnimator.SetInteger(int_mode, (int)SolidButtonState.Idle);
-
+                audioSourceButton.PlayOneClipFromPack(sfxHoverName);
             }
 
             void OnDownAgainBut()
             {
                 againButAnimator.SetInteger(int_mode, (int)SolidButtonState.Pressed);
-
+                audioSourceButton.PlayOneClipFromPack(sfxClickName);
             }
 
             void OnClickAgainBut()
@@ -121,25 +150,25 @@ namespace Hanako
 
             #endregion
 
-
             #region [Methods: Hub But]
 
 
             void OnEnterHubBut()
             {
                 hubButAnimator.SetInteger(int_mode, (int)SolidButtonState.Hover);
+                audioSourceButton.PlayOneClipFromPack(sfxHoverName);
             }
 
             void OnExitHubBut()
             {
                 hubButAnimator.SetInteger(int_mode, (int)SolidButtonState.Idle);
-
+                audioSourceButton.PlayOneClipFromPack(sfxHoverName);
             }
 
             void OnDownHubBut()
             {
                 hubButAnimator.SetInteger(int_mode, (int)SolidButtonState.Pressed);
-
+                audioSourceButton.PlayOneClipFromPack(sfxClickName);
             }
 
             void OnClickHubBut()
@@ -152,10 +181,30 @@ namespace Hanako
             }
 
             #endregion
+
+            //Init(levelInfo, new List<ScoreDetail>()
+            //{
+            //    new ("kill",killCount),
+            //    new ("multiKill",multiKillCount),
+            //    new ("playTime",playTime)
+            //});
+        }
+
+        private void Start()
+        {
+            StartCoroutine(DelayButAnimation(1f));
+            IEnumerator DelayButAnimation(float delay)
+            {
+                yield return new WaitForSeconds(delay);
+                againButAnimator.SetInteger(int_mode, (int)SolidButtonState.Idle);
+                hubButAnimator.SetInteger(int_mode, (int)SolidButtonState.Idle);
+            }
         }
 
         public void Init(LevelInfo levelInfo, List<ScoreDetail> scoreDetails)
         {
+
+
             this.levelInfo = levelInfo;
             scoreDetailsParent.DestroyChildren();
 
@@ -163,62 +212,112 @@ namespace Hanako
             scoreText.text = levelInfo.Score.ToString();
 
             for (int i = 0; i < scoreTowers.Count; i++)
-            {
-                var tower = scoreTowers[i];
                 if (i < levelInfo.ScoreThresholds.Count)
-                {
-                    tower.threshold.text = levelInfo.ScoreThresholds[i].ToString();
-                }
-            }
+                    scoreTowers[i].Threshold.text = levelInfo.ScoreThresholds[i].ToString();
 
-            StartCoroutine(Delay());
-            IEnumerator Delay()
+            StartCoroutine(AnimatingUI());
+            IEnumerator AnimatingUI()
             {
                 yield return new WaitForSeconds(1f);
 
-                var score = 0f;
-                foreach (var rule in levelInfo.ScoreRule.Rules)
+                var totalScore = 0f;
+                if (levelInfo.ScoreRules.Rules.Count < 3)
+                    audioSource.PlayOneClipFromPack(sfxRiser);
+
+                for (int i = 0; i < levelInfo.ScoreRules.Rules.Count; i++)
                 {
-                    var detailText = Instantiate(scoreDetailTextPrefab, scoreDetailsParent);
+                    if (levelInfo.ScoreRules.Rules.Count - i == 3)
+                        audioSource.PlayOneClipFromPack(sfxRiser);
 
-                    var detailTextContent = rule.DisplayFormat;
-                    detailTextContent = detailTextContent.Replace(
-                        levelInfo.ScoreRule.OpenToken + "displayName" + levelInfo.ScoreRule.CloseToken,
-                        rule.DisplayName);
+                    var rule = levelInfo.ScoreRules.Rules[i];
+                    var toReceiveScore = GetValue(scoreDetails, rule) * rule.ScoreMultiplier;
+                    MakeScoreDetailText(scoreDetailTextPrefab, scoreDetailsParent, levelInfo.ScoreRules, rule, scoreDetails);
+                    
+                    yield return StartCoroutine(AnimatingScoreUI(totalScore, toReceiveScore));
 
-                    detailTextContent = detailTextContent.Replace(
-                        levelInfo.ScoreRule.OpenToken + "scoreMultiplier" + levelInfo.ScoreRule.CloseToken,
-                        rule.ScoreMultiplier.ToString());
+                    totalScore += toReceiveScore;
+                    scoreText.text = ((int)totalScore).ToString();
+                    FillTowers(levelInfo, totalScore);
+                    animator.SetTrigger(tri_confirm);
+                    audioSource.PlayOneClipFromPack(sfxConfirmName);
 
-                    var valueDetail = scoreDetails.Find(x => x.ParamName == rule.ParamName);
-                    var value = valueDetail != null ? valueDetail.Value : 0;
-                    detailTextContent = detailTextContent.Replace(
-                        levelInfo.ScoreRule.OpenToken + "value" + levelInfo.ScoreRule.CloseToken,
-                        value.ToString());
+                    #region [Methods]
 
-                    detailText.Init(detailTextContent);
-
-                    var previousScore = score;
-                    var receivedScore = value * rule.ScoreMultiplier;
-                    var targetScore = previousScore + receivedScore;
-                    var isTargetScorePositive = score < targetScore;
-                    var increment = isTargetScorePositive ? 1 : -1;
-
-                    while ( (isTargetScorePositive && score < targetScore) ||
-                            (!isTargetScorePositive && score > targetScore))
+                    void MakeScoreDetailText(ScoreDetailText scoreDetailTextPrefab, Transform scoreDetailsParent, ScoreRules scoreRule, ScoreRules.Rule rule, List<ScoreDetail> scoreDetails)
                     {
-                        score+=increment;
-                        scoreText.text = ((int)score).ToString();
-                        yield return null;
+                        var detailText = Instantiate(scoreDetailTextPrefab, scoreDetailsParent);
+                        var detailTextContent = rule.DisplayFormat;
+                        detailTextContent = detailTextContent.Replace(
+                            scoreRule.OpenToken + "displayName" + scoreRule.CloseToken,
+                            rule.DisplayName);
+
+                        detailTextContent = detailTextContent.Replace(
+                            scoreRule.OpenToken + "scoreMultiplier" + scoreRule.CloseToken,
+                            rule.ScoreMultiplier.ToString());
+
+                        var valueDetail = scoreDetails.Find(x => x.ParamName == rule.ParamName);
+                        var value = valueDetail != null ? valueDetail.Value : 0;
+                        detailTextContent = detailTextContent.Replace(
+                            scoreRule.OpenToken + "value" + scoreRule.CloseToken,
+                            value.ToString());
+
+                        detailText.Init(detailTextContent, rule.FontColor);
                     }
 
+                    void FillTowers(LevelInfo levelInfo, float score)
+                    {
+                        var scoreLeft = score;
+                        int thresholdIndex = 0;
+                        foreach (var threshold in levelInfo.ScoreThresholds)
+                        {
+                            var tower = scoreTowers[thresholdIndex];
+                            scoreLeft -= threshold;
+                            if (scoreLeft < 0)
+                            {
+                                tower.Fill.fillAmount = (1 - (-scoreLeft) / threshold);
+                                tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Dead);
+                                tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Idle);
+                                break;
+                            }
+                            else
+                            {
+                                if (thresholdIndex > scoreTowers.Count) break;
+                                tower.Fill.fillAmount = 1f;
+                                tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Alive);
+                                tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Active);
+                                scoreLeft += threshold;
+                                thresholdIndex++;
+                            }
+                        }
+                    }
+
+                    int GetValue(List<ScoreDetail> scoreDetails, ScoreRules.Rule targetRule)
+                    {
+                        var valueDetail = scoreDetails.Find(x => x.ParamName == targetRule.ParamName);
+                        return valueDetail != null ? valueDetail.Value : 0;
+                    }
+
+                    IEnumerator AnimatingScoreUI(float previousTotalScore, float toReceiveScore)
+                    {
+                        var time = 0f;
+                        var curve = AnimationCurve.Linear(0, 0, ruleAnimationDuration, toReceiveScore);
+                        var animatedScore = previousTotalScore;
+                        while (time < ruleAnimationDuration)
+                        {
+                            animatedScore = previousTotalScore + curve.Evaluate(time);
+                            scoreText.text = ((int)animatedScore).ToString();
+                            FillTowers(levelInfo, animatedScore);
+                            time += Time.deltaTime;
+                            yield return null;
+                        }
+                    }
+
+                    #endregion
                 }
 
+                if (totalScore >= levelInfo.ScoreThresholds.GetLast())
+                    animator.SetBool(boo_overScore, true);
             }
-
-
-
-            //tower.soulIcon.SetInteger(int_mode, (int)SoulIconState.Alive);
         }
     }
 }

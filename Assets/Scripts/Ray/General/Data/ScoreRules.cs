@@ -6,7 +6,7 @@ namespace Hanako
 {
     [CreateAssetMenu(fileName ="ScoreRule_", menuName ="SO/Score Rule")]
 
-    public class ScoreRule : ScriptableObject
+    public class ScoreRules : ScriptableObject
     {
         [System.Serializable]
         public class Rule

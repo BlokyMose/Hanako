@@ -10,9 +10,10 @@ namespace Hanako
         [SerializeField]
         TextMeshProUGUI text;
 
-        public void Init(string text)
+        public void Init(string text, Color textColor)
         {
             this.text.text = text;
+            this.text.color = textColor;
         }
     }
 }

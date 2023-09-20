@@ -79,6 +79,9 @@ namespace Hanako.Hanako
 
         [SerializeField]
         ScoreCanvas scoreCanvas;
+
+        [SerializeField]
+        LostCanvas lostCanvas;
         
         [Header("Player: Hanako Crawl")]
         [SerializeField]
@@ -155,7 +158,14 @@ namespace Hanako.Hanako
                 level = levelInfo.HanakoLevel;
             }
 
-           Init(level);
+            if (scoreCanvas == null)
+                scoreCanvas = FindObjectOfType<ScoreCanvas>();
+            scoreCanvas.gameObject.SetActive(false);
+            if (lostCanvas == null)
+                lostCanvas = FindObjectOfType<LostCanvas>();
+            lostCanvas.gameObject.SetActive(false);
+
+            Init(level);
         }
 
         void Init(HanakoLevel level)
@@ -427,8 +437,15 @@ namespace Hanako.Hanako
             }   
         }
 
+        void EndGame()
+        {
+            if (cursor != null)
+                cursor.Exit(SetHanakoCrawl);
+        }
+
         public void LostGame()
         {
+            EndGame();
             gameState = HanakoGameState.Lost;
             StopCoroutine(corInitializingGame);
             foreach (var enemy in enemies)
@@ -439,13 +456,13 @@ namespace Hanako.Hanako
             IEnumerator Delay(float delay)
             {
                 yield return new WaitForSeconds(delay);
-                Debug.LogWarning("Make LOST canvas");
-                //scoreCanvas.Init();
+                lostCanvas.gameObject.SetActive(true);
             }
         }
 
         public void WonGame()
         {
+            EndGame();
             gameState = HanakoGameState.Won;
             StopAllCoroutines();
 
@@ -453,6 +470,7 @@ namespace Hanako.Hanako
             IEnumerator Delay(float delay)
             {
                 yield return new WaitForSeconds(delay);
+                scoreCanvas.gameObject.SetActive(true);
                 scoreCanvas.Init(levelInfo, new List<ScoreDetail>()
                 {
                     new(killCountParamName,killCount),

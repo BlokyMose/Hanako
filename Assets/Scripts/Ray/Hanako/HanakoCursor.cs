@@ -10,19 +10,23 @@ namespace Hanako.Hanako
 {
     public class HanakoCursor : PlayerCursor
     {
+        [Header("Hanako")]
+        [SerializeField]
+        bool isInGame = false;
+
         IHanakoInteractableByCursor hoveredObject;
         HanakoDestination_Toilet possessedToilet;
         event Action<HanakoDestination_Toilet, HanakoDestination_Toilet> OnPossess;
         HanakoLevelManager levelManager;
         float possessCooldown = 0f;
-
         public HanakoDestination_Toilet PossessedToilet { get => possessedToilet; }
 
         public void Init(HanakoLevelManager levelManager, HanakoDestination_Toilet initialPossessedToilet, Action<HanakoDestination_Toilet, HanakoDestination_Toilet> onPossess)
         {
-            this.possessedToilet = initialPossessedToilet;
             OnPossess += onPossess;
+            this.possessedToilet = initialPossessedToilet;
             this.levelManager = levelManager;
+            isInGame = true;
 
             StartCoroutine(Update());
             IEnumerator Update()
@@ -38,19 +42,24 @@ namespace Hanako.Hanako
         public void Exit(Action<HanakoDestination_Toilet, HanakoDestination_Toilet> onPossess)
         {
             OnPossess -= onPossess;
-
+            isInGame = false;
+            StopAllCoroutines();
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.TryGetComponent<IHanakoInteractableByCursor>(out var interctableObject))
+            if (!isInGame) return;
+
+            if (collision.TryGetComponent<IHanakoInteractableByCursor>(out var interactableObject))
             {
-                Hover(interctableObject);
+                Hover(interactableObject);
             }
         }
 
         private void OnTriggerExit2D(Collider2D collision)
         {
+            if (!isInGame) return;
+
             if (collision.TryGetComponent<IHanakoInteractableByCursor>(out var interctableObject))
             {
                 if (interctableObject == hoveredObject)
@@ -61,6 +70,8 @@ namespace Hanako.Hanako
         public override void ClickState(bool isClicking)
         {
             base.ClickState(isClicking);
+            if (!isInGame) return;
+
             if (!isClicking || hoveredObject == null) return;
 
             if (hoveredObject is HanakoDestination_Toilet)
