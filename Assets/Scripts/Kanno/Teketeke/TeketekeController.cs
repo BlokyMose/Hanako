@@ -9,11 +9,15 @@ namespace Hanako
         [SerializeField] private float speed;//プレイヤーの移動速度
         [SerializeField] private float maxY, minY; //移動範囲の制限
 
-       
+        private BoxCollider2D targetCollider;
+
+
+
+
 
         void Start()
         {
-
+            targetCollider = null;
         }
 
         // Update is called once per frame
@@ -59,9 +63,10 @@ namespace Hanako
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
+            targetCollider = collision.gameObject.GetComponent<BoxCollider2D>();
             if (collision.CompareTag("desk") || collision.CompareTag("chair") || collision.CompareTag("lectern"))
             {
-                collision.gameObject.SetActive(false);
+                targetCollider.enabled = false;
             }
         }
 
