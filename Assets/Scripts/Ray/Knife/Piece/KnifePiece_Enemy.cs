@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityUtility;
 using static Hanako.Knife.KnifeLevel;
 using static Hanako.Knife.KnifeLevelManager;
 
@@ -46,6 +47,16 @@ namespace Hanako.Knife
         [SerializeField]
         List<PreferenceProperties> movePreferences = new();
 
+        [Header("Enemy: SFX")]
+        [SerializeField]
+        AudioSourceRandom bloodAudioSource;
+
+        [SerializeField]
+        AudioSourceRandom hurtAudioSource;
+
+        [SerializeField]
+        string sfxDeadName = "sfxDead";
+
         public override void WhenWaitingForAct()
         {
             base.WhenWaitingForAct();
@@ -77,6 +88,11 @@ namespace Hanako.Knife
             }
         }
 
-
+        public override void Die(LivingPieceCache otherPiece)
+        {
+            base.Die(otherPiece);
+            bloodAudioSource.PlayOneClipFromPack(sfxDeadName);
+            hurtAudioSource.PlayOneClipFromPack(sfxDeadName);
+        }
     }
 }

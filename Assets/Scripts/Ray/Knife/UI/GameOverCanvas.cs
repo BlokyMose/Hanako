@@ -120,11 +120,11 @@ namespace Hanako.Knife
         void Won(KnifeLevelManager levelManager)
         {
             titleText.text = titleTemplate.Replace("{}", levelManager.LevelProperties.LevelName);
-            soulCountText.text = soulTemplate.ReplaceFirst("{}", levelManager.SoulCount.ToString());
+            soulCountText.text = soulTemplate.ReplaceFirst("{}", levelManager.KillCount.ToString());
             soulCountText.text = soulCountText.text.ReplaceFirst("{}", (levelManager.LevelProperties.PiecesPattern.GetLivingPieces().Count).ToString());
             roundCountText.text = roundTemplate.ReplaceFirst("{}", levelManager.RoundCount.ToString());
             roundCountText.text = roundCountText.text.ReplaceFirst("{}", levelManager.LevelProperties.RoundCount.ToString());
-            timeText.text = timeTemplate.Replace("{}", MathUtility.SecondsToTimeString(levelManager.GameTime));
+            timeText.text = timeTemplate.Replace("{}", MathUtility.SecondsToTimeString(levelManager.PlayTime));
 
             ShowCanvas();
 
@@ -133,11 +133,11 @@ namespace Hanako.Knife
         void Lost(KnifeLevelManager levelManager)
         {
             titleText.text = titleLostTemplate.Replace("{}", levelManager.LevelProperties.LevelName);
-            soulCountText.text = soulTemplate.ReplaceFirst("{}", levelManager.SoulCount.ToString());
+            soulCountText.text = soulTemplate.ReplaceFirst("{}", levelManager.KillCount.ToString());
             soulCountText.text = soulCountText.text.ReplaceFirst("{}", (levelManager.LevelProperties.PiecesPattern.GetLivingPieces().Count).ToString());
             roundCountText.text = roundTemplate.ReplaceFirst("{}", levelManager.RoundCount.ToString());
             roundCountText.text = roundCountText.text.ReplaceFirst("{}", levelManager.LevelProperties.RoundCount.ToString());
-            timeText.text = timeTemplate.Replace("{}", MathUtility.SecondsToTimeString(levelManager.GameTime));
+            timeText.text = timeTemplate.Replace("{}", MathUtility.SecondsToTimeString(levelManager.PlayTime));
 
             ShowCanvas();
         }

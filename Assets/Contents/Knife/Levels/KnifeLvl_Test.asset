@@ -16,9 +16,12 @@ MonoBehaviour:
   levelSize:
     col: 6
     row: 6
-  tileSize: {x: 2.55, y: 1.275}
+  tileSize: {x: 2.56, y: 1.28}
+  wallSize: {x: 2.56, y: 3.2}
   originOffset: {x: 0, y: 0}
+  bottomWallStoriesCount: 2
   tilesPattern: {fileID: 11400000, guid: 15c3197ff426dbd4785fcc899ba84e7c, type: 2}
   wallsPattern: {fileID: 11400000, guid: e369b8b89ff14334c81bd49dbf2e459c, type: 2}
+  bottomWallsPattern: {fileID: 11400000, guid: bd600e00e6a05854bb91cc509af0a221, type: 2}
   roundCount: 6
   piecesPattern: {fileID: 11400000, guid: 2f0566aab5a6bcd4eb781017870b9174, type: 2}

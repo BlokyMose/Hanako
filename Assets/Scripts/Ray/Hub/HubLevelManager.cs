@@ -1,7 +1,6 @@
 using Hanako.Dialogue;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Build.Content;
 using UnityEngine;
 
 namespace Hanako.Hub
@@ -55,9 +54,6 @@ namespace Hanako.Hub
 
         public void LoadScene(LevelInfo levelInfo)
         {
-            var allGamesInfo = FindObjectOfType<AllGamesInfoManager>();
-            if (allGamesInfo != null)
-                allGamesInfo.AllGamesInfo.SetCurrentLevel(levelInfo);
             sceneLoadingManager.LoadScene(levelInfo);
         }
     }

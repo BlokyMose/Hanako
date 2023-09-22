@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50f90a2334b9bc84982da2092aed3e12, type: 3}
+  m_Name: KnifeWalls_ByIndex_OuterWall
+  m_EditorClassIdentifier: 
+  patternName: 
+  leftWallColor: {r: 1, g: 1, b: 1, a: 1}
+  rightWallColor: {r: 0.79215693, g: 0.79215693, b: 0.79215693, a: 1}
+  walls:
+  - {fileID: 5012970997852608106, guid: 9278c87eae36ddd45ab29d9a45928340, type: 3}
+  - {fileID: 5012970997852608106, guid: 0427c04ea9f12c449a93ef275d374386, type: 3}
+  - {fileID: 5012970997852608106, guid: fabe04422f7200e428eaddd75ea4b9ab, type: 3}

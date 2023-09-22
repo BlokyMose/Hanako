@@ -225,10 +225,9 @@ namespace UnityUtility
                     isPlayed = true;
                     break;
                 }
-
             }
 
-            if (!isPlayed) Debug.LogWarning($"Failed to play audio: {packName}");
+            if (!isPlayed) Debug.LogWarning($"Cannot find packName: {packName}");
         }
 
         public void PlayAllClipsFromPack(string packName)

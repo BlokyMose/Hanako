@@ -25,7 +25,20 @@ namespace Hanako.Knife
         Camera gameCamera;
 
         [SerializeField]
+        List<Collider2D> tileUnhoverCols = new();
+
+        [SerializeField]
         KnifeColors colors;
+
+        [Header("Knife: SFX")]
+        [SerializeField]
+        AudioSourceRandom audioSourceKnife;
+
+        [SerializeField]
+        string sfxTileRiseName = "sfxTileRise";
+
+        [SerializeField]
+        string sfxTileFallName = "sfxTileFall";
 
         KnifeTile hoveredTile, hoveredValidTile;
         KnifeLevelManager levelManager;
@@ -37,11 +50,17 @@ namespace Hanako.Knife
         bool canHover = true;
         bool canPan = true;
 
-        public void Init(KnifeLevelManager levelManager, int controllerID)
+        protected override void Awake()
+        {
+            base.Awake();
+        }
+
+        public void Init(KnifeLevelManager levelManager, int controllerID, List<Collider2D> tileUnhoverCols)
         {
             this.levelManager = levelManager;
             this.colors = levelManager.Colors;
             this.controllerID = controllerID;
+            this.tileUnhoverCols = tileUnhoverCols;
 
             levelManager.OnGameOver += (isPlayerDead) => { canHover = false; canPan = false; };
         }
@@ -95,13 +114,9 @@ namespace Hanako.Knife
             {
                 Hover(tile);
             }
-        }
-
-        private void OnTriggerExit2D(Collider2D collision)
-        {
-            if (collision.TryGetComponentInFamily<KnifeTile>(out var tile) && hoveredTile == tile)
+            else if (tileUnhoverCols.Contains(collision) && hoveredTile!=null)
             {
-                Unhover(tile);
+                Unhover(hoveredTile);
             }
         }
 
@@ -122,6 +137,7 @@ namespace Hanako.Knife
 
             hoveredTile = tile;
             var tilePiece = hoveredTile.GetPiece();
+            audioSourceKnife.PlayOneClipFromPack(sfxTileRiseName);
 
             if (isMyTurn)
             {
@@ -195,6 +211,7 @@ namespace Hanako.Knife
             }
 
             tile.Unhovered();
+            audioSourceKnife.PlayOneClipFromPack(sfxTileFallName);
             hoveredTile = null;
             hoveredValidTile = null;
             if (infoCanvas != null )

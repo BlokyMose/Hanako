@@ -7,7 +7,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityUtility;
+using static Cinemachine.DocumentationSortingAttribute;
 using static Hanako.Knife.KnifeLevel;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 namespace Hanako.Knife
 {
@@ -296,6 +298,12 @@ namespace Hanako.Knife
         #region [Vars: Serialiazables]
 
         [SerializeField]
+        LevelInfoInitMode levelInfoInit = LevelInfoInitMode.SceneLoadingData;
+
+        [SerializeField, ShowIf("@"+nameof(levelInfoInit)+"=="+nameof(LevelInfoInitMode)+"."+nameof(LevelInfoInitMode.LevelInfo))]
+        LevelInfo levelInfo;
+
+        [SerializeField, ShowIf("@"+nameof(levelInfoInit)+"=="+nameof(LevelInfoInitMode)+"."+nameof(LevelInfoInitMode.LevelProperties))]
         KnifeLevel levelProperties;
 
         [SerializeField]
@@ -317,6 +325,9 @@ namespace Hanako.Knife
         [SerializeField]
         KnifeTurnOrderText turnOrderTextPrefab;
 
+        [SerializeField]
+        GameObject tileUnhoverColPrefab;
+
         [Header("Game")]
         [SerializeField]
         float moveDuration = 1f;
@@ -332,6 +343,29 @@ namespace Hanako.Knife
 
         [SerializeField]
         Vector2 panAreaMin = new(-4, -2);
+
+        [SerializeField]
+        string killParamName = "kill";
+
+        [SerializeField]
+        string turnParamName = "turn";
+
+        [SerializeField]
+        string playTimeParamName = "playTime";
+
+        [Header("UI")]
+        [SerializeField]
+        ScoreCanvas scoreCanvas;
+
+        [SerializeField]
+        LostCanvas lostCanvas;
+
+        [Header("SFX")]
+        [SerializeField]
+        AudioSourceRandom sfxAudioSource;
+
+        [SerializeField]
+        string sfxRoundTransition = "sfxRoundTransition";
 
         [Header("Debug")]
         [SerializeField]
@@ -353,9 +387,9 @@ namespace Hanako.Knife
         GameObject player;
         int playerControllerID = 0;
         KnifePiece_Player playerPiece;
-        int soulCount = 0;
-        float gameTime;
-        Coroutine corGameTime;
+        int killCount = 0;
+        float playTime;
+        Coroutine corPlayTime;
 
         public KnifeLevel LevelProperties { get => levelProperties; }
         public void SetLevelProperties(KnifeLevel newLevel) => levelProperties = newLevel;
@@ -368,14 +402,14 @@ namespace Hanako.Knife
         public GameObject PlayerPrefab { get => playerPrefab;  }
         public Vector2 PanAreaMax { get => panAreaMax;  }
         public Vector2 PanAreaMin { get => panAreaMin;  }
-        public int SoulCount { get => soulCount;  }
+        public int KillCount { get => killCount;  }
         public int RoundCount { get => turnManager != null ? turnManager.CurrentRoundIndex : 0; }
-        public float GameTime { get => gameTime;  }
+        public float PlayTime { get => playTime;  }
         public KnifePiece_Player PlayerPiece { get => playerPiece; }
 
         #endregion
 
-        public event Action<float> OnGameTime;
+        public event Action<float> OnPlayTime;
         public event Action OnStartGame;
         public event Action<KnifePiece_Living> OnLivingPieceDied;
         public event Action<int> OnNextRound;
@@ -385,18 +419,53 @@ namespace Hanako.Knife
 
         private void Awake()
         {
-            playerCursor.Init(this, playerControllerID);
+            scoreCanvas.gameObject.SetActive(false);
+            lostCanvas.gameObject.SetActive(false);
         }
 
         private void Start()
         {
+            AdjustLevelInfo();
             Init();
+        }
+
+        void AdjustLevelInfo()
+        {
+            if (levelInfoInit == LevelInfoInitMode.SceneLoadingData)
+            {
+                var sceneLoading = FindObjectOfType<SceneLoadingManager>();
+                if (sceneLoading != null)
+                {
+                    if (sceneLoading.SceneLoadingData.LevelInfoToLoad.GameType == GameType.Knife)
+                    {
+                        levelInfo = sceneLoading.SceneLoadingData.LevelInfoToLoad;
+                        levelProperties = levelInfo.KnifeLevel;
+                    }
+                    else Debug.LogWarning("SceneLoadingData.LevelInfoToLoad doesn't match this gameType");
+                }
+                else Debug.LogWarning("Cannot find SceneLoadingManager");
+            }
+
+            if (levelInfo != null)
+            {
+                levelProperties = levelInfo.KnifeLevel;
+                var allGamesInfoManager = FindObjectOfType<AllGamesInfoManager>();
+                if (allGamesInfoManager != null)
+                {
+                    allGamesInfoManager.AllGamesInfo.SetCurrentLevel(levelInfo);
+                }
+            }
+            else Debug.LogWarning("LevelInfo is not set; Error might occur");
+
+            if (levelProperties == null) Debug.LogWarning("LevelProperties is not set; Error might occur");
         }
 
         public void Init()
         {
             GenerateLevelMap();
             GeneratePieces();
+            playerCursor.Init(this, playerControllerID, GenerateTileUnhoverCols());
+
             StartGame();
         }
 
@@ -413,11 +482,11 @@ namespace Hanako.Knife
                 );
             OnStartGame?.Invoke();
             turnManager.GoToNextRound();
-            StartGameTimer();
+            StartPlayTimer();
             
             void OnPlayerTurn()
             {
-                
+                sfxAudioSource.PlayOneClipFromPack(sfxRoundTransition);
                 playerCursor.PleaseClick(OnClickDone);
                 void OnClickDone(KnifeTile tile)
                 {
@@ -441,13 +510,13 @@ namespace Hanako.Knife
         {
             if (turnManager.CurrentRoundIndex >= levelProperties.RoundCount)
             {
-                Won();
+                WonGame();
                 return true;
             }
 
             if (turnManager.IsPieceCountOne())
             {
-                Won();
+                WonGame();
                 return true;
             }
 
@@ -458,7 +527,7 @@ namespace Hanako.Knife
                 {
                     if (piece.LivingPiece == playerPiece)
                     {
-                        PlayerDied();
+                        LostGame();
                         return true; // Lost
                     }
                     else
@@ -471,23 +540,30 @@ namespace Hanako.Knife
             return false;
         }
 
-        public void Won()
+        public void WonGame()
         {
-            StopGameTimer();
+            StopPlayTimer();
             gameInfoCanvas.CheckAllRound();
             OnGameOver?.Invoke(true);
+            scoreCanvas.gameObject.SetActive(true);
+            scoreCanvas.Init(levelInfo, new()
+            {
+                new(killParamName, KillCount),
+                new(turnParamName, RoundCount),
+                new(playTimeParamName, (int)playTime)
+            });
         }
 
-        public void PlayerDied()
+        public void LostGame()
         {
-            StopGameTimer();
+            StopPlayTimer();
             gameInfoCanvas.CheckAllRound();
             OnGameOver?.Invoke(false);
         }
 
-        public void AddSoul()
+        public void AddKillCount()
         {
-            soulCount++;
+            killCount++;
         }
 
         public void UpdateCache()
@@ -512,8 +588,6 @@ namespace Hanako.Knife
 
             playerCursor.Refresh();
         }
-
-
 
         public void RemoveTurnOf(LivingPieceCache targetPiece, int count = 1)
         {
@@ -551,63 +625,105 @@ namespace Hanako.Knife
                 piece.TurnOrderText.Hide();
         }
 
-        public void StartGameTimer()
+        public void StartPlayTimer()
         {
-            corGameTime = this.RestartCoroutine(Update(), corGameTime);
+            corPlayTime = this.RestartCoroutine(Update(), corPlayTime);
             IEnumerator Update()
             {
-                gameTime = 0f;
+                playTime = 0f;
                 while (true)
                 {
-                    gameTime += Time.deltaTime;
-                    OnGameTime?.Invoke(gameTime);
+                    playTime += Time.deltaTime;
+                    OnPlayTime?.Invoke(playTime);
                     yield return null;
                 }
             }
         }
 
-        public void StopGameTimer()
+        public void StopPlayTimer()
         {
-            if (corGameTime!=null)
-                StopCoroutine(corGameTime);
+            if (corPlayTime!=null)
+                StopCoroutine(corPlayTime);
         }
 
         #endregion
 
         #region [Methods: Generators]
 
-        [HorizontalGroup("Buts")]
-        [Button("Make Map")]
         public void GenerateLevelMap()
         {
             levelPos.DestroyImmediateChildren();
             tiles = new();
-            var tileSize = levelProperties.TileSize;
-            var offset = levelProperties.OriginOffset;
 
             for (int row = 0; row < levelProperties.LevelSize.row; row++)
             {
                 for (int col = 0; col < levelProperties.LevelSize.col; col++)
                 {
-                    var tileGO = Instantiate(levelProperties.TilesPattern.GetTile(new(col,row), levelProperties));
+                    var tileGO = InstantiateTile(
+                        levelProperties.TilesPattern.GetTile(new(col, row), levelProperties),
+                        levelPos,
+                        levelProperties.TileSize,
+                        levelProperties.OriginOffset, 
+                        row, 
+                        col);
+
                     tileGO.name = $"{col}, r{row}";
+                    tileGO.transform.parent = levelPos;
+
                     var layerNumber = tileLayer.GetMemberLayerNumbers()[0];
                     tileGO.layer = layerNumber;
                     for (int i = 0; i < tileGO.transform.childCount; i++)
                         tileGO.transform.GetChild(i).gameObject.layer = layerNumber;
-                    tileGO.transform.parent = levelPos;
-                    tileGO.transform.localPosition = new((col * tileSize.x / 2) - (row * tileSize.x / 2), (row * tileSize.y / 2) + (col * tileSize.y / 2));
-                    tileGO.transform.localPosition += (Vector3) offset;
-                    
-                    var tileComponent = tileGO.GetComponent<KnifeTile>();
-                    if (tileComponent == null) Debug.LogWarning("Tile prefab has no KnifeTile component");
-                    tileComponent.SortingGroup.sortingOrder = -row - col;
 
+                    var tileComponent = tileGO.GetComponent<KnifeTile>();
+                    tileComponent.SortingGroup.sortingOrder = -row - col;
                     tiles.Add(new TileCache(new(col, row), tileGO, tileComponent.SR, tileComponent));
                 }
             }
 
             GenerateLevelWalls();
+            GenerateLevelBottomWalls();
+        }
+
+        /// <summary>
+        /// Make tiles that surround the level map, so the cursor can be prompted to unhover when exiting the map
+        /// </summary>
+        public List<Collider2D> GenerateTileUnhoverCols()
+        {
+            var parent = new GameObject("__UNHOVER__");
+            parent.transform.parent = levelPos;
+            parent.transform.localPosition = Vector3.zero;
+
+            var tileUnhoverCols = new List<Collider2D>();
+            for (int row = -1; row < levelProperties.LevelSize.row+1; row++)
+            {
+                for (int col = -1; col < levelProperties.LevelSize.col+1; col++)
+                {
+                    if (!(col == -1 || col == levelProperties.LevelSize.col ||
+                          row == -1 || row == levelProperties.LevelSize.row ))
+                        continue;
+
+                    var tileGO = InstantiateTile(
+                        tileUnhoverColPrefab,
+                        parent.transform,
+                        levelProperties.TileSize,
+                        levelProperties.OriginOffset,
+                        row,
+                        col);
+
+                    tileGO.name = $"UN: {col}, r{row}";
+                    tileUnhoverCols.Add(tileGO.GetComponent<Collider2D>());
+                }
+            }
+            return tileUnhoverCols;
+        }
+
+        private GameObject InstantiateTile(GameObject tilePrefab, Transform parent, Vector2 tileSize, Vector2 offset, int row, int col)
+        {
+            var tileGO = Instantiate(tilePrefab, parent);
+            tileGO.transform.localPosition = new((col * tileSize.x / 2) - (row * tileSize.x / 2), (row * tileSize.y / 2) + (col * tileSize.y / 2));
+            tileGO.transform.localPosition += (Vector3)offset;
+            return tileGO;
         }
 
         public void GenerateLevelWalls()
@@ -618,11 +734,7 @@ namespace Hanako.Knife
                 return;
             }
 
-            const string WALLS = "__WALLS__";
-            float wallYOffset = levelProperties.TileSize.y * 1 / 4;
-            var previousWallsParent = transform.Find(WALLS);
-            if (previousWallsParent != null) DestroyImmediate(previousWallsParent.gameObject);   
-
+            float wallYOffset =  levelProperties.TileHeightHalf;
             var mostTopTile = tiles.GetLast();
             var wallsParent = new GameObject("__WALLS__");
             var sortingGroup = wallsParent.AddComponent<SortingGroup>();
@@ -655,9 +767,88 @@ namespace Hanako.Knife
                 rightWalls.Add(new(row, wallGO, sr));
             }
         }
+        
+        public void GenerateLevelBottomWalls()
+        {
+            if (tiles.Count == 0)
+            {
+                Debug.LogWarning("Generate level map first before generate walls");
+                return;
+            }
 
-        [HorizontalGroup("Buts")]
-        [Button("Make ColRowTexts")]
+            for (int i = 0; i < levelProperties.BottomWallStoriesCount; i++)
+            {
+                var wallYOffset = levelProperties.WallSize.y + levelProperties.TileSize.y + (levelProperties.WallSize.y * i);
+                var mostBottomTile = tiles[0];
+                var mostTopTile = tiles.GetLast();
+                var wallsParent = new GameObject("__BOTTOM_WALLS__"+i);
+                var sortingGroup = wallsParent.AddComponent<SortingGroup>();
+                sortingGroup.sortingOrder = mostTopTile.Tile.SortingGroup.sortingOrder - (2+i); // BottomWalls should be behind Walls
+                wallsParent.transform.parent = levelPos;
+                wallsParent.transform.position = mostBottomTile.GO.transform.position;
+                GenerateWalls(wallYOffset, wallsParent.transform);
+
+                wallYOffset = levelProperties.WallSize.y + levelProperties.TileSize.y - levelProperties.TileHeightHalf + (levelProperties.WallSize.y * (i-2));
+                GenerateRightEdgeWall(levelProperties.LevelSize.row - 1, wallYOffset, wallsParent.transform);
+                GenerateLeftEdgeWall(levelProperties.LevelSize.col - 1, wallYOffset, wallsParent.transform);
+            }
+
+            void GenerateWalls(float wallYOffset, Transform wallsParent)
+            {
+                for (int col = 0; col < levelProperties.LevelSize.col; col++)
+                {
+                    var wallGO = Instantiate(levelProperties.BottomWallsPattern.GetLeftWall(col, levelProperties));
+                    wallGO.transform.localScale = new(-wallGO.transform.localScale.x, wallGO.transform.localScale.y);
+                    wallGO.name = "Left_" + col;
+                    wallGO.transform.parent = wallsParent.transform;
+                    wallGO.transform.localPosition = new(-(levelProperties.TileSize.x / 2 * col), levelProperties.TileSize.y / 2 * col - wallYOffset);
+                    var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
+                    sr.color = levelProperties.BottomWallsPattern.LeftWallColor;
+                    sr.sortingOrder = -col;
+                    leftWalls.Add(new(col, wallGO, sr));
+                }
+
+                for (int row = 0; row < levelProperties.LevelSize.row; row++)
+                {
+                    var wallGO = Instantiate(levelProperties.BottomWallsPattern.GetRightWall(row, levelProperties));
+                    wallGO.name = "Right_" + row;
+                    wallGO.transform.parent = wallsParent.transform;
+                    wallGO.transform.localPosition = new((levelProperties.TileSize.x / 2 * row), levelProperties.TileSize.y / 2 * row - wallYOffset);
+                    var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
+                    sr.color = levelProperties.BottomWallsPattern.RightWallColor;
+                    sr.sortingOrder = -row;
+                    rightWalls.Add(new(row, wallGO, sr));
+                }
+
+
+            }
+
+            void GenerateRightEdgeWall(int row, float wallYOffset, Transform wallsParent)
+            {
+                var wallGO = Instantiate(levelProperties.WallsPattern.GetRightWall(row, levelProperties));
+                wallGO.transform.localScale = new(-wallGO.transform.localScale.x, wallGO.transform.localScale.y);
+                wallGO.name = "Right_" + row;
+                wallGO.transform.parent = wallsParent.transform;
+                wallGO.transform.localPosition = new((levelProperties.TileSize.x / 2 * (row + 1)), -levelProperties.TileSize.y / 2 * row - wallYOffset);
+                var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
+                sr.color = levelProperties.WallsPattern.RightWallColor;
+                sr.sortingOrder = -(row+1);
+                rightWalls.Add(new(row, wallGO, sr));
+            }
+
+            void GenerateLeftEdgeWall(int col, float wallYOffset, Transform wallsParent)
+            {
+                var wallGO = Instantiate(levelProperties.WallsPattern.GetLeftWall(col, levelProperties));
+                wallGO.name = "Left_" + col;
+                wallGO.transform.parent = wallsParent.transform;
+                wallGO.transform.localPosition = new(-(levelProperties.TileSize.x / 2 * (col + 1)), -levelProperties.TileSize.y / 2 * col - wallYOffset);
+                var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
+                sr.color = levelProperties.WallsPattern.LeftWallColor;
+                sr.sortingOrder = -(col+1);
+                leftWalls.Add(new(col, wallGO, sr));
+            }
+        }
+
         public void GenerateColRowTexts()
         {
             const string DEBUG_TEXT = "__DEBUG_TEXT__";
@@ -907,7 +1098,7 @@ namespace Hanako.Knife
                 foundLivingCache.TurnOrderText.Hide();
                 diedPieces.Add(foundLivingCache);
                 targetPiece.transform.parent = null;
-                AddSoul();
+                AddKillCount();
                 OnLivingPieceDied?.Invoke(targetPiece);
             }
         }

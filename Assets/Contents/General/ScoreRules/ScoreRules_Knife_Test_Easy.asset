@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a246737be2101934990d51f4690b60cd, type: 3}
-  m_Name: ScoreRule_Hanako
+  m_Name: ScoreRules_Knife_Test_Easy
   m_EditorClassIdentifier: 
   openToken: '{'
   closeToken: '}'
@@ -20,13 +20,13 @@ MonoBehaviour:
     scoreMultiplier: 10
     fontColor: {r: 1, g: 1, b: 1, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'
-  - paramName: multiKill
-    displayName: Multi-kill
-    scoreMultiplier: 10
-    fontColor: {r: 1, g: 1, b: 1, a: 1}
+  - paramName: turn
+    displayName: Turn
+    scoreMultiplier: -2
+    fontColor: {r: 1, g: 0.4764151, b: 0.4764151, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'
   - paramName: playTime
     displayName: Play time
-    scoreMultiplier: -1
-    fontColor: {r: 1, g: 0.5896226, b: 0.5896226, a: 1}
+    scoreMultiplier: 0
+    fontColor: {r: 1, g: 0.47450984, b: 0.47450984, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'

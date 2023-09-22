@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Hanako
 {
-    [CreateAssetMenu(fileName ="ScoreRule_", menuName ="SO/Score Rule")]
+    [CreateAssetMenu(fileName ="ScoreRules_", menuName ="SO/Score Rules")]
 
     public class ScoreRules : ScriptableObject
     {
@@ -24,7 +24,7 @@ namespace Hanako
             Color fontColor = Color.white;
 
             [SerializeField, TextArea]
-            string displayFormat = "{displayName}<indent=350>{value}x{scoreMultiplier}";
+            string displayFormat = "{displayName}<indent=350>{value}  x{scoreMultiplier}";
 
             public string ParamName { get => paramName; }
             public string DisplayName { get => displayName; }

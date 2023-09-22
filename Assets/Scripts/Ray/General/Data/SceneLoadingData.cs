@@ -8,29 +8,14 @@ namespace Hanako
 
     public class SceneLoadingData : ScriptableObject
     {
-        [SerializeField, Tooltip("Use levelInfo's data when playing")]
-        bool isActive = true;
-
         [SerializeField]
-        LevelInfo levelInfo;
+        LevelInfo levelInfoToLoad;
 
-        public bool IsActive { get => isActive; }
-        public LevelInfo LevelInfo { get => levelInfo; }
-
-        public void Activate()
-        {
-            isActive = true;
-        }
-
-        public void Deactivate()
-        {
-            isActive = false;
-        }
-
+        public LevelInfo LevelInfoToLoad { get => levelInfoToLoad; }
 
         public void SetData(LevelInfo levelInfo)
         {
-            this.levelInfo = levelInfo;
+            this.levelInfoToLoad = levelInfo;
         }
     }
 }

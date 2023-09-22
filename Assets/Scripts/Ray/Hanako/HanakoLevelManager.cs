@@ -17,25 +17,27 @@ namespace Hanako.Hanako
         public enum HanakoGameState { Init, Play, Won, Lost }
 
         [SerializeField]
+        LevelInfoInitMode levelInfoInit = LevelInfoInitMode.SceneLoadingData;
+
+        [SerializeField, ShowIf("@" + nameof(levelInfoInit) + "==" + nameof(LevelInfoInitMode) + "." + nameof(LevelInfoInitMode.LevelInfo))]
+        LevelInfo levelInfo;
+
+        [SerializeField, ShowIf("@" + nameof(levelInfoInit) + "==" + nameof(LevelInfoInitMode) + "." + nameof(LevelInfoInitMode.LevelProperties))]
+        HanakoLevel levelProperties;
+
+        [SerializeField]
         bool isAutoStart = true;
 
         [SerializeField]
         float autoStartDuration = 2.5f;
 
-
-        [SerializeField]
-        LevelInfo levelInfo;
-
-        [SerializeField]
-        HanakoLevel level;
-
-        [SerializeField, ShowIf("@!"+nameof(level))]
+        [SerializeField, ShowIf("@!"+nameof(levelProperties))]
         HanakoEnemySequence enemySequence;
 
-        [SerializeField, ShowIf("@!"+nameof(level))]
+        [SerializeField, ShowIf("@!"+nameof(levelProperties))]
         HanakoDestinationSequence destinationSequence;
 
-        [SerializeField, ShowIf("@!"+nameof(level))]
+        [SerializeField, ShowIf("@!"+nameof(levelProperties))]
         HanakoDistractionSequence distractionSequence;
 
         [Header("Score")]
@@ -151,167 +153,21 @@ namespace Hanako.Hanako
 
         void Awake()
         {
-            var sceneLoading = FindObjectOfType<SceneLoadingManager>();
-            if (sceneLoading != null && sceneLoading.IsUsingLevelInfo)
-            {
-                levelInfo = sceneLoading.SceneLoadingData.LevelInfo;
-                level = levelInfo.HanakoLevel;
-            }
-
             if (scoreCanvas == null)
                 scoreCanvas = FindObjectOfType<ScoreCanvas>();
             scoreCanvas.gameObject.SetActive(false);
+
             if (lostCanvas == null)
                 lostCanvas = FindObjectOfType<LostCanvas>();
             lostCanvas.gameObject.SetActive(false);
 
-            Init(level);
         }
 
-        void Init(HanakoLevel level)
+        void Start()
         {
-            if (level != null)
-            {
-                destinationSequence = level.DestinationSequence;
-                enemySequence = level.EnemySequence;
-                distractionSequence = level.DistractionSequence;
-            }
+            AdjustLevelInfo();
+            Init(levelProperties);
 
-            destinations = InstantiateDestinations(destinationSequence);
-            destinations = SortDestinations(destinations);
-            distractions = InstantiateDistractions(distractionSequence);
-            enemies = InstantiateEnemies(enemySequence);
-            gameInfoCanvas.Init(enemies.Count, ref OnAddKillCount);
-
-            if (cursor == null)
-                cursor = FindAnyObjectByType<HanakoCursor>();
-
-            if (enemyList == null)
-                enemyList = FindAnyObjectByType<HanakoEnemyList>();
-
-            foreach (var bloodSplatter in bloodSplatters)
-                bloodSplatter.SetActive(false);
-
-            foreach (var bloodSplatter in bloodSplattersBig)
-                bloodSplatter.SetActive(false);
-
-            tri_intoToilet = Animator.StringToHash(nameof(tri_intoToilet));
-            var initialToilet = GetInitialToilet();
-            initHanako.transform.position = (Vector2)initialToilet.InteractablePos.position + new Vector2(-1, -1);
-            initProtagonist.transform.position = (Vector2)initialToilet.InteractablePos.position + new Vector2(-1, -1);
-
-
-            List<HanakoDestination> InstantiateDestinations(HanakoDestinationSequence destinationSequence)
-            {
-                destinationsParent.DestroyChildren();
-                exitDoor.Init(colors,icons, () => GameState,0,0);
-
-                var destinations = new List<HanakoDestination>();
-                var destinationIDCounter = new Dictionary<HanakoDestinationID, int>();
-                foreach (var destination in destinationSequence.Sequence)
-                {
-                    var destinationGO = Instantiate(destination.Prefab, destinationsParent);
-                    destinationGO.name = destinations.Count+"_"+ destinationGO.name;
-                    destinationGO.transform.localPosition = destination.Position;
-
-                    var destinationComponent = destinationGO.GetComponent<HanakoDestination>();
-
-                    if (destinationIDCounter.ContainsKey(destinationComponent.ID))
-                        destinationIDCounter[destinationComponent.ID]++;
-                    else
-                        destinationIDCounter.Add(destinationComponent.ID, 0);
-
-                    if (destinationComponent is HanakoDestination_Toilet)
-                    {
-                        var toilet = destinationComponent as HanakoDestination_Toilet;
-                        toilet.Init(colors, 
-                            icons, 
-                            () => GameState, 
-                            destinations.Count, 
-                            destinationIDCounter[destinationComponent.ID], 
-                            LostGame, 
-                            PlayBloodSplatter,
-                            AddMultiKillCount);
-                    }
-                    else
-                    {
-                        destinationComponent.Init(colors,icons, () => GameState, destinations.Count, destinationIDCounter[destinationComponent.ID]);
-                    }
-
-
-                    destinations.Add(destinationComponent);
-                }
-                return destinations;
-            }
-
-            List<HanakoDestination> SortDestinations(List<HanakoDestination> destinations)
-            {
-                var sortedDestinations = new List<HanakoDestination>();
-                foreach (var destination in destinations)
-                {
-                    bool isInserted = false;
-                    foreach (var sortedDestination in sortedDestinations)
-                    {
-                        if (destination.InteractablePos.position.x < sortedDestination.InteractablePos.position.x)
-                        {
-                            sortedDestinations.Insert(0,destination);
-                            isInserted = true;
-                            break;
-                        }
-                    }
-
-                    if (!isInserted) 
-                        sortedDestinations.Add(destination);
-                }
-
-                return sortedDestinations;
-            }
-
-            List<HanakoDistraction> InstantiateDistractions(HanakoDistractionSequence distractionSequence)
-            {
-                distractionsParent.DestroyChildren();
-
-                var distractions = new List<HanakoDistraction>();
-                foreach (var distraction in distractionSequence.Sequence)
-                {
-                    var distractionGO = Instantiate(distraction.Prefab, distractionsParent);
-                    distractionGO.name = distractions.Count + "_" + distractionGO.name;
-                    distractionGO.transform.localPosition = distraction.Position;
-
-                    var distractionComponent = distractionGO.GetComponent<HanakoDistraction>();
-                    distractionComponent.Init(colors, icons, () => GameState);
-
-                    distractions.Add(distractionComponent);
-                }
-                return distractions;
-            }
-
-            List<HanakoEnemy> InstantiateEnemies(HanakoEnemySequence enemySequence)
-            {
-                var enemies = new List<HanakoEnemy>();
-                foreach (var enemy in enemySequence.Sequence)
-                {
-                    var enemyGO = Instantiate(enemy.ID.Prefab, enemiesParent);
-                    enemyGO.name = enemies.Count + "_" + enemyGO.name;
-                    enemyGO.transform.localPosition = Vector3.zero;
-                    var enemyComponent = enemyGO.GetComponent<HanakoEnemy>();
-                    enemyComponent.Init(
-                        enemy.DestinationSequence,
-                        exitDoor, 
-                        GetDestinationByIDAndIndexOfSameID,
-                        ()=>GameState, 
-                        colors,icons, 
-                        AddKillCount, 
-                        AddExitCount);
-                    enemies.Add(enemyComponent);
-                }
-
-                return enemies;
-            }
-        }
-
-        private void Start()
-        {
             if (isAutoStart)
             {
                 StartCoroutine(Delay(autoStartDuration));
@@ -377,6 +233,179 @@ namespace Hanako.Hanako
                         startBut_et.triggers.Add(startBut_entry_click);
                     }
                 }
+            }
+        }
+
+        void AdjustLevelInfo()
+        {
+            if (levelInfoInit == LevelInfoInitMode.SceneLoadingData)
+            {
+                var sceneLoading = FindObjectOfType<SceneLoadingManager>();
+                if (sceneLoading != null)
+                {
+                    if (sceneLoading.SceneLoadingData.LevelInfoToLoad.GameType == GameType.Hanako)
+                    {
+                        levelInfo = sceneLoading.SceneLoadingData.LevelInfoToLoad;
+                        levelProperties = levelInfo.HanakoLevel;
+                    }
+                    else Debug.LogWarning("SceneLoadingData.LevelInfoToLoad doesn't match this gameType");
+                }
+                else Debug.LogWarning("Cannot find SceneLoadingManager");
+            }
+
+            if (levelInfo != null)
+            {
+                levelProperties = levelInfo.HanakoLevel;
+                var allGamesInfoManager = FindObjectOfType<AllGamesInfoManager>();
+                if (allGamesInfoManager != null)
+                {
+                    allGamesInfoManager.AllGamesInfo.SetCurrentLevel(levelInfo);
+                }
+            }
+            else Debug.LogWarning("LevelInfo is not set; Error might occur");
+
+            if (levelProperties == null) Debug.LogWarning("LevelProperties is not set; Error might occur");
+        }
+
+        void Init(HanakoLevel level)
+        {
+            if (level != null)
+            {
+                destinationSequence = level.DestinationSequence;
+                enemySequence = level.EnemySequence;
+                distractionSequence = level.DistractionSequence;
+            }
+
+            destinations = InstantiateDestinations(destinationSequence);
+            destinations = SortDestinations(destinations);
+            distractions = InstantiateDistractions(distractionSequence);
+            enemies = InstantiateEnemies(enemySequence);
+            gameInfoCanvas.Init(enemies.Count, ref OnAddKillCount);
+
+            if (cursor == null)
+                cursor = FindAnyObjectByType<HanakoCursor>();
+
+            if (enemyList == null)
+                enemyList = FindAnyObjectByType<HanakoEnemyList>();
+
+            foreach (var bloodSplatter in bloodSplatters)
+                bloodSplatter.SetActive(false);
+
+            foreach (var bloodSplatter in bloodSplattersBig)
+                bloodSplatter.SetActive(false);
+
+            tri_intoToilet = Animator.StringToHash(nameof(tri_intoToilet));
+            var initialToilet = GetInitialToilet();
+            initHanako.transform.position = (Vector2)initialToilet.InteractablePos.position + new Vector2(-1, -1);
+            initProtagonist.transform.position = (Vector2)initialToilet.InteractablePos.position + new Vector2(-1, -1);
+
+
+            List<HanakoDestination> InstantiateDestinations(HanakoDestinationSequence destinationSequence)
+            {
+                destinationsParent.DestroyChildren();
+                exitDoor.Init(colors, icons, () => GameState, 0, 0);
+
+                var destinations = new List<HanakoDestination>();
+                var destinationIDCounter = new Dictionary<HanakoDestinationID, int>();
+                foreach (var destination in destinationSequence.Sequence)
+                {
+                    var destinationGO = Instantiate(destination.Prefab, destinationsParent);
+                    destinationGO.name = destinations.Count + "_" + destinationGO.name;
+                    destinationGO.transform.localPosition = destination.Position;
+
+                    var destinationComponent = destinationGO.GetComponent<HanakoDestination>();
+
+                    if (destinationIDCounter.ContainsKey(destinationComponent.ID))
+                        destinationIDCounter[destinationComponent.ID]++;
+                    else
+                        destinationIDCounter.Add(destinationComponent.ID, 0);
+
+                    if (destinationComponent is HanakoDestination_Toilet)
+                    {
+                        var toilet = destinationComponent as HanakoDestination_Toilet;
+                        toilet.Init(colors,
+                            icons,
+                            () => GameState,
+                            destinations.Count,
+                            destinationIDCounter[destinationComponent.ID],
+                            LostGame,
+                            PlayBloodSplatter,
+                            AddMultiKillCount);
+                    }
+                    else
+                    {
+                        destinationComponent.Init(colors, icons, () => GameState, destinations.Count, destinationIDCounter[destinationComponent.ID]);
+                    }
+
+
+                    destinations.Add(destinationComponent);
+                }
+                return destinations;
+            }
+
+            List<HanakoDestination> SortDestinations(List<HanakoDestination> destinations)
+            {
+                var sortedDestinations = new List<HanakoDestination>();
+                foreach (var destination in destinations)
+                {
+                    bool isInserted = false;
+                    foreach (var sortedDestination in sortedDestinations)
+                    {
+                        if (destination.InteractablePos.position.x < sortedDestination.InteractablePos.position.x)
+                        {
+                            sortedDestinations.Insert(0, destination);
+                            isInserted = true;
+                            break;
+                        }
+                    }
+
+                    if (!isInserted)
+                        sortedDestinations.Add(destination);
+                }
+
+                return sortedDestinations;
+            }
+
+            List<HanakoDistraction> InstantiateDistractions(HanakoDistractionSequence distractionSequence)
+            {
+                distractionsParent.DestroyChildren();
+
+                var distractions = new List<HanakoDistraction>();
+                foreach (var distraction in distractionSequence.Sequence)
+                {
+                    var distractionGO = Instantiate(distraction.Prefab, distractionsParent);
+                    distractionGO.name = distractions.Count + "_" + distractionGO.name;
+                    distractionGO.transform.localPosition = distraction.Position;
+
+                    var distractionComponent = distractionGO.GetComponent<HanakoDistraction>();
+                    distractionComponent.Init(colors, icons, () => GameState);
+
+                    distractions.Add(distractionComponent);
+                }
+                return distractions;
+            }
+
+            List<HanakoEnemy> InstantiateEnemies(HanakoEnemySequence enemySequence)
+            {
+                var enemies = new List<HanakoEnemy>();
+                foreach (var enemy in enemySequence.Sequence)
+                {
+                    var enemyGO = Instantiate(enemy.ID.Prefab, enemiesParent);
+                    enemyGO.name = enemies.Count + "_" + enemyGO.name;
+                    enemyGO.transform.localPosition = Vector3.zero;
+                    var enemyComponent = enemyGO.GetComponent<HanakoEnemy>();
+                    enemyComponent.Init(
+                        enemy.DestinationSequence,
+                        exitDoor,
+                        GetDestinationByIDAndIndexOfSameID,
+                        () => GameState,
+                        colors, icons,
+                        AddKillCount,
+                        AddExitCount);
+                    enemies.Add(enemyComponent);
+                }
+
+                return enemies;
             }
         }
 

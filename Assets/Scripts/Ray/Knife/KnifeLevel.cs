@@ -51,7 +51,6 @@ namespace Hanako.Knife
             }
         }
 
-
         [SerializeField]
         string levelName;
 
@@ -60,16 +59,25 @@ namespace Hanako.Knife
         ColRow levelSize;
 
         [SerializeField]
-        Vector2 tileSize = new(2.55f, 1.275f);
+        Vector2 tileSize = new(2.56f, 1.28f);
+
+        [SerializeField]
+        Vector2 wallSize = new(2.56f, 2.878f);
 
         [SerializeField]
         Vector2 originOffset = new(0, 0);
+
+        [SerializeField]
+        int bottomWallStoriesCount = 2;
 
         [SerializeField]
         KnifeTilesPattern tilesPattern;
 
         [SerializeField]
         KnifeWallsPattern wallsPattern;
+
+        [SerializeField]
+        KnifeWallsPattern bottomWallsPattern;
 
         [Header("Game")]
         [SerializeField]
@@ -82,12 +90,14 @@ namespace Hanako.Knife
         public ColRow LevelSize { get => levelSize;}
         public KnifeTilesPattern TilesPattern { get => tilesPattern; }
         public KnifeWallsPattern WallsPattern { get => wallsPattern; }
+        public KnifeWallsPattern BottomWallsPattern { get => bottomWallsPattern; }
         public Vector2 TileSize { get => tileSize; }
+        public Vector2 WallSize { get => wallSize; }
+        public float TileHeightHalf { get => tileSize.y / 2; }
         public Vector2 OriginOffset { get => originOffset; }
         public KnifePiecesPattern PiecesPattern { get => piecesPattern; }
         public void SetPiecesPattern(KnifePiecesPattern newPattern) { piecesPattern = newPattern; }
         public int RoundCount { get => roundCount;  }
-
-
+        public int BottomWallStoriesCount { get => bottomWallStoriesCount;  }
     }
 }

@@ -2,6 +2,7 @@ using Encore.Utility;
 using Hanako.Hub;
 using Sirenix.OdinInspector;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -45,6 +46,9 @@ namespace Hanako
         [Header("Audio Settings")]
         [SerializeField]
         AudioMixer audioMixer;
+
+        [SerializeField]
+        string masterVolumeName = "MASTER_VOLUME";
 
         [SerializeField]
         string sfxVolumeName = "SFX_VOLUME";
@@ -107,17 +111,6 @@ namespace Hanako
                 level.ResetRuntimeData();
         }
 
-        [Button]
-        void UpdateInfosByLevelDoors()
-        {
-            var levelDoors = new List<HubLevelDoor>(FindObjectsByType<HubLevelDoor>(FindObjectsSortMode.None));
-            foreach (var levelDoor in levelDoors)
-            {
-                levelInfos.AddIfHasnt(levelDoor.LevelInfo);
-                gameInfos.AddIfHasnt(levelDoor.LevelInfo.GameInfo);
-            }
-        }
-
         public AudioVolume SpinSFXVolume()
         {
             sfxVolume = (AudioVolume)(((int)(sfxVolume + 1)) % Enum.GetNames(typeof(AudioVolume)).Length);
@@ -138,5 +131,34 @@ namespace Hanako
             audioMixer.SetFloatLog(ambienceVolumeName, GetAudioVolumeValue(ambienceVolume));
             return ambienceVolume;
         }
+
+        public IEnumerator FadeMasterVolume(float targetVolume, float duration)
+        {
+            if (targetVolume > 1f) targetVolume = 1f;
+            else if (targetVolume < 0f) targetVolume = 0f;
+
+            var curve = AnimationCurve.Linear(0, audioMixer.GetFloatExp(masterVolumeName), duration, targetVolume);
+            var time = 0f;
+            while (time < duration)
+            {
+                audioMixer.SetFloatLog(masterVolumeName, curve.Evaluate(time));
+                time += Time.deltaTime;
+                yield return null;
+            }
+            audioMixer.SetFloatLog(masterVolumeName, targetVolume);
+        }
+
+
+        [Button]
+        void UpdateInfosByLevelDoors()
+        {
+            var levelDoors = new List<HubLevelDoor>(FindObjectsByType<HubLevelDoor>(FindObjectsSortMode.None));
+            foreach (var levelDoor in levelDoors)
+            {
+                levelInfos.AddIfHasnt(levelDoor.LevelInfo);
+                gameInfos.AddIfHasnt(levelDoor.LevelInfo.GameInfo);
+            }
+        }
+
     }
 }

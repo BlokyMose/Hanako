@@ -17,7 +17,7 @@ namespace Hanako.Knife
 
         [Header("Timer")]
         [SerializeField]
-        TextMeshProUGUI gameTimeText;
+        TextMeshProUGUI playTimeText;
 
         [Header("Targets")]
         [SerializeField]
@@ -44,7 +44,7 @@ namespace Hanako.Knife
             var levelManager = FindObjectOfType<KnifeLevelManager>();
             if (levelManager != null)
             {
-                levelManager.OnGameTime += SetGameTimeText;
+                levelManager.OnPlayTime += SetPlayTimeText;
                 levelManager.OnStartGame += () => { OnStartGame(levelManager); };
                 levelManager.OnLivingPieceDied += Eliminate;
                 levelManager.OnNextRound += (roundIndex) => { PlayRedAnimation(); CheckRound(); };
@@ -56,7 +56,7 @@ namespace Hanako.Knife
             var levelManager = FindObjectOfType<KnifeLevelManager>();
             if (levelManager != null)
             {
-                levelManager.OnGameTime -= SetGameTimeText;
+                levelManager.OnPlayTime -= SetPlayTimeText;
                 levelManager.OnStartGame -= () => { OnStartGame(levelManager); };
                 levelManager.OnLivingPieceDied -= Eliminate;
                 levelManager.OnNextRound -= (roundIndex) => { PlayRedAnimation(); CheckRound(); };
@@ -99,9 +99,9 @@ namespace Hanako.Knife
             RefreshCanvas();
         }
 
-        public void SetGameTimeText(float time)
+        public void SetPlayTimeText(float time)
         {
-            gameTimeText.text = MathUtility.SecondsToTimeString(time);
+            playTimeText.text = MathUtility.SecondsToTimeString(time);
         }
 
         void PlayRedAnimation()

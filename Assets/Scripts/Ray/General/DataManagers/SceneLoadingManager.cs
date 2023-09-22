@@ -9,9 +9,6 @@ namespace Hanako
     [RequireComponent(typeof(CanvasGroup))]
     public class SceneLoadingManager : MonoBehaviour
     {
-        [SerializeField, Tooltip("When loading a new scene, use levelInfo to the game")]
-        bool isUsingLevelInfo = true;
-
         [SerializeField]
         SceneLoadingData sceneLoadingData;
 
@@ -28,17 +25,12 @@ namespace Hanako
         int boo_show;
         bool isLoading;
 
-        public bool IsUsingLevelInfo { get => isUsingLevelInfo; }
         public SceneLoadingData SceneLoadingData { get => sceneLoadingData;  }
 
         void Awake()
         {
             canvasGroup = GetComponent<CanvasGroup>();
             boo_show = Animator.StringToHash(nameof(boo_show));
-
-            if (isUsingLevelInfo) sceneLoadingData.Activate(); 
-            else sceneLoadingData.Deactivate();
-
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
         }
@@ -57,6 +49,10 @@ namespace Hanako
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
 
+            var allGamesInfo = FindObjectOfType<AllGamesInfoManager>();
+            if (allGamesInfo != null)
+                StartCoroutine(allGamesInfo.AllGamesInfo.FadeMasterVolume(0f, toBlackDuration));
+
             StartCoroutine(Delay(toBlackDuration));
             IEnumerator Delay(float delay)
             {
@@ -69,8 +65,15 @@ namespace Hanako
 
         public void Hide()
         {
-            var loadingAnimationGO = Instantiate(sceneLoadingData.LevelInfo != null
-                ? sceneLoadingData.LevelInfo.GameInfo.LoadingAnimation
+            var allGamesInfo = FindObjectOfType<AllGamesInfoManager>();
+            if (allGamesInfo != null)
+            {
+                allGamesInfo.AllGamesInfo.SetCurrentLevel(sceneLoadingData.LevelInfoToLoad);
+                StartCoroutine(allGamesInfo.AllGamesInfo.FadeMasterVolume(1f, toBlackDuration));
+            }
+
+            var loadingAnimationGO = Instantiate(sceneLoadingData.LevelInfoToLoad != null
+                ? sceneLoadingData.LevelInfoToLoad.GameInfo.LoadingAnimation
                 : defaultLoadingAnimation,
                 transform);
             var loadingAnimator = loadingAnimationGO.GetComponent<Animator>();

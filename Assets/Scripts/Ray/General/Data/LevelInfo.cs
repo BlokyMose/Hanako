@@ -4,6 +4,7 @@ using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Hanako.GameType;
 
 namespace Hanako
 {
@@ -11,18 +12,16 @@ namespace Hanako
     [InlineEditor]
     public class LevelInfo : ScriptableObject
     {
-        public enum GameType { Hub = -1, Hanako, Knife, TekeTeke }
-
         [SerializeField]
         GameInfo gameInfo;
 
         [SerializeField]
         GameType gameType;
 
-        [SerializeField, ShowIf("@" + nameof(gameType) + "==" + nameof(GameType) + "." + nameof(GameType.Hanako))]
+        [SerializeField, ShowIf("@" + nameof(gameType) + "==" + nameof(Hanako) + "." + nameof(GameType) + "." + nameof(GameType.Hanako))]
         HanakoLevel hanakoLevel;
 
-        [SerializeField, ShowIf("@" + nameof(gameType) + "==" + nameof(GameType) + "." + nameof(GameType.Knife))]
+        [SerializeField, ShowIf("@" + nameof(gameType) + "==" + nameof(Hanako) + "." + nameof(GameType) + "." + nameof(GameType.Knife))]
         KnifeLevel knifeLevel;
 
         [SerializeField]
@@ -57,6 +56,7 @@ namespace Hanako
         public HanakoLevel HanakoLevel { get => hanakoLevel; }
         public KnifeLevel KnifeLevel { get => knifeLevel; }
         public List<int> ScoreThresholds { get => scoreThresholds;  }
+        public GameType GameType { get => gameType; set => gameType = value; }
 
         public void ResetRuntimeData()
         {

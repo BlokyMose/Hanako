@@ -87,14 +87,6 @@ namespace Hanako
         int int_mode, tri_confirm, boo_overScore;
         Animator animator, againButAnimator, hubButAnimator;
 
-        [Header("Debug")]
-        [SerializeField]
-        int killCount = 1;
-        [SerializeField]
-        int multiKillCount = 1;
-        [SerializeField]
-        int playTime = 1;
-
         void Awake()
         {
             animator = GetComponent<Animator>();
@@ -181,13 +173,6 @@ namespace Hanako
             }
 
             #endregion
-
-            //Init(levelInfo, new List<ScoreDetail>()
-            //{
-            //    new ("kill",killCount),
-            //    new ("multiKill",multiKillCount),
-            //    new ("playTime",playTime)
-            //});
         }
 
         private void Start()
@@ -203,8 +188,6 @@ namespace Hanako
 
         public void Init(LevelInfo levelInfo, List<ScoreDetail> scoreDetails)
         {
-
-
             this.levelInfo = levelInfo;
             scoreDetailsParent.DestroyChildren();
 
@@ -271,10 +254,14 @@ namespace Hanako
                         foreach (var threshold in levelInfo.ScoreThresholds)
                         {
                             var tower = scoreTowers[thresholdIndex];
-                            scoreLeft -= threshold;
+                            var previousThreshold = thresholdIndex > 0 ? levelInfo.ScoreThresholds[thresholdIndex - 1] : 0;
+                            thresholdIndex++;
+                            var relativeThreshold = threshold - previousThreshold;
+                            scoreLeft -= relativeThreshold;
+
                             if (scoreLeft < 0)
                             {
-                                tower.Fill.fillAmount = (1 - (-scoreLeft) / threshold);
+                                tower.Fill.fillAmount = 1 - (-scoreLeft) / relativeThreshold; 
                                 tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Dead);
                                 tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Idle);
                                 break;
@@ -285,16 +272,28 @@ namespace Hanako
                                 tower.Fill.fillAmount = 1f;
                                 tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Alive);
                                 tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Active);
-                                scoreLeft += threshold;
-                                thresholdIndex++;
                             }
+                        }
+
+                        for (int i = thresholdIndex; i < scoreTowers.Count; i++)
+                        {
+                            var tower = scoreTowers[i];
+                            tower.Fill.fillAmount = 0;
+                            tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Dead);
+                            tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Idle);
                         }
                     }
 
                     int GetValue(List<ScoreDetail> scoreDetails, ScoreRules.Rule targetRule)
                     {
                         var valueDetail = scoreDetails.Find(x => x.ParamName == targetRule.ParamName);
-                        return valueDetail != null ? valueDetail.Value : 0;
+                        if (valueDetail != null)
+                            return valueDetail.Value;
+                        else
+                        {
+                            Debug.LogWarning("Cannot find rule with paramName: "+targetRule.ParamName);
+                            return 0;
+                        }
                     }
 
                     IEnumerator AnimatingScoreUI(float previousTotalScore, float toReceiveScore)
