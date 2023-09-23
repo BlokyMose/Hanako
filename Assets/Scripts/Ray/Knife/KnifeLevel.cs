@@ -79,6 +79,9 @@ namespace Hanako.Knife
         [SerializeField]
         KnifeWallsPattern bottomWallsPattern;
 
+        [SerializeField]
+        GameObject intersectionWall;
+
         [Header("Game")]
         [SerializeField]
         int roundCount;
@@ -99,5 +102,6 @@ namespace Hanako.Knife
         public void SetPiecesPattern(KnifePiecesPattern newPattern) { piecesPattern = newPattern; }
         public int RoundCount { get => roundCount;  }
         public int BottomWallStoriesCount { get => bottomWallStoriesCount;  }
+        public GameObject IntersectionWall { get => intersectionWall; }
     }
 }

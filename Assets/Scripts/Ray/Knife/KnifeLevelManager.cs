@@ -734,7 +734,7 @@ namespace Hanako.Knife
                 return;
             }
 
-            float wallYOffset =  levelProperties.TileHeightHalf;
+            float yOffset =  levelProperties.TileHeightHalf;
             var mostTopTile = tiles.GetLast();
             var wallsParent = new GameObject("__WALLS__");
             var sortingGroup = wallsParent.AddComponent<SortingGroup>();
@@ -742,26 +742,40 @@ namespace Hanako.Knife
             wallsParent.transform.parent = levelPos;
             wallsParent.transform.position = mostTopTile.GO.transform.position;
 
+            GenerateIntersectionWall(yOffset, wallsParent.transform);
 
             for (int col = 0; col < levelProperties.LevelSize.col; col++)
+                GenerateLeftWall(yOffset, wallsParent.transform, col);
+
+            for (int row = 0; row < levelProperties.LevelSize.row; row++)
+                GenerateRightWall(yOffset, wallsParent.transform, row);
+
+            void GenerateIntersectionWall(float yOffset, Transform parent)
+            {
+                var wallGO = Instantiate(levelProperties.IntersectionWall);
+                wallGO.name = "IntersectionWall";
+                wallGO.transform.parent = parent;
+                wallGO.transform.localPosition = new(0, -yOffset + levelProperties.TileHeightHalf);
+            }
+
+            void GenerateLeftWall(float yOffset, Transform parent, int col)
             {
                 var wallGO = Instantiate(levelProperties.WallsPattern.GetLeftWall(col, levelProperties));
                 wallGO.name = "Left_" + col;
-                wallGO.transform.parent = wallsParent.transform;
-                wallGO.transform.localPosition = new(-(levelProperties.TileSize.x/2*(col+1)), -levelProperties.TileSize.y/2*col - wallYOffset);
+                wallGO.transform.parent = parent;
+                wallGO.transform.localPosition = new(-(levelProperties.TileSize.x / 2 * (col + 1)), -levelProperties.TileSize.y / 2 * col - yOffset);
                 var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
                 sr.color = levelProperties.WallsPattern.LeftWallColor;
                 leftWalls.Add(new(col, wallGO, sr));
             }
 
-
-            for (int row = 0; row < levelProperties.LevelSize.row; row++)
+            void GenerateRightWall(float yOffset, Transform parent, int row)
             {
                 var wallGO = Instantiate(levelProperties.WallsPattern.GetRightWall(row, levelProperties));
                 wallGO.transform.localScale = new(-wallGO.transform.localScale.x, wallGO.transform.localScale.y);
                 wallGO.name = "Right_" + row;
-                wallGO.transform.parent = wallsParent.transform;
-                wallGO.transform.localPosition = new((levelProperties.TileSize.x /2* (row + 1)), -levelProperties.TileSize.y/2 * row - wallYOffset);
+                wallGO.transform.parent = parent;
+                wallGO.transform.localPosition = new((levelProperties.TileSize.x / 2 * (row + 1)), -levelProperties.TileSize.y / 2 * row - yOffset);
                 var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
                 sr.color = levelProperties.WallsPattern.RightWallColor;
                 rightWalls.Add(new(row, wallGO, sr));
@@ -778,7 +792,7 @@ namespace Hanako.Knife
 
             for (int i = 0; i < levelProperties.BottomWallStoriesCount; i++)
             {
-                var wallYOffset = levelProperties.WallSize.y + levelProperties.TileSize.y + (levelProperties.WallSize.y * i);
+                var yOffset = levelProperties.WallSize.y + levelProperties.TileSize.y + (levelProperties.WallSize.y * i);
                 var mostBottomTile = tiles[0];
                 var mostTopTile = tiles.GetLast();
                 var wallsParent = new GameObject("__BOTTOM_WALLS__"+i);
@@ -786,66 +800,61 @@ namespace Hanako.Knife
                 sortingGroup.sortingOrder = mostTopTile.Tile.SortingGroup.sortingOrder - (2+i); // BottomWalls should be behind Walls
                 wallsParent.transform.parent = levelPos;
                 wallsParent.transform.position = mostBottomTile.GO.transform.position;
-                GenerateWalls(wallYOffset, wallsParent.transform);
-
-                wallYOffset = levelProperties.WallSize.y + levelProperties.TileSize.y - levelProperties.TileHeightHalf + (levelProperties.WallSize.y * (i-2));
-                GenerateRightEdgeWall(levelProperties.LevelSize.row - 1, wallYOffset, wallsParent.transform);
-                GenerateLeftEdgeWall(levelProperties.LevelSize.col - 1, wallYOffset, wallsParent.transform);
-            }
-
-            void GenerateWalls(float wallYOffset, Transform wallsParent)
-            {
-                for (int col = 0; col < levelProperties.LevelSize.col; col++)
-                {
-                    var wallGO = Instantiate(levelProperties.BottomWallsPattern.GetLeftWall(col, levelProperties));
-                    wallGO.transform.localScale = new(-wallGO.transform.localScale.x, wallGO.transform.localScale.y);
-                    wallGO.name = "Left_" + col;
-                    wallGO.transform.parent = wallsParent.transform;
-                    wallGO.transform.localPosition = new(-(levelProperties.TileSize.x / 2 * col), levelProperties.TileSize.y / 2 * col - wallYOffset);
-                    var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
-                    sr.color = levelProperties.BottomWallsPattern.LeftWallColor;
-                    sr.sortingOrder = -col;
-                    leftWalls.Add(new(col, wallGO, sr));
-                }
 
                 for (int row = 0; row < levelProperties.LevelSize.row; row++)
+                    GenerateLeftWall(yOffset, wallsParent.transform, row);
+                GenerateLeftEdgeWall(yOffset, wallsParent.transform, levelProperties.LevelSize.row);
+
+                for (int col = 0; col < levelProperties.LevelSize.col; col++)
+                    GenerateRightWall(yOffset, wallsParent.transform, col);
+                GenerateRightEdgeWall(yOffset, wallsParent.transform, levelProperties.LevelSize.col);
+
+
+                void GenerateLeftWall(float yOffset, Transform wallsParent, int row)
                 {
-                    var wallGO = Instantiate(levelProperties.BottomWallsPattern.GetRightWall(row, levelProperties));
-                    wallGO.name = "Right_" + row;
+                    var wallGO = Instantiate(levelProperties.BottomWallsPattern.GetLeftWall(row, levelProperties));
+                    wallGO.transform.localScale = new(-wallGO.transform.localScale.x, wallGO.transform.localScale.y);
+                    wallGO.name = "Left_" + row;
                     wallGO.transform.parent = wallsParent.transform;
-                    wallGO.transform.localPosition = new((levelProperties.TileSize.x / 2 * row), levelProperties.TileSize.y / 2 * row - wallYOffset);
+                    wallGO.transform.localPosition = new(-(levelProperties.TileSize.x / 2 * row), levelProperties.TileSize.y / 2 * row - yOffset);
                     var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
-                    sr.color = levelProperties.BottomWallsPattern.RightWallColor;
+                    sr.color = levelProperties.BottomWallsPattern.LeftWallColor;
                     sr.sortingOrder = -row;
-                    rightWalls.Add(new(row, wallGO, sr));
                 }
 
+                void GenerateRightWall(float yOffset, Transform wallsParent, int col)
+                {
+                    var wallGO = Instantiate(levelProperties.BottomWallsPattern.GetRightWall(col, levelProperties));
+                    wallGO.name = "Right_" + col;
+                    wallGO.transform.parent = wallsParent.transform;
+                    wallGO.transform.localPosition = new((levelProperties.TileSize.x / 2 * col), levelProperties.TileSize.y / 2 * col - yOffset);
+                    var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
+                    sr.color = levelProperties.BottomWallsPattern.RightWallColor;
+                    sr.sortingOrder = -col;
+                }
 
-            }
+                void GenerateLeftEdgeWall(float yOffset, Transform parent, int rowEdgeIndex)
+                {
+                    var wallGO = Instantiate(levelProperties.WallsPattern.GetLeftWall(0, levelProperties));
+                    wallGO.name = "Left_Edge";
+                    wallGO.transform.parent = parent;
+                    wallGO.transform.localPosition = new(-(levelProperties.TileSize.x / 2 * rowEdgeIndex), levelProperties.TileSize.y / 2 * rowEdgeIndex - yOffset);
+                    var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
+                    sr.color = levelProperties.BottomWallsPattern.RightWallColor;
+                    sr.sortingOrder = -rowEdgeIndex;
+                }
 
-            void GenerateRightEdgeWall(int row, float wallYOffset, Transform wallsParent)
-            {
-                var wallGO = Instantiate(levelProperties.WallsPattern.GetRightWall(row, levelProperties));
-                wallGO.transform.localScale = new(-wallGO.transform.localScale.x, wallGO.transform.localScale.y);
-                wallGO.name = "Right_" + row;
-                wallGO.transform.parent = wallsParent.transform;
-                wallGO.transform.localPosition = new((levelProperties.TileSize.x / 2 * (row + 1)), -levelProperties.TileSize.y / 2 * row - wallYOffset);
-                var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
-                sr.color = levelProperties.WallsPattern.RightWallColor;
-                sr.sortingOrder = -(row+1);
-                rightWalls.Add(new(row, wallGO, sr));
-            }
-
-            void GenerateLeftEdgeWall(int col, float wallYOffset, Transform wallsParent)
-            {
-                var wallGO = Instantiate(levelProperties.WallsPattern.GetLeftWall(col, levelProperties));
-                wallGO.name = "Left_" + col;
-                wallGO.transform.parent = wallsParent.transform;
-                wallGO.transform.localPosition = new(-(levelProperties.TileSize.x / 2 * (col + 1)), -levelProperties.TileSize.y / 2 * col - wallYOffset);
-                var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
-                sr.color = levelProperties.WallsPattern.LeftWallColor;
-                sr.sortingOrder = -(col+1);
-                leftWalls.Add(new(col, wallGO, sr));
+                void GenerateRightEdgeWall(float yOffset, Transform parent, int colEdgeIndex)
+                {
+                    var wallGO = Instantiate(levelProperties.WallsPattern.GetLeftWall(0, levelProperties));
+                    wallGO.transform.localScale = new(-wallGO.transform.localScale.x, wallGO.transform.localScale.y);
+                    wallGO.name = "Right_Edge";
+                    wallGO.transform.parent = parent;
+                    wallGO.transform.localPosition = new((levelProperties.TileSize.x / 2 * colEdgeIndex), levelProperties.TileSize.y / 2 * colEdgeIndex - yOffset);
+                    var sr = wallGO.GetComponentInFamily<SpriteRenderer>();
+                    sr.color = levelProperties.BottomWallsPattern.LeftWallColor;
+                    sr.sortingOrder = -colEdgeIndex;
+                }
             }
         }
 
