@@ -96,6 +96,7 @@ namespace Hanako.Hanako
         public event Action OnDurationEnd;
         public event Action OnOccupationStart;
         public event Action OnOccupationEnd;
+        public event Action<HanakoEnemy, Vector2> OnMoveOccupantEnd;
         public event Func<HanakoLevelManager.HanakoGameState> GetGameState;
 
         #endregion
@@ -225,6 +226,8 @@ namespace Hanako.Hanako
             }
             if (this.currentOccupant == occupant)
                 occupant.PlayAnimation(CharacterMotion.Idle);
+
+            OnMoveOccupantEnd?.Invoke(occupant, targetPos);
         }
 
 

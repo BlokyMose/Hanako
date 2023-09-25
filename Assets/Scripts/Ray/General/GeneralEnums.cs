@@ -7,13 +7,16 @@ namespace Hanako
 
     public enum CharacterMotion { 
         Die = -1, 
-        Idle, 
-        Run, 
-        Attack, 
-        Pushed, 
+        Idle = 0, 
+        Run = 1, 
+        Attack = 2, 
+        Pushed = 3, 
         Scared = 11, 
         Stiffed = 12, 
-        PointingScared = 13 
+        PointingScared = 13,
+        WaveMuch = 14,
+        WashHands = 15,
+        
     }
 
     public enum SoulIconState { Dead, Alive }

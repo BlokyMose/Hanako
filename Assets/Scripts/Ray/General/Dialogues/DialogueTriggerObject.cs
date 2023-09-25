@@ -93,14 +93,14 @@ namespace Hanako.Dialogue
             else
                 currentDialoguePreviewCanvas = Instantiate(dialoguePreviewCanvasPrefab, dialoguePreviewParent);
             currentDialoguePreviewCanvas.Show(charID);
-            characterAnimator.SetInteger(int_motion, (int)CharacterAnimation.WaveMuch);
+            characterAnimator.SetInteger(int_motion, (int)CharacterMotion.WaveMuch);
         }
 
         void HideDialoguePreviewCanvas()
         {
             currentDialoguePreviewCanvas.Hide();
             corDeletingDialoguePreview = this.RestartCoroutine(Delay(1f), corDeletingDialoguePreview);
-            characterAnimator.SetInteger(int_motion, (int)CharacterAnimation.Idle);
+            characterAnimator.SetInteger(int_motion, (int)CharacterMotion.Idle);
 
             IEnumerator Delay(float delay)
             {

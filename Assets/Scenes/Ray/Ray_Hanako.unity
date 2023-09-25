@@ -13716,10 +13716,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 069f1f4e016760344a4b77e778950888, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isAutoStart: 0
-  autoStartDuration: 0
+  levelInfoInit: 2
   levelInfo: {fileID: 11400000, guid: 0dbce9298e2c6464f9aa7419ee641e0f, type: 2}
-  level: {fileID: 11400000, guid: 9415832ee09bdb84a9ca70d0bf61514a, type: 2}
+  levelProperties: {fileID: 11400000, guid: c08de9424bcafaa4a80bc86ced5e9e46, type: 2}
+  isAutoStart: 1
+  autoStartDuration: 0
   enemySequence: {fileID: 11400000, guid: 1e2106e7c2c03a343b60726cd35b603b, type: 2}
   destinationSequence: {fileID: 11400000, guid: b8184e3b4103ffc4197d5393d4d0a7f8, type: 2}
   distractionSequence: {fileID: 11400000, guid: e63e07208237a9a428ea0c6329dbb9c6, type: 2}

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityUtility;
 using static Hanako.Hanako.HanakoEnemySequence;
 using static Hanako.Hanako.HanakoLevelManager;
@@ -44,6 +45,9 @@ namespace Hanako.Hanako
 
         [Header("Rig: Flashlight")]
         [SerializeField]
+        ChainIKConstraint flashlightRigChainIK;
+
+        [SerializeField]
         Transform flashlight;
 
         [SerializeField, ShowIf("@"+nameof(flashlight))]
@@ -54,6 +58,23 @@ namespace Hanako.Hanako
 
         [SerializeField]
         List<GameObject> gosToDeactivateWhenNotMoving = new();
+
+        [Header("Rig: Eyes")]
+        [SerializeField]
+        MultiPositionConstraint eyeRigR;
+
+        [SerializeField]
+        MultiPositionConstraint eyeRigL;
+
+        [SerializeField]
+        Transform eyesTarget;
+
+        [Header("Body Parts")]
+        [SerializeField]
+        Transform handL;
+
+        [SerializeField]
+        Transform handR;
 
         [Header("Customizations")]
         [SerializeField]
@@ -79,6 +100,8 @@ namespace Hanako.Hanako
         public bool IsKillable { get => isKillable; }
         public bool IsAlive { get => isAlive; }
         public List<DestinationProperties> DestinationSequence { get => destinationSequence; }
+        public Transform HandL { get => handL; }
+        public Transform HandR { get => handR; }
 
         public event Func<HanakoDestinationID, int, HanakoDestination> GetDestinationByID;
         public event Func<HanakoGameState> GetGameState;
@@ -104,12 +127,14 @@ namespace Hanako.Hanako
             {
                 if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
                     srEditor.ChangeAlpha(0f);
-
+                UnholdFlashlight();
                 DeactivateGOs(gosToDeactivateWhenNotMoving);
             }
 
             if (colDetectArea!=null)
                 colDetectArea.DisableCollider();
+
+            ResetLook();
         }
 
         public void Init(
@@ -204,6 +229,7 @@ namespace Hanako.Hanako
                 thoughtBubble.Show(destination.ID.GetLogo(destination.IndexOfSameID), destination.ID.Color);
                 animator.SetInteger(int_motion, (int)CharacterMotion.Run);
                 ActivateGOs(gosToDeactivateWhenNotMoving);
+                HoldFlashlight();
                 colDetectArea.EnableCollider();
                 isKillable = true;
 
@@ -231,6 +257,7 @@ namespace Hanako.Hanako
                     Highlight(HighlightMode.None); // in case RemoveEnemyInDetectArea not called because "isKillable = false" below executed first
                     thoughtBubble.Hide();
                     animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
+                    UnholdFlashlight();
                     DeactivateGOs(gosToDeactivateWhenNotMoving);
                     colDetectArea.DisableCollider();
                     isKillable = false;
@@ -278,6 +305,7 @@ namespace Hanako.Hanako
             thoughtBubble.Hide();
             animator.SetInteger(int_motion, (int)CharacterMotion.Pushed);
             colDetectArea.DisableCollider();
+            UnholdFlashlight();
             DeactivateGOs(gosToDeactivateWhenNotMoving);
 
             StartCoroutine(Animating());
@@ -369,6 +397,7 @@ namespace Hanako.Hanako
             isAlive = false;
             isKillable = false;
             HideHighlightIcon();
+            UnholdFlashlight();
             DeactivateGOs(gosToDeactivateWhenNotMoving);
             if (transform.TryGetComponentInFamily<SpriteRendererEditor>(out var srEditor))
                 srEditor.BeTransparent(fadeOutDuration);
@@ -381,6 +410,31 @@ namespace Hanako.Hanako
                 animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
                 gameObject.SetActive(false);
             }
+        }
+
+        public void LookAt(Transform target)
+        {
+            eyeRigL.weight = 1f;
+            eyeRigR.weight = 1f;
+
+        }
+
+        public void ResetLook()
+        {
+            eyeRigL.weight = 0f;
+            eyeRigR.weight = 0f;
+        }
+
+        public void HoldFlashlight()
+        {
+            flashlightRigChainIK.weight = 1f;
+            flashlight.gameObject.SetActive(true);
+        }
+
+        public void UnholdFlashlight()
+        {
+            flashlightRigChainIK.weight = 0f;
+            flashlight.gameObject.SetActive(false);
         }
     }
 }
