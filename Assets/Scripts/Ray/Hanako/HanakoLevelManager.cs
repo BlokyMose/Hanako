@@ -387,6 +387,7 @@ namespace Hanako.Hanako
 
             List<HanakoEnemy> InstantiateEnemies(HanakoEnemySequence enemySequence)
             {
+                enemiesParent.DestroyChildren();
                 var enemies = new List<HanakoEnemy>();
                 foreach (var enemy in enemySequence.Sequence)
                 {

@@ -185,7 +185,7 @@ namespace Hanako.Hanako
             lastOccupant = currentOccupant;
             currentOccupant = null;
             ResetColor();
-            StartCoroutine(MoveOccupant(enemy, occupantLastPos, durationToPostInteractPos));
+            yield return StartCoroutine(MoveOccupant(enemy, occupantLastPos, durationToPostInteractPos));
             WhenOccupationEnd(enemy);
             occupationMode = OccupationMode.Unoccupied;
 
@@ -216,17 +216,19 @@ namespace Hanako.Hanako
         protected IEnumerator MoveOccupant(HanakoEnemy occupant, Vector2 targetPos, float duration)
         {
             occupant.PlayAnimation(CharacterMotion.Run);
-            var speed = Vector2.Distance(transform.position, targetPos) / duration;
+            const float animationDelay = 0.15f;
+            yield return new WaitForSeconds(animationDelay);
+
+            var curveX = AnimationCurve.Linear(0, occupant.transform.position.x, duration, targetPos.x);
+            var curveY = AnimationCurve.Linear(0, occupant.transform.position.y, duration, targetPos.y);
             var time = 0f;
             while (time < duration)
             {
-                occupant.transform.position = Vector2.MoveTowards(occupant.transform.position, targetPos, speed * Time.deltaTime);
+                occupant.transform.position = new(curveX.Evaluate(time), curveY.Evaluate(time));
                 time += Time.deltaTime;
                 yield return null;
             }
-            if (this.currentOccupant == occupant)
-                occupant.PlayAnimation(CharacterMotion.Idle);
-
+            occupant.PlayAnimation(CharacterMotion.Idle);
             OnMoveOccupantEnd?.Invoke(occupant, targetPos);
         }
 

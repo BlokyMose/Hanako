@@ -7,6 +7,7 @@ using UnityEngine.Animations.Rigging;
 using UnityUtility;
 using static Hanako.Hanako.HanakoEnemySequence;
 using static Hanako.Hanako.HanakoLevelManager;
+using static Hanako.HanakoDestinationSequence;
 
 namespace Hanako.Hanako
 {
@@ -23,6 +24,9 @@ namespace Hanako.Hanako
         [Header("Properties")]
         [SerializeField]
         float moveSpeed = 1;
+
+        [SerializeField, Tooltip("Delay duration before start moving to the next destination")]
+        float planningDuration = 1f;
 
         [SerializeField]
         List<DestinationProperties> destinationSequence = new();
@@ -107,6 +111,7 @@ namespace Hanako.Hanako
         public event Func<HanakoGameState> GetGameState;
         public event Action OnReachedExitDoor;
         public event Action OnDie;
+        Coroutine corPlanning;
 
         void Awake()
         {
@@ -196,10 +201,10 @@ namespace Hanako.Hanako
             if (currentDestination != null)
                 MoveTo(currentDestination);
             else
-                MoveToNextDestination();
+                PlanToMoveToNextDestination();
         }
 
-        public void MoveToNextDestination()
+        public void PlanToMoveToNextDestination()
         {
             if (currentDestination == exitDoor) // Prevent going to other destination once door has been reached
                 return;
@@ -213,7 +218,16 @@ namespace Hanako.Hanako
                 currentDestination = exitDoor;
             }
 
-            MoveToCurrentDestination();
+            corPlanning = this.RestartCoroutine(Delay(planningDuration), corPlanning);
+            IEnumerator Delay(float delay)
+            {
+                PlayAnimation(CharacterMotion.Idle);
+                thoughtBubble.Show(
+                    currentDestination.ID.GetLogo(currentDestination.IndexOfSameID), 
+                    currentDestination.ID.Color);
+                yield return new WaitForSeconds(delay);
+                MoveToCurrentDestination();
+            }
         }
 
         public void MoveTo(HanakoDestination destination)
@@ -227,7 +241,7 @@ namespace Hanako.Hanako
             {
                 col.enabled = true;
                 thoughtBubble.Show(destination.ID.GetLogo(destination.IndexOfSameID), destination.ID.Color);
-                animator.SetInteger(int_motion, (int)CharacterMotion.Run);
+                PlayAnimation(CharacterMotion.Run);
                 ActivateGOs(gosToDeactivateWhenNotMoving);
                 HoldFlashlight();
                 colDetectArea.EnableCollider();
@@ -256,7 +270,6 @@ namespace Hanako.Hanako
                     col.enabled = false;
                     Highlight(HighlightMode.None); // in case RemoveEnemyInDetectArea not called because "isKillable = false" below executed first
                     thoughtBubble.Hide();
-                    animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
                     UnholdFlashlight();
                     DeactivateGOs(gosToDeactivateWhenNotMoving);
                     colDetectArea.DisableCollider();
@@ -265,14 +278,14 @@ namespace Hanako.Hanako
                     yield return StartCoroutine(destination.Occupy(this));
                 }
 
-                MoveToNextDestination();
+                PlanToMoveToNextDestination();
             }
         }
 
         public void DetectHanako(Vector2 hanakoPos)
         {
             this.StopCoroutineIfExists(corMoving);
-            animator.SetInteger(int_motion, (int)CharacterMotion.PointingScared);
+            PlayAnimation(CharacterMotion.PointingScared);
             var isFacingRight = hanakoPos.x > transform.position.x;
             transform.localEulerAngles = new(0, isFacingRight ? 0 : 180, 0);
             thoughtBubble.Hide();
@@ -303,7 +316,7 @@ namespace Hanako.Hanako
             isAlive = false; // this will prevent corMoving from entering a destination
 
             thoughtBubble.Hide();
-            animator.SetInteger(int_motion, (int)CharacterMotion.Pushed);
+            PlayAnimation(CharacterMotion.Pushed);
             colDetectArea.DisableCollider();
             UnholdFlashlight();
             DeactivateGOs(gosToDeactivateWhenNotMoving);
@@ -383,7 +396,7 @@ namespace Hanako.Hanako
             this.StopCoroutineIfExists(corMoving);
             var isFacingRight = transform.position.x < distractionPos.x;
             transform.localEulerAngles = new(0, isFacingRight ? 0 : 180, 0);
-            animator.SetInteger(int_motion, (int)CharacterMotion.Stiffed);
+            PlayAnimation(CharacterMotion.Stiffed);
 
             if (flashlight != null)
             {
@@ -407,7 +420,7 @@ namespace Hanako.Hanako
             IEnumerator Delay(float delay)
             {
                 yield return new WaitForSeconds(delay);
-                animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
+                PlayAnimation(CharacterMotion.Idle);
                 gameObject.SetActive(false);
             }
         }
