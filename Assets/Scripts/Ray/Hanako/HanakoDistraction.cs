@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.VFX;
 using UnityUtility;
 using static Hanako.Hanako.HanakoLevelManager;
+using static Hanako.Hanako.IHanakoInteractableByCursor;
 
 namespace Hanako.Hanako
 {
@@ -26,6 +27,9 @@ namespace Hanako.Hanako
 
         [SerializeField]
         ColliderProxy detectArea;
+
+        [SerializeField]
+        Animator detectAreaAnimator;
 
         [Header("UI")]
         [SerializeField]
@@ -86,6 +90,8 @@ namespace Hanako.Hanako
         public event Action OnShowDestinationUI;
         public event Action OnHideDestinationUI;
 
+        public Animator GetDetectAreaAnimator() => detectAreaAnimator;
+
         void Awake()
         {
             int_mode = Animator.StringToHash(nameof(int_mode));
@@ -132,7 +138,6 @@ namespace Hanako.Hanako
             }
         }
 
-
         protected virtual void OnDestroy()
         {
             if (destinationUIPrefab!=null)
@@ -158,6 +163,7 @@ namespace Hanako.Hanako
             colorSetter.ChangeColor(colors.HoverColor);
             HighlightEnemies();
             ShowActionIcon();
+            detectAreaAnimator.SetInteger(int_mode, (int)DetectAreaAnimation.Show);
         }
 
         public void Unhover()
@@ -168,6 +174,7 @@ namespace Hanako.Hanako
             colorSetter.ResetColor();
             ResetHighlightEnemies();
             HideActionIcon();
+            detectAreaAnimator.SetInteger(int_mode, (int)DetectAreaAnimation.Hide);
         }
 
         IEnumerator DepletingCooldown()

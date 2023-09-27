@@ -221,7 +221,7 @@ namespace Hanako.Hanako
             corPlanning = this.RestartCoroutine(Delay(planningDuration), corPlanning);
             IEnumerator Delay(float delay)
             {
-                PlayAnimation(CharacterMotion.Idle);
+                PlayAnimation(CharacterMotion.Think);
                 thoughtBubble.Show(
                     currentDestination.ID.GetLogo(currentDestination.IndexOfSameID), 
                     currentDestination.ID.Color);
@@ -239,13 +239,12 @@ namespace Hanako.Hanako
             corMoving = this.RestartCoroutine(Moving(), corMoving);
             IEnumerator Moving()
             {
-                col.enabled = true;
+                AllowToBeKilled();
                 thoughtBubble.Show(destination.ID.GetLogo(destination.IndexOfSameID), destination.ID.Color);
                 PlayAnimation(CharacterMotion.Run);
+                yield return new WaitForSeconds(0.1f); // animation transition
                 ActivateGOs(gosToDeactivateWhenNotMoving);
                 HoldFlashlight();
-                colDetectArea.EnableCollider();
-                isKillable = true;
 
                 // Moving
                 while (true)
@@ -267,24 +266,39 @@ namespace Hanako.Hanako
 
                 if (destination.Occupation == HanakoDestination.OccupationMode.Unoccupied)
                 {
-                    col.enabled = false;
+                    DisallowToBeKilled();
                     Highlight(HighlightMode.None); // in case RemoveEnemyInDetectArea not called because "isKillable = false" below executed first
                     thoughtBubble.Hide();
                     UnholdFlashlight();
                     DeactivateGOs(gosToDeactivateWhenNotMoving);
-                    colDetectArea.DisableCollider();
-                    isKillable = false;
 
                     yield return StartCoroutine(destination.Occupy(this));
+
+                    AllowToBeKilled();
                 }
 
                 PlanToMoveToNextDestination();
+            }
+
+            void AllowToBeKilled()
+            {
+                col.enabled = true;
+                colDetectArea.EnableCollider();
+                isKillable = true;
+            }
+
+            void DisallowToBeKilled()
+            {
+                col.enabled = false;
+                colDetectArea.DisableCollider();
+                isKillable = false;
             }
         }
 
         public void DetectHanako(Vector2 hanakoPos)
         {
             this.StopCoroutineIfExists(corMoving);
+            this.StopCoroutineIfExists(corPlanning);
             PlayAnimation(CharacterMotion.PointingScared);
             var isFacingRight = hanakoPos.x > transform.position.x;
             transform.localEulerAngles = new(0, isFacingRight ? 0 : 180, 0);
@@ -326,6 +340,8 @@ namespace Hanako.Hanako
             {
                 yield return new WaitForSeconds(delayScalingAnimation);
                 this.StopCoroutineIfExists(corMoving);
+                this.StopCoroutineIfExists(corPlanning);
+
                 OnDie?.Invoke();
 
                 var time = 0f;
@@ -394,6 +410,8 @@ namespace Hanako.Hanako
         {
             if (!isAlive || !IsKillable) return;
             this.StopCoroutineIfExists(corMoving);
+            this.StopCoroutineIfExists(corPlanning);
+
             var isFacingRight = transform.position.x < distractionPos.x;
             transform.localEulerAngles = new(0, isFacingRight ? 0 : 180, 0);
             PlayAnimation(CharacterMotion.Stiffed);

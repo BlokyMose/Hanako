@@ -5755,7 +5755,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 776886671}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.48, y: 0, z: 0}
+  m_LocalPosition: {x: -1.6, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9184,6 +9184,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2078453598}
     m_Modifications:
+    - target: {fileID: 1815935411, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
+      propertyPath: m_Color.a
+      value: 0.2784314
+      objectReference: {fileID: 0}
+    - target: {fileID: 1815935411, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
+      propertyPath: m_Color.b
+      value: 0.472
+      objectReference: {fileID: 0}
+    - target: {fileID: 1815935411, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1815935411, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
+      propertyPath: m_Color.r
+      value: 0.33999997
+      objectReference: {fileID: 0}
     - target: {fileID: 6629668864783541412, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -17471,7 +17487,7 @@ MonoBehaviour:
   colors: {fileID: 0}
   icons: {fileID: 0}
   fadeOutDuration: 0.4
-  extraRunPosition: {fileID: 1385774121}
+  extraRunPosition: {fileID: 776886672}
 --- !u!114 &2051968737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19237,10 +19253,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 561701250}
     m_Modifications:
-    - target: {fileID: 4610187264104441502, guid: 9399950e12454fa4b911f6a5f268c971, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4610187265161202040, guid: 9399950e12454fa4b911f6a5f268c971, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -19288,10 +19300,6 @@ PrefabInstance:
     - target: {fileID: 4610187265161202044, guid: 9399950e12454fa4b911f6a5f268c971, type: 3}
       propertyPath: m_Name
       value: Hanako_ToiletFan
-      objectReference: {fileID: 0}
-    - target: {fileID: 4610187265452005482, guid: 9399950e12454fa4b911f6a5f268c971, type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9399950e12454fa4b911f6a5f268c971, type: 3}

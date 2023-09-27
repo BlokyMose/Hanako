@@ -16,6 +16,7 @@ namespace Hanako
         PointingScared = 13,
         WaveMuch = 14,
         WashHands = 15,
+        Think = 16,
         
     }
 

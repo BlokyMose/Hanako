@@ -33,8 +33,6 @@ namespace Hanako.Hanako
         public void Hide()
         {
             animator.SetInteger(int_mode, (int)Mode.Hide);
-            logo.color = new Color(1, 1, 1, 0);
-            logo.sprite = null;
         }
     }
 }

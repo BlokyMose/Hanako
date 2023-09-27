@@ -16,17 +16,9 @@ namespace Hanako.Hanako
 
         public override IEnumerator Occupy(HanakoEnemy enemy)
         {
-            //return base.Occupy(enemy);
             StartCoroutine(MoveOccupant(enemy, extraRunPosition.position, fadeOutDuration));
             enemy.ReachedExitDoor(fadeOutDuration);
             yield return null;
         }
-
-        //protected override void WhenOccupationStart(HanakoEnemy enemy)
-        //{
-        //    base.WhenOccupationStart(enemy);
-        //    StartCoroutine(MoveOccupant(currentOccupant, extraRunPosition.position, fadeOutDuration));
-        //    enemy.ReachedExitDoor(fadeOutDuration);
-        //}
     }
 }

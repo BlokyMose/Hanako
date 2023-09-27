@@ -2,17 +2,23 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
 using UnityUtility;
+using static Hanako.Hanako.IHanakoInteractableByCursor;
 
 namespace Hanako.Hanako
 {
     public class HanakoDestination_Toilet : HanakoDestination, IHanakoInteractableByCursor
     {
+        [Header("Toilet")]
         [SerializeField]
         ColliderProxy detectArea;
+
+        [SerializeField]
+        Animator detectAreaAnimator;
 
         [SerializeField]
         Transform hanakoFront;
@@ -72,6 +78,7 @@ namespace Hanako.Hanako
         bool canInstantiateVFXSuccessfulAttack = false;
         int killedEnemiesInLastAttack = 0;
 
+        public Animator GetDetectAreaAnimator() => detectAreaAnimator;
 
         protected override void Awake()
         {
@@ -325,6 +332,7 @@ namespace Hanako.Hanako
             foreach (var enemy in enemiesInDetectArea)
                 enemy.Highlight(HanakoEnemy.HighlightMode.Attackable);
 
+            detectAreaAnimator.SetInteger(int_mode, (int)DetectAreaAnimation.Show);
 
         }
 
@@ -341,6 +349,7 @@ namespace Hanako.Hanako
             foreach (var enemy in enemiesInDetectArea)
                 enemy.Highlight(HanakoEnemy.HighlightMode.None);
 
+            detectAreaAnimator.SetInteger(int_mode, (int)DetectAreaAnimation.Hide);
         }
 
         public void PlayAnimationPossessed()
