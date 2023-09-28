@@ -18,11 +18,21 @@ namespace Hanako.Hanako
         [SerializeField]
         private HanakoDestinationID id;
 
-        [SerializeField]
+        [SerializeField, ReadOnly]
         int indexOfAllDestinations;
 
-        [SerializeField]
+        [SerializeField, ReadOnly]
         int indexOfSameID;
+
+        [Header("Interact")]
+        [SerializeField]
+        protected Transform interactablePos;
+
+        [SerializeField]
+        protected Transform postInteractPos;
+
+        [SerializeField]
+        protected float durationToPostInteractPos = 0.1f;
 
         [SerializeField]
         protected float interactDuration = 1f;
@@ -33,29 +43,11 @@ namespace Hanako.Hanako
         SpriteRenderer logoSR;
 
         [SerializeField]
-        GameObject actionIconPrefab;
-
-        [SerializeField, ShowIf("@" + nameof(actionIconPrefab))]
-        Transform actionIconParent;
-
-        [SerializeField]
         protected GameObject destinationUIPrefab;
         
         [SerializeField, ShowIf("@" + nameof(destinationUIPrefab))]
         protected Transform destinationUIParent;
-
-        [Header("Interact")]
-        [SerializeField]
-        protected Transform interactablePos;
-
-        [SerializeField]
-        protected Transform postInteractPos;
-
-        [SerializeField]
-        protected Transform postAttackPos;
-
-        [SerializeField]
-        protected float durationToPostInteractPos = 0.1f;
+        
 
         [Header("Components")]
         [SerializeField]
@@ -80,10 +72,9 @@ namespace Hanako.Hanako
         protected HanakoEnemy currentOccupant, lastOccupant;
         protected float durationLeft;
         protected Dictionary<SpriteRenderer, Color> cacheHoveredSRs = new();
-        protected bool isHovered = false;
+        protected bool isHovering = false;
         protected Vector2 occupantLastPos;
         protected OccupationMode occupationMode = OccupationMode.Unoccupied;
-        protected HashSet<HanakoEnemy> enemiesDetecting = new();
         protected int int_mode, tri_transition;
 
         #endregion
@@ -105,10 +96,8 @@ namespace Hanako.Hanako
 
         public HanakoDestinationID ID { get => id; }
         public Transform InteractablePos => interactablePos == null ? transform : interactablePos;
-
+        public Transform PostInteractPos => postInteractPos == null ? transform : postInteractPos;
         public virtual OccupationMode Occupation { get => occupationMode; }
-        public Transform PostInteractPos { get => postInteractPos;  }
-        public Transform PostAttackPos { get => postAttackPos;  }
         public int IndexOfAllDestinations { get => indexOfAllDestinations; }
         public int IndexOfSameID { get => indexOfSameID; }
 
@@ -129,32 +118,17 @@ namespace Hanako.Hanako
                 destinationUI.Init(true, ref OnDurationStartDepleting, ref OnDurationStartFilling, ref OnOccupationStart, ref OnOccupationEnd);
             }
 
-            if (actionIconPrefab != null)
-            {
-                var actionIconGO = Instantiate(actionIconPrefab, actionIconParent);
-                actionIconAnimator = actionIconGO.GetComponent<Animator>();
-                actionIconSR = actionIconGO.GetComponentInChildren<SpriteRenderer>();
-                colorSetter.RemoveSR(actionIconSR);
-            }
-
             foreach (var sr in coloredSRsByID)
-            {
-                var alpha = sr.color.a;
-                sr.color = id.Color.ChangeAlpha(alpha);
-            }
+                sr.color = id.Color.ChangeAlpha(sr.color.a);
 
             if (postInteractPos == null)
                 postInteractPos = transform;
-
-
         }
 
         protected virtual void OnDestroy()
         {
             if (destinationUIPrefab != null)
-            {
                 destinationUI.Exit(ref OnDurationStartDepleting, ref OnDurationStartFilling, ref OnOccupationStart, ref OnOccupationEnd);
-            }
         }
 
         public void Init(HanakoColors colors, HanakoIcons icons, Func<HanakoLevelManager.HanakoGameState> getGameState, int indexOfAllDestinations, int indexOfSameID)
@@ -233,64 +207,14 @@ namespace Hanako.Hanako
         }
 
 
-        public virtual void Hover()
-        {
-            if (isHovered || occupationMode == OccupationMode.Enemy) return;
-            isHovered = true;
-            cacheHoveredSRs = new();
-            ChangeColor(colors.HoverColor);
-            ShowActionIcon();
-        }
-
-        public virtual void Unhover()
-        {
-            if (!isHovered) return;
-            HideActionIcon();
-
-            if (occupationMode == OccupationMode.Player)
-            {
-                isHovered = false;
-                ChangeColor(colors.PlayerColor);
-            }
-            else
-            {
-                isHovered = false;
-                ResetColor();
-            }
-        }
-
-        protected virtual void ShowActionIcon()
-        {
-            actionIconSR.sprite = icons.ArrownDownIcon;
-            actionIconSR.color = colors.PlayerColor;
-            actionIconAnimator.SetInteger(int_mode, (int)icons.ArrowDownAnimation);
-            actionIconAnimator.SetTrigger(tri_transition);
-        }
-
-        protected void HideActionIcon()
-        {
-            actionIconAnimator.SetInteger(int_mode, (int)icons.HideAnimation);
-            actionIconAnimator.SetTrigger(tri_transition);
-        }
-
-        public void ChangeColor(Color color)
+        protected void ChangeColor(Color color)
         {
             colorSetter.ChangeColor(color);
         }
 
-        public void ResetColor()
+        protected void ResetColor()
         {
             colorSetter.ResetColor();
-        }
-
-        public virtual void AddDetectedBy(HanakoEnemy enemy)
-        {
-            enemiesDetecting.Add(enemy);
-        }
-
-        public virtual void RemoveDetectedBy(HanakoEnemy enemy)
-        {
-            enemiesDetecting.Remove(enemy);
         }
     }
 }

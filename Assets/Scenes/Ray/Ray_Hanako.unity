@@ -9184,22 +9184,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2078453598}
     m_Modifications:
-    - target: {fileID: 1815935411, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
-      propertyPath: m_Color.a
-      value: 0.2784314
-      objectReference: {fileID: 0}
-    - target: {fileID: 1815935411, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
-      propertyPath: m_Color.b
-      value: 0.472
-      objectReference: {fileID: 0}
-    - target: {fileID: 1815935411, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
-      propertyPath: m_Color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1815935411, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
-      propertyPath: m_Color.r
-      value: 0.33999997
-      objectReference: {fileID: 0}
     - target: {fileID: 6629668864783541412, guid: 8af8c72f3a7c7bf47a5c14b5185797b7, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -13735,7 +13719,7 @@ MonoBehaviour:
   levelInfoInit: 2
   levelInfo: {fileID: 11400000, guid: 0dbce9298e2c6464f9aa7419ee641e0f, type: 2}
   levelProperties: {fileID: 11400000, guid: 9415832ee09bdb84a9ca70d0bf61514a, type: 2}
-  isAutoStart: 1
+  isAutoStart: 0
   autoStartDuration: 0
   enemySequence: {fileID: 11400000, guid: 1e2106e7c2c03a343b60726cd35b603b, type: 2}
   destinationSequence: {fileID: 11400000, guid: b8184e3b4103ffc4197d5393d4d0a7f8, type: 2}
@@ -17473,16 +17457,13 @@ MonoBehaviour:
   id: {fileID: 11400000, guid: 173815349e54c5240890b3d3b33203f1, type: 2}
   indexOfAllDestinations: 0
   indexOfSameID: 0
-  interactDuration: 0
-  logoSR: {fileID: 1320062626}
-  actionIconPrefab: {fileID: 0}
-  actionIconParent: {fileID: 0}
-  destinationUIPrefab: {fileID: 0}
-  destinationUIParent: {fileID: 305418277}
   interactablePos: {fileID: 1385774121}
   postInteractPos: {fileID: 776886672}
-  postAttackPos: {fileID: 0}
   durationToPostInteractPos: 0.25
+  interactDuration: 0
+  logoSR: {fileID: 1320062626}
+  destinationUIPrefab: {fileID: 0}
+  destinationUIParent: {fileID: 305418277}
   coloredSRsByID: []
   colors: {fileID: 0}
   icons: {fileID: 0}

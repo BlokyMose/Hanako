@@ -822,9 +822,9 @@ GameObject:
   m_Component:
   - component: {fileID: 3625728510422226015}
   - component: {fileID: 1114074411902098756}
-  - component: {fileID: 6722249847813101188}
   - component: {fileID: 7942413290551463393}
   - component: {fileID: 1643140508}
+  - component: {fileID: 6722249847813101188}
   m_Layer: 0
   m_Name: Hanako_Enemy_StudentBoy
   m_TagString: Untagged
@@ -861,39 +861,6 @@ SortingGroup:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 100
---- !u!114 &6722249847813101188
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7099011770073373190}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 11b7158e2ace83b429b8c94ac037d491, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  autoTransparent: 1
-  moveSpeed: 4
-  planningDuration: 1
-  destinationSequence: []
-  colDetectArea: {fileID: 6828650884465276180}
-  thoughtBubblePrefab: {fileID: 3909762446411602003, guid: f49d8572a81449d48abab0d029aadf8b, type: 3}
-  thoughtBubbleParent: {fileID: 1755173594057264384}
-  highlightIcon: {fileID: 1065592169742104254}
-  animator: {fileID: 7420813449035912698}
-  flashlightRigChainIK: {fileID: 2067749461}
-  flashlight: {fileID: 880355154}
-  flashlightTarget: {fileID: 1849024947358615385}
-  flashlightPointingPos: {fileID: 3914065041916103362}
-  gosToDeactivateWhenNotMoving: []
-  eyeRigR: {fileID: 720483521}
-  eyeRigL: {fileID: 859760578}
-  eyesTarget: {fileID: 337952323}
-  handL: {fileID: 7420813449428274666}
-  handR: {fileID: 7420813448649320125}
-  colors: {fileID: 0}
-  icons: {fileID: 0}
 --- !u!70 &7942413290551463393
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -927,6 +894,39 @@ MonoBehaviour:
   excludeSRs:
   - {fileID: 7420813448366750719}
   - {fileID: 7420813449250254748}
+--- !u!114 &6722249847813101188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7099011770073373190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11b7158e2ace83b429b8c94ac037d491, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoTransparent: 1
+  moveSpeed: 4
+  planningDuration: 1
+  destinationSequence: []
+  colDetectArea: {fileID: 6828650884465276180}
+  thoughtBubblePrefab: {fileID: 3909762446411602003, guid: f49d8572a81449d48abab0d029aadf8b, type: 3}
+  thoughtBubbleParent: {fileID: 1755173594057264384}
+  highlightIcon: {fileID: 1065592169742104254}
+  animator: {fileID: 7420813449035912698}
+  flashlightRigChainIK: {fileID: 2067749461}
+  flashlight: {fileID: 880355154}
+  flashlightTarget: {fileID: 1849024947358615385}
+  flashlightPointingPos: {fileID: 3914065041916103362}
+  gosToDeactivateWhenNotMoving: []
+  eyeRigR: {fileID: 720483521}
+  eyeRigL: {fileID: 859760578}
+  eyesTarget: {fileID: 337952323}
+  handL: {fileID: 7420813449428274666}
+  handR: {fileID: 7420813448649320125}
+  colors: {fileID: 0}
+  icons: {fileID: 0}
 --- !u!1 &7565442990689770685
 GameObject:
   m_ObjectHideFlags: 0

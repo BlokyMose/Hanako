@@ -23,5 +23,6 @@ namespace Hanako
     public enum SoulIconState { Dead, Alive }
     public enum SolidButtonState { Pressed, Idle, Hover }
     public enum LevelInfoInitMode { SceneLoadingData, LevelInfo, LevelProperties }
-    
+    public enum DetectAreaAnimation { Hide, Show }
+
 }

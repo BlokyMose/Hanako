@@ -180,17 +180,17 @@ namespace Hanako.Hanako
 
                 void OnEnter(Collider2D col)
                 {
-                    if (col.TryGetComponent<HanakoDestination>(out var destination))
+                    if (col.TryGetComponent<HanakoInteractable_Toilet>(out var toilet))
                     {
-                        destination.AddDetectedBy(this);
+                        toilet.AddDetectedBy(this);
                     }
                 }
 
                 void OnExit(Collider2D col)
                 {
-                    if (col.TryGetComponent<HanakoDestination>(out var destination))
+                    if (col.TryGetComponent<HanakoInteractable_Toilet>(out var toilet))
                     {
-                        destination.RemoveDetectedBy(this);
+                        toilet.RemoveDetectedBy(this);
                     }
                 }
             }
@@ -323,7 +323,7 @@ namespace Hanako.Hanako
                 go.SetActive(true);
         }
 
-        public void ReceiveAttack(HanakoDestination_Toilet toilet, float delayScalingAnimation, float scalingAnimationDuration)
+        public void ReceiveAttack(HanakoInteractable_Toilet toilet, float delayScalingAnimation, float scalingAnimationDuration)
         {
             if (!isKillable) return;
             isKillable = false;

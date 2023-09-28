@@ -14,14 +14,14 @@ namespace Hanako.Hanako
         [SerializeField]
         bool isInGame = false;
 
-        IHanakoInteractableByCursor hoveredObject;
-        HanakoDestination_Toilet possessedToilet;
-        event Action<HanakoDestination_Toilet, HanakoDestination_Toilet> OnPossess;
+        HanakoInteractable hoveredObject;
+        HanakoInteractable_Toilet possessedToilet;
+        event Action<HanakoInteractable_Toilet, HanakoInteractable_Toilet> OnPossess;
         HanakoLevelManager levelManager;
         float possessCooldown = 0f;
-        public HanakoDestination_Toilet PossessedToilet { get => possessedToilet; }
+        public HanakoInteractable_Toilet PossessedToilet { get => possessedToilet; }
 
-        public void Init(HanakoLevelManager levelManager, HanakoDestination_Toilet initialPossessedToilet, Action<HanakoDestination_Toilet, HanakoDestination_Toilet> onPossess)
+        public void Init(HanakoLevelManager levelManager, HanakoInteractable_Toilet initialPossessedToilet, Action<HanakoInteractable_Toilet, HanakoInteractable_Toilet> onPossess)
         {
             OnPossess += onPossess;
             this.possessedToilet = initialPossessedToilet;
@@ -39,7 +39,7 @@ namespace Hanako.Hanako
             }
         }
 
-        public void Exit(Action<HanakoDestination_Toilet, HanakoDestination_Toilet> onPossess)
+        public void Exit(Action<HanakoInteractable_Toilet, HanakoInteractable_Toilet> onPossess)
         {
             OnPossess -= onPossess;
             isInGame = false;
@@ -50,7 +50,7 @@ namespace Hanako.Hanako
         {
             if (!isInGame) return;
 
-            if (collision.TryGetComponent<IHanakoInteractableByCursor>(out var interactableObject))
+            if (collision.TryGetComponent<HanakoInteractable>(out var interactableObject))
             {
                 Hover(interactableObject);
             }
@@ -60,7 +60,7 @@ namespace Hanako.Hanako
         {
             if (!isInGame) return;
 
-            if (collision.TryGetComponent<IHanakoInteractableByCursor>(out var interctableObject))
+            if (collision.TryGetComponent<HanakoInteractable>(out var interctableObject))
             {
                 if (interctableObject == hoveredObject)
                     Unhover(interctableObject);
@@ -74,13 +74,13 @@ namespace Hanako.Hanako
 
             if (!isClicking || hoveredObject == null) return;
 
-            if (hoveredObject is HanakoDestination_Toilet)
+            if (hoveredObject is HanakoInteractable_Toilet)
             {
-                var hoveredToilet = hoveredObject as HanakoDestination_Toilet;
+                var hoveredToilet = hoveredObject as HanakoInteractable_Toilet;
                 if (possessedToilet == hoveredToilet)
                     AttackFromPossessedToilet();
 
-                else if (hoveredToilet.Occupation == OccupationMode.Unoccupied && possessCooldown < 0f)
+                else if (hoveredToilet.CanBePossessed && possessCooldown < 0f)
                     PossessToilet(hoveredToilet);
             }
             else if (hoveredObject is HanakoDistraction)
@@ -97,7 +97,7 @@ namespace Hanako.Hanako
             possessedToilet.Attack(levelManager.AttackCooldown, levelManager.EnemyReceiveAttackDelay);
         }
 
-        void PossessToilet(HanakoDestination_Toilet targetToilet)
+        void PossessToilet(HanakoInteractable_Toilet targetToilet)
         {
             possessCooldown = levelManager.HanakoMoveDuration;
             OnPossess?.Invoke(possessedToilet, targetToilet);
@@ -106,7 +106,7 @@ namespace Hanako.Hanako
             possessedToilet.Possess(levelManager.HanakoMoveDuration);
         }
 
-        void Hover(IHanakoInteractableByCursor interactableObject)
+        void Hover(HanakoInteractable interactableObject)
         {
             if (hoveredObject != null && hoveredObject != interactableObject)
                 Unhover(hoveredObject);
@@ -115,7 +115,7 @@ namespace Hanako.Hanako
             hoveredObject.Hover();
         }
 
-        void Unhover(IHanakoInteractableByCursor interactableObject)
+        void Unhover(HanakoInteractable interactableObject)
         {
             hoveredObject = null;
             interactableObject.Unhover();

@@ -320,23 +320,10 @@ namespace Hanako.Hanako
                     else
                         destinationIDCounter.Add(destinationComponent.ID, 0);
 
-                    if (destinationComponent is HanakoDestination_Toilet)
-                    {
-                        var toilet = destinationComponent as HanakoDestination_Toilet;
-                        toilet.Init(colors,
-                            icons,
-                            () => GameState,
-                            destinations.Count,
-                            destinationIDCounter[destinationComponent.ID],
-                            LostGame,
-                            PlayBloodSplatter,
-                            AddMultiKillCount);
-                    }
-                    else
-                    {
-                        destinationComponent.Init(colors, icons, () => GameState, destinations.Count, destinationIDCounter[destinationComponent.ID]);
-                    }
-
+                    if (destinationGO.TryGetComponent<HanakoInteractable_Toilet>(out var toilet))
+                        toilet.Init(LostGame, PlayBloodSplatter, AddMultiKillCount);
+                    
+                    destinationComponent.Init(colors, icons, () => GameState, destinations.Count, destinationIDCounter[destinationComponent.ID]);
 
                     destinations.Add(destinationComponent);
                 }
@@ -378,7 +365,7 @@ namespace Hanako.Hanako
                     distractionGO.transform.localPosition = distraction.Position;
 
                     var distractionComponent = distractionGO.GetComponent<HanakoDistraction>();
-                    distractionComponent.Init(colors, icons, () => GameState);
+                    distractionComponent.Init(colors, icons);
 
                     distractions.Add(distractionComponent);
                 }
@@ -510,16 +497,16 @@ namespace Hanako.Hanako
             }
         }
 
-        private HanakoDestination_Toilet GetInitialToilet()
+        private HanakoInteractable_Toilet GetInitialToilet()
         {
-            HanakoDestination_Toilet initialToilet = null;
+            HanakoInteractable_Toilet initialToilet = null;
             int toiletIndex = 0;
             int targetIndex = 3;
             foreach (var destination in destinations)
             {
-                if (destination is HanakoDestination_Toilet)
+                if (destination.TryGetComponent<HanakoInteractable_Toilet>(out var toilet))
                 {
-                    initialToilet = destination as HanakoDestination_Toilet;
+                    initialToilet = toilet;
                     toiletIndex++;
                     if (toiletIndex == targetIndex)
                         break;
@@ -540,7 +527,7 @@ namespace Hanako.Hanako
             return foundDestinations.Find(x=>x.IndexOfSameID == indexOfSameID);
         }
 
-        public void SetHanakoCrawl(HanakoDestination_Toilet fromToilet, HanakoDestination_Toilet toToilet)
+        public void SetHanakoCrawl(HanakoInteractable_Toilet fromToilet, HanakoInteractable_Toilet toToilet)
         {
             hanakoCrawl.Crawl(fromToilet, toToilet, hanakoMoveDuration);
         }

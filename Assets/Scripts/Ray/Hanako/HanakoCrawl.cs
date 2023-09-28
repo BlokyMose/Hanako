@@ -52,7 +52,7 @@ namespace Hanako.Hanako
             pebbleVFX.SetBool("isPlaying", false);
         }
 
-        public void Crawl(HanakoDestination_Toilet fromToilet, HanakoDestination_Toilet toToilet, float duration)
+        public void Crawl(HanakoInteractable_Toilet fromToilet, HanakoInteractable_Toilet toToilet, float duration)
         {
             corCrawling = this.RestartCoroutine(Crawling(), corCrawling);
             IEnumerator Crawling()
