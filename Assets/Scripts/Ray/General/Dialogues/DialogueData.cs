@@ -17,6 +17,11 @@ namespace Hanako.Dialogue
             [SerializeField, HideLabel]
             CharID charID;
 
+            public CharProperties(CharID charID)
+            {
+                this.charID = charID;
+            }
+
             public CharID CharID { get => charID; }
         }
 
@@ -44,7 +49,7 @@ namespace Hanako.Dialogue
             [SerializeField]
             Color textColor = Color.black;
 
-            public CharID CharID { get => charID; }
+            public CharID CharID { get => charID; internal set => charID = value; }
             public string Text { get => text; }
             public FaceAnimation FaceAnimation { get => faceAnimation;  }
             public BubbleShape BubbleShape { get => bubbleShape; }
@@ -69,5 +74,23 @@ namespace Hanako.Dialogue
         public DialogueCharPos CharPos { get => charPos; }
         public List<CharProperties> Chars { get => charProperties; }
         public List<TextLine> TextLines { get => textLines; }
+
+        [Button("Swap")]
+        void SwapCharID(CharID from, CharID to)
+        {
+            for (int i = charProperties.Count - 1; i >= 0; i--)
+                if (charProperties[i].CharID == from)
+                {
+                    charProperties.RemoveAt(i);
+                    charProperties.Insert(i, new(to));
+                    break;
+                }
+
+            foreach (var line in textLines)
+            {
+                if (line.CharID == from)
+                    line.CharID = to;
+            }
+        }
     }
 }

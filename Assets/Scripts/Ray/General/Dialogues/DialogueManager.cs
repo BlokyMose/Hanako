@@ -7,6 +7,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityUtility;
 using static Hanako.Dialogue.DialogueData;
+using static Hanako.Dialogue.DialogueEnums;
+using static Hanako.Dialogue.DialogueRuntimeData;
 
 namespace Hanako.Dialogue
 {
@@ -17,11 +19,26 @@ namespace Hanako.Dialogue
         {
             CharID charID;
             DialogueCharParent charParent;
+            List<CharID> alternateCharIDs = new();
 
             public Char(CharID charID, DialogueCharParent charParent)
             {
                 this.charID = charID;
                 this.charParent = charParent;
+            }
+
+            public Char(CharID charID, DialogueCharParent charParent, List<CharID> alternateCharIDs)
+            {
+                this.charID = charID;
+                this.charParent = charParent;
+                this.alternateCharIDs = alternateCharIDs;
+            }
+
+            public Char(CharID charID, DialogueCharParent charParent, CharID alternateCharID)
+            {
+                this.charID = charID;
+                this.charParent = charParent;
+                this.alternateCharIDs = new() { alternateCharID };
             }
 
             public void Reset(int sortingOrder)
@@ -36,7 +53,7 @@ namespace Hanako.Dialogue
 
             public void EvaluateThenSay(TextLine textLine, DialogueSettings settings, int sortingOrder)
             {
-                if (textLine.CharID != charID)
+                if (textLine.CharID != charID && !alternateCharIDs.Contains(textLine.CharID))
                     return;
                 charParent.Say(textLine, settings, sortingOrder);
             }
@@ -95,6 +112,47 @@ namespace Hanako.Dialogue
             StartDialogue(testDialogueData);
         }
 
+        public void StartDialogue(DialogueRuntimeData dialogueRuntimeData)
+        {
+            currentDialogueData = dialogueRuntimeData.DialogueData;
+            currentDialogueSettings = dialogueRuntimeData.DialogueData.Settings != null ? dialogueRuntimeData.DialogueData.Settings : defaultDialogueSettings;
+            currentTextLineIndex = 0;
+            chars.Clear();
+            dialogueCharsParent.DestroyChildren();
+            for (int i = 0; i < dialogueRuntimeData.DialogueData.Chars.Count; i++)
+            {
+                if (i >= dialogueRuntimeData.DialogueData.CharPos.AllPos.Count)
+                    break;
+
+                var charID = SwapCharID(i, dialogueRuntimeData.Chars);
+                var charPos = dialogueRuntimeData.DialogueData.CharPos.AllPos[i];
+                var newChar = Instantiate(dialogueCharPrefab, dialogueCharsParent);
+                newChar.transform.localPosition = charPos.Pos;
+                newChar.Init(charID, currentDialogueSettings.CharScale, charPos.IsFacingRight);
+
+                chars.Add(new Char(charID, newChar, dialogueRuntimeData.DialogueData.Chars[i].CharID));
+            }
+
+            ShowBG();
+            ActivateCanvasGroup();
+            NextTextLine();
+
+            CharID SwapCharID(int originalCharIndex, List<CharacterRuntimeProperties> newChars)
+            {
+                var originalCharID = dialogueRuntimeData.DialogueData.Chars[originalCharIndex].CharID;
+
+                foreach (var newChar in newChars)
+                {
+                    if(newChar.SwapMode.HasFlag(SwapCharMode.Index) && newChar.SwapWithIndex == originalCharIndex)
+                        return newChar.CharID;
+                    if(newChar.SwapMode.HasFlag(SwapCharMode.CharID) && newChar.SwapWithCharID == originalCharID)
+                        return newChar.CharID;
+                }
+
+                return originalCharID;
+            }
+        }
+
         public void StartDialogue(DialogueData dialogueData)
         {
             currentDialogueData = dialogueData;
@@ -118,7 +176,6 @@ namespace Hanako.Dialogue
 
             ShowBG();
             ActivateCanvasGroup();
-
             NextTextLine();
         }
 

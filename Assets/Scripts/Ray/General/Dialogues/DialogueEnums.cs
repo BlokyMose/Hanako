@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,8 @@ namespace Hanako.Dialogue
 {
     public static class DialogueEnums
     {
+        [Flags]
+        public enum SwapCharMode { None = 0, Index = 1, CharID = 2 }
         public enum BubbleAnimation { Hidden, Still, Swaying }
         public enum BubbleShape { Round, Rectangle, Spiky, Wiggly, Grumpy, RectangleBlack, Epiphany }
         public enum CharParentAnimation { Hidden, Idle }

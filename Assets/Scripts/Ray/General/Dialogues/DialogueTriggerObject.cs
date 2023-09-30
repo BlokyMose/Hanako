@@ -1,10 +1,12 @@
 using Hanako.Hub;
 using Hanako.Knife;
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityUtility;
+using static Hanako.Dialogue.DialogueEnums;
 
 namespace Hanako.Dialogue
 {
@@ -15,8 +17,17 @@ namespace Hanako.Dialogue
         [SerializeField]
         DialogueData dialogueData;
 
-        [SerializeField]
+        [SerializeField, InlineButton(nameof(InstantiateCharacter), "Show")]
         CharID charID;
+
+        [SerializeField]
+        SwapCharMode swapMode;
+
+        [SerializeField, ShowIf("@"+nameof(swapMode)+".HasFlag("+nameof(DialogueEnums)+"."+nameof(DialogueEnums.SwapCharMode)+"."+nameof(DialogueEnums.SwapCharMode.Index)+")")]
+        int swapWithIndex = 1;
+
+        [SerializeField, ShowIf("@"+nameof(swapMode)+".HasFlag("+nameof(DialogueEnums)+"."+nameof(DialogueEnums.SwapCharMode)+"."+nameof(DialogueEnums.SwapCharMode.CharID)+")")]
+        CharID swapWithCharID;
 
         [Header("Components")]
         [SerializeField]
@@ -32,7 +43,7 @@ namespace Hanako.Dialogue
         Transform dialoguePreviewParent;
 
         [SerializeField]
-        Animator characterAnimator;
+        Transform characterPos;
 
         [Header("Minimap")]
         [SerializeField]
@@ -41,8 +52,9 @@ namespace Hanako.Dialogue
         [SerializeField]
         Transform minimapIconParent;
 
+        Animator characterAnimator;
         DialoguePreviewCanvas currentDialoguePreviewCanvas;
-        Action<DialogueData> OnShowDialogueTriggerCanvas;
+        Action<DialogueRuntimeData> OnShowDialogueTriggerCanvas;
         Action OnHideDialogueTriggerCanvas;
         Coroutine corDeletingDialoguePreview;
         int int_motion;
@@ -67,18 +79,31 @@ namespace Hanako.Dialogue
                 minimapIcon.Init(charID.Icon);
             }
 
+            dialoguePreviewParent.DestroyChildren();
+            InstantiateCharacter();
         }
 
-        public void Init(Action<DialogueData> onShowDialogueTriggerCanvas, Action onHideDialogueTriggerCanvas, ref Action<DialogueData> onDialogueStart)
+        public void Init(Action<DialogueRuntimeData> onShowDialogueTriggerCanvas, Action onHideDialogueTriggerCanvas, ref Action<DialogueRuntimeData> onDialogueStart)
         {
             this.OnShowDialogueTriggerCanvas = onShowDialogueTriggerCanvas;
             this.OnHideDialogueTriggerCanvas = onHideDialogueTriggerCanvas;
-            onDialogueStart += (dialogueData) => { HideDialoguePreviewCanvas(); };
+            onDialogueStart += (dialogueData) => { if (dialogueData.DialogueData == this.dialogueData) HideDialoguePreviewCanvas(); };
+        }
+
+        public void InstantiateCharacter()
+        {
+            if (charID == null) return;
+            characterPos.DestroyChildren();
+            var character = Instantiate(charID.Prefab, characterPos);
+            character.transform.localPosition = Vector3.zero;
+            characterAnimator = character.GetComponent<Animator>();
         }
 
         void ShowDialogueTriggerCanvas()
         {
-            OnShowDialogueTriggerCanvas?.Invoke(dialogueData);
+            OnShowDialogueTriggerCanvas?.Invoke(new DialogueRuntimeData(
+                dialogueData: dialogueData, 
+                characters: new() {new(charID,swapMode, swapWithIndex, swapWithCharID)}));
         }
 
         void HideDialogueTriggerCanvas()
@@ -90,7 +115,7 @@ namespace Hanako.Dialogue
         {
             if (corDeletingDialoguePreview != null)
                 StopCoroutine(corDeletingDialoguePreview);
-            else
+            if (currentDialoguePreviewCanvas == null)
                 currentDialoguePreviewCanvas = Instantiate(dialoguePreviewCanvasPrefab, dialoguePreviewParent);
             currentDialoguePreviewCanvas.Show(charID);
             characterAnimator.SetInteger(int_motion, (int)CharacterMotion.WaveMuch);
@@ -98,6 +123,7 @@ namespace Hanako.Dialogue
 
         void HideDialoguePreviewCanvas()
         {
+            if (currentDialoguePreviewCanvas == null) return;
             currentDialoguePreviewCanvas.Hide();
             corDeletingDialoguePreview = this.RestartCoroutine(Delay(1f), corDeletingDialoguePreview);
             characterAnimator.SetInteger(int_motion, (int)CharacterMotion.Idle);
@@ -105,7 +131,8 @@ namespace Hanako.Dialogue
             IEnumerator Delay(float delay)
             {
                 yield return new WaitForSeconds(delay);
-                Destroy(currentDialoguePreviewCanvas);
+                Destroy(currentDialoguePreviewCanvas.gameObject);
+                currentDialoguePreviewCanvas = null;
                 corDeletingDialoguePreview = null;
             }
         }

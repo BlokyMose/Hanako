@@ -43,8 +43,8 @@ namespace Hanako.Dialogue
 
         CanvasGroup canvasGroup;
         Animator animator, talkButAnimator;
-        DialogueData currentDialogueData;
-        public event Action<DialogueData> OnStartDialogue;
+        DialogueRuntimeData currentDialogueData;
+        public event Action<DialogueRuntimeData> OnStartDialogue;
 
         void Awake()
         {
@@ -106,7 +106,7 @@ namespace Hanako.Dialogue
             }
         }
 
-        public void Show(DialogueData dialogueData)
+        public void Show(DialogueRuntimeData dialogueData)
         {
             if (isInDialogue) return;
 
