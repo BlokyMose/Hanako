@@ -13716,7 +13716,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 069f1f4e016760344a4b77e778950888, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelInfoInit: 2
+  levelInfoInit: 1
   levelInfo: {fileID: 11400000, guid: 0dbce9298e2c6464f9aa7419ee641e0f, type: 2}
   levelProperties: {fileID: 11400000, guid: 9415832ee09bdb84a9ca70d0bf61514a, type: 2}
   isAutoStart: 0
@@ -19453,6 +19453,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1211660706}
     m_Modifications:
+    - target: {fileID: 5761320644986361483, guid: 961dab26963c5174783669252cf78aa1, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 431.40002
+      objectReference: {fileID: 0}
     - target: {fileID: 7425908773783273584, guid: 961dab26963c5174783669252cf78aa1, type: 3}
       propertyPath: m_Pivot.x
       value: 0

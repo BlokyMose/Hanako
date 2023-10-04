@@ -22,12 +22,16 @@ namespace Hanako
         Sprite titleIcon;
 
         [SerializeField]
+        TutorialInfo tutorialInfo;
+
+        [SerializeField]
         GameObject loadingAnimation;
 
         public string GameName { get => gameName; }
-        public Sprite TitleLogo { get => titleLogo; }
         public string SceneName { get => sceneName; set => sceneName = value; }
-        public GameObject LoadingAnimation { get => loadingAnimation; }
+        public Sprite TitleLogo { get => titleLogo; }
         public Sprite TitleIcon { get => titleIcon; }
+        public TutorialInfo TutorialInfo { get => tutorialInfo;  }
+        public GameObject LoadingAnimation { get => loadingAnimation; }
     }
 }

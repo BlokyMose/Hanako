@@ -1,10 +1,10 @@
 using Hanako.Hanako;
 using Hanako.Knife;
 using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Hanako.GameType;
 
 namespace Hanako
 {
@@ -30,16 +30,11 @@ namespace Hanako
         [SerializeField, ListDrawerSettings(Expanded = true)]
         List<int> scoreThresholds = new() { 100, 200, 300 };
 
-        [Header("Runtime Data")]
+        [SerializeField]
+        TutorialPreview tutorialPreview = new();
 
         [SerializeField]
-        int currentSoulCount;
-
-        [SerializeField]
-        int score;
-
-        [SerializeField]
-        float playTime;
+        LevelRuntimeData runtimeData;
 
         public GameInfo GameInfo { get => gameInfo; }
         public string LevelName { get => gameType switch {
@@ -48,23 +43,28 @@ namespace Hanako
             GameType.Knife => KnifeLevel.LevelName,
             _=> ""
         }; }
-        public int Score { get => score; }
-        public float PlayTime { get => playTime; }
-        public int CurrentSoulCount { get => currentSoulCount; }
+        public int Score { get => runtimeData.Score; }
+        public float PlayTime { get => runtimeData.PlayTime; }
+        public int CurrentSoulCount { get => runtimeData.CurrentSoulCount; }
         public int MaxSoulCount { get => scoreThresholds.Count; }
         public ScoreRules ScoreRules { get => scoreRules; }
         public HanakoLevel HanakoLevel { get => hanakoLevel; }
         public KnifeLevel KnifeLevel { get => knifeLevel; }
         public List<int> ScoreThresholds { get => scoreThresholds;  }
-        public GameType GameType { get => gameType; set => gameType = value; }
+        public GameType GameType { get => gameType; }
+        public TutorialPreview TutorialPreview { get => tutorialPreview;  }
+        public bool HasShownTutorial { get => runtimeData.HasShownTutorial; }
 
         public void ResetRuntimeData()
         {
-            currentSoulCount = 0;
-            score = 0;
-            playTime = 0;
+            runtimeData = new();
         }
 
-        // TODO: make scoring rule, and evaluate it to set new currentSoulCount
+        public void SetRuntimeData(LevelRuntimeData newData)
+        {
+            runtimeData = newData;
+        }
+
+        // TODO: set currentSouldCount when evaluating score for each game
     }
 }

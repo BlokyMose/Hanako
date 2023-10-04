@@ -18,6 +18,12 @@ MonoBehaviour:
   knifeLevel: {fileID: 0}
   scoreRules: {fileID: 11400000, guid: e94448a708919464a89dc48329fbafe7, type: 2}
   scoreThresholds: 1e0000003c00000046000000
-  currentSoulCount: 1
-  score: 0
-  playTime: 44
+  tutorialPreview:
+    startIndex: 0
+    endIndex: 3
+    isAutoShow: 1
+  runtimeData:
+    currentSoulCount: 0
+    score: 0
+    playTime: 0
+    hasShownTutorial: 1

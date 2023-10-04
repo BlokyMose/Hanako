@@ -16,6 +16,13 @@ namespace Hanako.Knife
         [SerializeField]
         AllGamesInfo allGamesInfo;
 
+        [Header("Tutorial")]
+        [SerializeField]
+        TutorialCanvas tutorialCanvasPrefab;
+
+        [SerializeField]
+        float delayAutoShowTutorial = 2.5f;
+
         [Header("SFX")]
         [SerializeField]
         AudioSourceRandom audioSource;
@@ -50,6 +57,13 @@ namespace Hanako.Knife
 
         [SerializeField]
         TextMeshProUGUI bgmVolumeText;
+
+        [Header("Tutorial")]
+        [SerializeField]
+        Image tutorialBut;
+
+        [SerializeField]
+        TextMeshProUGUI tutorialText;
         
         [Header("Exit")]
         [SerializeField]
@@ -63,7 +77,7 @@ namespace Hanako.Knife
 
         List<Animator> functionalButs = new();
         int int_mode, tri_click;
-        Animator pauseButAnimator, sfxButAnimator, bgmButAnimator, exitButAnimator;
+        Animator pauseButAnimator, sfxButAnimator, bgmButAnimator, tutorialButAnimator, exitButAnimator;
         bool isInPause = false;
 
         void Awake()
@@ -80,11 +94,10 @@ namespace Hanako.Knife
             pauseButAnimator = pauseBut.GetComponentInFamily<Animator>();
             sfxButAnimator = sfxBut.GetComponentInFamily<Animator>();
             bgmButAnimator = bgmBut.GetComponentInFamily<Animator>();
+            tutorialButAnimator = tutorialBut.GetComponentInFamily<Animator>();
             exitButAnimator = exitBut.GetComponentInFamily<Animator>();
-            functionalButs = new() { sfxButAnimator, bgmButAnimator, exitButAnimator };
+            functionalButs = new() { sfxButAnimator, bgmButAnimator, tutorialButAnimator, exitButAnimator };
 
-            pauseButAnimator.SetInteger(int_mode, (int)ButMode.Idle);
-            
             pauseBut.AddEventTrigger(Show, EventTriggerType.PointerEnter);
             hitAreaHide.AddEventTrigger(Hide, EventTriggerType.PointerEnter);
 
@@ -98,20 +111,37 @@ namespace Hanako.Knife
                 onExit: () => { IdleBut(bgmButAnimator); },
                 onClick: () => { ClickBut(bgmButAnimator); ChangeBGMVolume(); } );
 
+            tutorialBut.AddEventTriggers(
+                onEnter: () => { HoverBut(tutorialButAnimator); },
+                onExit: () => { IdleBut(tutorialButAnimator); },
+                onClick: () => { ClickBut(tutorialButAnimator); ShowTutorialCanvas(); } );
+
             exitBut.AddEventTriggers(
                 onEnter: () => { HoverBut(exitButAnimator); },
                 onExit: () => { IdleBut(exitButAnimator); },
                 onClick: () => { ClickBut(exitButAnimator); ExitGame(); } );
 
             hitAreaHide.gameObject.SetActive(false);
+            pauseButAnimator.SetInteger(int_mode, (int)ButMode.Idle);
         }
 
         void Start()
         {
             UpdateBGMVolumeText();
             UpdateSFXVolumeText();
-        }
 
+            StartCoroutine(Delay(delayAutoShowTutorial));
+            IEnumerator Delay(float delay)
+            {
+                yield return new WaitForSeconds(delay);
+                if (allGamesInfo != null)
+                {
+                    var currentLevel = allGamesInfo.CurrentLevel;
+                    if (!currentLevel.HasShownTutorial && currentLevel.TutorialPreview.IsAutoShow)
+                        ShowTutorialCanvas();
+                }
+            }
+        }
 
         public void Hide()
         {
@@ -170,7 +200,6 @@ namespace Hanako.Knife
             UpdateSFXVolumeText();
         }
 
-
         public void ChangeBGMVolume()
         {
             if (allGamesInfo == null) return;
@@ -227,6 +256,16 @@ namespace Hanako.Knife
                     sfxVolumeText.text = "100%";
                     break;
             }
+        }
+
+        public void ShowTutorialCanvas()
+        {
+            if (allGamesInfo == null) return;
+
+            var currentLevel = allGamesInfo.CurrentLevel;
+            currentLevel.SetRuntimeData(new(currentLevel.CurrentSoulCount, currentLevel.Score, currentLevel.PlayTime, true));
+            var tutorialCanvas = Instantiate(tutorialCanvasPrefab);
+            tutorialCanvas.Init(currentLevel.GameInfo.TutorialInfo, currentLevel.TutorialPreview);
         }
 
         public void ExitGame()
