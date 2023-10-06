@@ -21,6 +21,11 @@ namespace Hanako.Hanako
 
             public HanakoDestinationID ID { get => destinationID; }
             public int Index { get => index; }
+
+#if UNITY_EDITOR
+            public void SetID(HanakoDestinationID newID) => destinationID = newID;
+            public void SetIndex(int newIndex) => index = newIndex;
+#endif
         }
 
         [Serializable]
@@ -38,6 +43,12 @@ namespace Hanako.Hanako
             public HanakoEnemyID ID { get => id; }
             public List<DestinationProperties> DestinationSequence { get => destinationSequence; }
             public float Delay { get => delay; }
+
+#if UNITY_EDITOR
+            public void SetID(HanakoEnemyID newID) => id = newID;
+            public void SetSequence(List<DestinationProperties> newDestinationSequence) => destinationSequence = newDestinationSequence;
+            public void SetDelay(float newDelay) => delay = newDelay;
+#endif
         }
 
         [SerializeField]

@@ -1,3 +1,4 @@
+using Encore.Utility;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +13,12 @@ namespace Hanako.Hanako
         string displayName;
 
         [SerializeField]
+        float marginLeft = 1.5f;
+
+        [SerializeField]
+        float marginRight = 1.5f;
+
+        [SerializeField]
         Color color = Color.white;
 
         [SerializeField, PreviewField, ListDrawerSettings(Expanded =true)]
@@ -19,7 +26,9 @@ namespace Hanako.Hanako
 
         public string DisplayName { get => displayName; }
         public List<Sprite> LogosByIndex { get => logosByIndex; }
-        public Sprite GetLogo(int index) => logosByIndex[index];
+        public Sprite GetLogo(int index) => logosByIndex.GetAt(index,null);
         public Color Color { get => color;  }
+        public float MarginLeft { get => marginLeft; }
+        public float MarginRight { get => marginRight; }
     }
 }

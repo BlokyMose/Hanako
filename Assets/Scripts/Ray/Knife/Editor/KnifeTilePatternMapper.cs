@@ -8,7 +8,6 @@ using UnityUtility;
 using static Hanako.Knife.KnifeLevel;
 using static Hanako.Knife.KnifeLevelManager;
 using Unity.EditorCoroutines.Editor;
-using Mono.Cecil.Cil;
 using static Hanako.Knife.KnifePiecesPattern;
 
 namespace Hanako.Knife
@@ -21,12 +20,6 @@ namespace Hanako.Knife
         public static void OpenWindow()
         {
             GetWindow<KnifePiecesPatternMapper>("Map").Show();
-        }
-
-        public static void OpenWindow(TextAsset textAsset)
-        {
-            var window = GetWindow<KnifePiecesPatternMapper>("Map");
-            window.Show();
         }
 
         #endregion

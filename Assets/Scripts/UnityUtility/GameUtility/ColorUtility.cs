@@ -40,7 +40,6 @@ namespace UnityUtility
         #endregion
 
 
-
         public static Color TransitionColor(this Color color, Color targetColor, float speed)
         {
             if (color.r - speed > targetColor.r)

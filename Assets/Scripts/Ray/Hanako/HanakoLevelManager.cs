@@ -253,16 +253,14 @@ namespace Hanako.Hanako
                 else Debug.LogWarning("Cannot find SceneLoadingManager");
             }
 
-            if (levelInfo != null)
+            else if (levelInfoInit == LevelInfoInitMode.LevelInfo && levelInfo != null && levelInfo.HanakoLevel != null)
             {
                 levelProperties = levelInfo.HanakoLevel;
                 var allGamesInfoManager = FindObjectOfType<AllGamesInfoManager>();
                 if (allGamesInfoManager != null)
-                {
                     allGamesInfoManager.AllGamesInfo.SetCurrentLevel(levelInfo);
-                }
             }
-            else Debug.LogWarning("LevelInfo is not set; Error might occur");
+            else Debug.LogWarning("LevelInfo is not set or LevelInfo.HanakoLevel is not set; Error might occur");
 
             if (levelProperties == null) Debug.LogWarning("LevelProperties is not set; Error might occur");
         }
