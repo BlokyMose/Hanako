@@ -23,6 +23,11 @@ namespace Hanako
 
             public GameObject Prefab { get => prefab; }
             public Vector2 Position { get => position; }
+
+#if UNITY_EDITOR
+            public void SetPrefab(GameObject newPrefab)=> prefab = newPrefab;
+            public void SetPosition(Vector2 newPosition) => position = newPosition;
+#endif
         }
 
         [SerializeField]
