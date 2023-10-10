@@ -18,13 +18,16 @@ namespace UnityUtility
 
         void Awake()
         {
-            if (!isActive) return;
-
             if (sr == null)
                 sr = this.GetComponentInFamily<SpriteRenderer>();
 
             if (!sprites.Contains(sr.sprite)) sprites.Add(sr.sprite);
+            SetRandom();
+        }
 
+        void SetRandom()
+        {
+            if (!isActive) return;
             sr.sprite = sprites.GetRandom();
         }
     }

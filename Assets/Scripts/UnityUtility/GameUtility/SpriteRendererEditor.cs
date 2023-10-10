@@ -81,12 +81,10 @@ namespace Hanako
             {
                 var curve = AnimationCurve.EaseInOut(0, alphaOrigin == null ? srs[0].color.a : (float)alphaOrigin, duration, alpha);
                 var time = 0f;
-                while (true)
+                while (time < duration)
                 {
                     ChangeAlpha(curve.Evaluate(time));
                     time += Time.deltaTime;
-
-                    if (time > duration) break;
                     yield return null;
                 }
 
@@ -112,6 +110,11 @@ namespace Hanako
                     sr.SR.color = sr.SR.color.ChangeAlpha(sr.MinAlpha);
                 }
             }
+        }
+
+        public void BeTransparent()
+        {
+            ChangeAlpha(0);
         }
     }
 }

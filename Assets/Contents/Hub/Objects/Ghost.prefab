@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2051742405336661385}
   - component: {fileID: 2051742405336661386}
+  - component: {fileID: 4880834595113016139}
   m_Layer: 0
-  m_Name: RandomGhost
+  m_Name: Ghost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,13 +46,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5897c1494dd927044b7d6c6afb6b05a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveDirection: {x: 1, y: 0}
-  moveSpeed: 1
-  fadeIn: 1
-  visibleDuration: 2
-  fadeOut: 1
+  moveSpeed: 0.2
+  moveSpeedRandomRange: 2
+  duration: 3
+  durationRandomRange: 5
   srEditor: {fileID: 6925009197624881449}
-  lights:
+  light2DAnimator: {fileID: 4880834595113016139}
+--- !u!114 &4880834595113016139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051742405336661384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75602775283d82f43af1a6eb81bc2c36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetLights:
   - {fileID: 8186602702136684534}
 --- !u!1001 &122619771268341589
 PrefabInstance:

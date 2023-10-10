@@ -31,8 +31,10 @@ namespace Hanako.Hub
         [SerializeField]
         HubColors colors;
 
-        Action<LevelInfo> OnShowLevelCanvas;
-        Action OnHideLevelCanvas;
+        public event Action<LevelInfo> OnShowLevelCanvas;
+        public event Action OnHideLevelCanvas;
+        public event Action OnShowLevelInfoPreview;
+        public event Action OnHideLevelInfoPreview;
         HubLevelInfoPreview currentLevelInfoPreview;
 
         public LevelInfo LevelInfo { get => levelInfo; }
@@ -66,8 +68,8 @@ namespace Hanako.Hub
 
         public void ShowLevelCanvas()
         {
-            OnShowLevelCanvas?.Invoke(levelInfo);
             HideLevelInfoPreview();
+            OnShowLevelCanvas?.Invoke(levelInfo);
         }
 
         public void HideLevelCanvas()
@@ -80,11 +82,13 @@ namespace Hanako.Hub
         {
             currentLevelInfoPreview = Instantiate(levelInfoPreviewPrefab, levelInfoPreviewParent);
             currentLevelInfoPreview.Init(levelInfo);
+            OnShowLevelInfoPreview?.Invoke();
         }
 
         public void HideLevelInfoPreview()
         {
             currentLevelInfoPreview.Exit();
+            OnHideLevelInfoPreview?.Invoke();
         }
     }
 }

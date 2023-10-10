@@ -523,7 +523,7 @@ namespace Hanako
 
                 void AutoPositionDestinations()
                 {
-                    if (destinationSequence.Sequence.Count == 0) return;
+                    if (destinationSequence == null || destinationSequence.Sequence.Count == 0) return;
 
                     destinationSequence.Sequence[0].SetPosition(Vector2.zero);
 
