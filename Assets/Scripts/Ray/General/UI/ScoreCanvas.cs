@@ -192,7 +192,7 @@ namespace Hanako
             scoreDetailsParent.DestroyChildren();
 
             levelNameText.text = levelInfo.GameInfo.GameName + " - " + levelInfo.LevelName;
-            scoreText.text = levelInfo.Score.ToString();
+            scoreText.text = levelInfo.CurrentScore.ToString();
 
             for (int i = 0; i < scoreTowers.Count; i++)
                 if (i < levelInfo.ScoreThresholds.Count)
@@ -204,6 +204,8 @@ namespace Hanako
                 yield return new WaitForSeconds(1f);
 
                 var totalScore = 0f;
+                var totalPlayTime = GetValue(scoreDetails, "playTime");
+                var filledTowerCount = 0;
                 if (levelInfo.ScoreRules.Rules.Count < 3)
                     audioSource.PlayOneClipFromPack(sfxRiser);
 
@@ -213,109 +215,127 @@ namespace Hanako
                         audioSource.PlayOneClipFromPack(sfxRiser);
 
                     var rule = levelInfo.ScoreRules.Rules[i];
-                    var toReceiveScore = GetValue(scoreDetails, rule) * rule.ScoreMultiplier;
+                    var toReceiveScore = GetValue(scoreDetails, rule.ParamName) * rule.ScoreMultiplier;
                     MakeScoreDetailText(scoreDetailTextPrefab, scoreDetailsParent, levelInfo.ScoreRules, rule, scoreDetails);
                     
                     yield return StartCoroutine(AnimatingScoreUI(totalScore, toReceiveScore));
 
                     totalScore += toReceiveScore;
                     scoreText.text = ((int)totalScore).ToString();
-                    FillTowers(levelInfo, totalScore);
+                    filledTowerCount = FillTowers(levelInfo, totalScore);
                     animator.SetTrigger(tri_confirm);
                     audioSource.PlayOneClipFromPack(sfxConfirmName);
-
-                    #region [Methods]
-
-                    void MakeScoreDetailText(ScoreDetailText scoreDetailTextPrefab, Transform scoreDetailsParent, ScoreRules scoreRule, ScoreRules.Rule rule, List<ScoreDetail> scoreDetails)
-                    {
-                        var detailText = Instantiate(scoreDetailTextPrefab, scoreDetailsParent);
-                        var detailTextContent = rule.DisplayFormat;
-                        detailTextContent = detailTextContent.Replace(
-                            scoreRule.OpenToken + "displayName" + scoreRule.CloseToken,
-                            rule.DisplayName);
-
-                        detailTextContent = detailTextContent.Replace(
-                            scoreRule.OpenToken + "scoreMultiplier" + scoreRule.CloseToken,
-                            rule.ScoreMultiplier.ToString());
-
-                        var valueDetail = scoreDetails.Find(x => x.ParamName == rule.ParamName);
-                        var value = valueDetail != null ? valueDetail.Value : 0;
-                        detailTextContent = detailTextContent.Replace(
-                            scoreRule.OpenToken + "value" + scoreRule.CloseToken,
-                            value.ToString());
-
-                        detailText.Init(detailTextContent, rule.FontColor);
-                    }
-
-                    void FillTowers(LevelInfo levelInfo, float score)
-                    {
-                        var scoreLeft = score;
-                        int thresholdIndex = 0;
-                        foreach (var threshold in levelInfo.ScoreThresholds)
-                        {
-                            var tower = scoreTowers[thresholdIndex];
-                            var previousThreshold = thresholdIndex > 0 ? levelInfo.ScoreThresholds[thresholdIndex - 1] : 0;
-                            thresholdIndex++;
-                            var relativeThreshold = threshold - previousThreshold;
-                            scoreLeft -= relativeThreshold;
-
-                            if (scoreLeft < 0)
-                            {
-                                tower.Fill.fillAmount = 1 - (-scoreLeft) / relativeThreshold; 
-                                tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Dead);
-                                tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Idle);
-                                break;
-                            }
-                            else
-                            {
-                                if (thresholdIndex > scoreTowers.Count) break;
-                                tower.Fill.fillAmount = 1f;
-                                tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Alive);
-                                tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Active);
-                            }
-                        }
-
-                        for (int i = thresholdIndex; i < scoreTowers.Count; i++)
-                        {
-                            var tower = scoreTowers[i];
-                            tower.Fill.fillAmount = 0;
-                            tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Dead);
-                            tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Idle);
-                        }
-                    }
-
-                    int GetValue(List<ScoreDetail> scoreDetails, ScoreRules.Rule targetRule)
-                    {
-                        var valueDetail = scoreDetails.Find(x => x.ParamName == targetRule.ParamName);
-                        if (valueDetail != null)
-                            return valueDetail.Value;
-                        else
-                        {
-                            Debug.LogWarning("Cannot find rule with paramName: "+targetRule.ParamName);
-                            return 0;
-                        }
-                    }
-
-                    IEnumerator AnimatingScoreUI(float previousTotalScore, float toReceiveScore)
-                    {
-                        var time = 0f;
-                        var curve = AnimationCurve.Linear(0, 0, ruleAnimationDuration, toReceiveScore);
-                        var animatedScore = previousTotalScore;
-                        while (time < ruleAnimationDuration)
-                        {
-                            animatedScore = previousTotalScore + curve.Evaluate(time);
-                            scoreText.text = ((int)animatedScore).ToString();
-                            FillTowers(levelInfo, animatedScore);
-                            time += Time.deltaTime;
-                            yield return null;
-                        }
-                    }
-
-                    #endregion
                 }
 
                 if (totalScore >= levelInfo.ScoreThresholds.GetLast())
                     animator.SetBool(boo_overScore, true);
+
+                if (levelInfo.CurrentScore < (int)totalScore)
+                {
+                    var currentScore = (int)totalScore;
+
+                    var currentSoulCount = levelInfo.CurrentSoulCount < filledTowerCount ? filledTowerCount : levelInfo.CurrentSoulCount;
+                    var playTime = totalPlayTime;
+                    levelInfo.SetRuntimeData(new(
+                        currentScore,
+                        currentSoulCount,
+                        playTime,
+                        true
+                        ));
+                }
+
+                #region [Methods]
+
+                int GetValue(List<ScoreDetail> scoreDetails, string ruleName)
+                {
+                    var valueDetail = scoreDetails.Find(x => x.ParamName == ruleName);
+                    if (valueDetail != null)
+                        return valueDetail.Value;
+                    else
+                    {
+                        Debug.LogWarning("Cannot find rule with paramName: " + ruleName);
+                        return 0;
+                    }
+                }
+
+                void MakeScoreDetailText(ScoreDetailText scoreDetailTextPrefab, Transform scoreDetailsParent, ScoreRules scoreRule, ScoreRules.Rule rule, List<ScoreDetail> scoreDetails)
+                {
+                    var detailText = Instantiate(scoreDetailTextPrefab, scoreDetailsParent);
+                    var detailTextContent = rule.DisplayFormat;
+                    detailTextContent = detailTextContent.Replace(
+                        scoreRule.OpenToken + "displayName" + scoreRule.CloseToken,
+                        rule.DisplayName);
+
+                    detailTextContent = detailTextContent.Replace(
+                        scoreRule.OpenToken + "scoreMultiplier" + scoreRule.CloseToken,
+                        rule.ScoreMultiplier.ToString());
+
+                    var valueDetail = scoreDetails.Find(x => x.ParamName == rule.ParamName);
+                    var value = valueDetail != null ? valueDetail.Value : 0;
+                    detailTextContent = detailTextContent.Replace(
+                        scoreRule.OpenToken + "value" + scoreRule.CloseToken,
+                        value.ToString());
+
+                    detailText.Init(detailTextContent, rule.FontColor);
+                }
+
+                int FillTowers(LevelInfo levelInfo, float score)
+                {
+                    var scoreLeft = score;
+                    int thresholdIndex = 0;
+                    int filledTowerCount = 0;
+                    foreach (var threshold in levelInfo.ScoreThresholds)
+                    {
+                        var tower = scoreTowers[thresholdIndex];
+                        var previousThreshold = thresholdIndex > 0 ? levelInfo.ScoreThresholds[thresholdIndex - 1] : 0;
+                        thresholdIndex++;
+                        var relativeThreshold = threshold - previousThreshold;
+                        scoreLeft -= relativeThreshold;
+
+                        if (scoreLeft < 0)
+                        {
+                            tower.Fill.fillAmount = 1 - (-scoreLeft) / relativeThreshold;
+                            tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Dead);
+                            tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Idle);
+                            break;
+                        }
+                        else
+                        {
+                            if (thresholdIndex > scoreTowers.Count) break;
+                            tower.Fill.fillAmount = 1f;
+                            tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Alive);
+                            tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Active);
+                            filledTowerCount++;
+                        }
+                    }
+
+                    for (int i = thresholdIndex; i < scoreTowers.Count; i++)
+                    {
+                        var tower = scoreTowers[i];
+                        tower.Fill.fillAmount = 0;
+                        tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Dead);
+                        tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Idle);
+                    }
+
+                    return filledTowerCount;
+                }
+
+                IEnumerator AnimatingScoreUI(float previousTotalScore, float toReceiveScore)
+                {
+                    var time = 0f;
+                    var curve = AnimationCurve.Linear(0, 0, ruleAnimationDuration, toReceiveScore);
+                    var animatedScore = previousTotalScore;
+                    while (time < ruleAnimationDuration)
+                    {
+                        animatedScore = previousTotalScore + curve.Evaluate(time);
+                        scoreText.text = ((int)animatedScore).ToString();
+                        FillTowers(levelInfo, animatedScore);
+                        time += Time.deltaTime;
+                        yield return null;
+                    }
+                }
+
+                #endregion
             }
         }
     }

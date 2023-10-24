@@ -43,7 +43,7 @@ namespace Hanako
             GameType.Knife => KnifeLevel.LevelName,
             _=> ""
         }; }
-        public int Score { get => runtimeData.Score; }
+        public int CurrentScore { get => runtimeData.CurrentScore; }
         public float PlayTime { get => runtimeData.PlayTime; }
         public int CurrentSoulCount { get => runtimeData.CurrentSoulCount; }
         public int MaxSoulCount { get => scoreThresholds.Count; }

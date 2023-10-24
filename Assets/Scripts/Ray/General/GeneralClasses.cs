@@ -42,10 +42,10 @@ namespace Hanako
     public class LevelRuntimeData
     {
         [SerializeField]
-        int currentSoulCount;
+        int currentScore;
 
         [SerializeField]
-        int score;
+        int currentSoulCount;
 
         [SerializeField]
         float playTime;
@@ -53,16 +53,17 @@ namespace Hanako
         [SerializeField]
         bool hasShownTutorial = false;
 
-        public LevelRuntimeData(int currentSoulCount = 0, int score = 0, float playTime = 0, bool hasShownTutorial = false)
+        public LevelRuntimeData(int currentScore = 0, int currentSoulCount = 0,  float playTime = 0, bool hasShownTutorial = false)
         {
+            this.currentScore = currentScore;
             this.currentSoulCount = currentSoulCount;
-            this.score = score;
             this.playTime = playTime;
             this.hasShownTutorial = hasShownTutorial;
         }
 
+
+        public int CurrentScore { get => currentScore; }
         public int CurrentSoulCount { get => currentSoulCount; }
-        public int Score { get => score; }
         public float PlayTime { get => playTime; }
         public bool HasShownTutorial { get => hasShownTutorial; }
     }
