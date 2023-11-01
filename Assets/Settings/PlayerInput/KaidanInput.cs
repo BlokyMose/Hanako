@@ -781,6 +781,24 @@ namespace UnityEngine.InputSystem
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Click"",
+                    ""type"": ""Button"",
+                    ""id"": ""f7f6122d-6c50-40fd-a030-9d3fea29bb0e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Run"",
+                    ""type"": ""Button"",
+                    ""id"": ""d6d0c12e-f5ab-46b1-8b58-c564f0441e90"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -838,6 +856,72 @@ namespace UnityEngine.InputSystem
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""668472a4-4fb4-4e53-ab95-1bd51c41825f"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Run"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fd0eeeed-949b-4e02-8aa0-1999aa5c66b6"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0e870a22-6db1-4f56-b041-2148e8a648c7"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""452b1bb1-c53f-4ff5-9a5b-e6e7fad0a8f4"",
+                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Touch"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f11e5dea-09d2-4ace-b685-55fc5df13d02"",
+                    ""path"": ""<Joystick>/trigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Joystick"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""94e48395-2557-4469-b244-d93e7b516937"",
+                    ""path"": ""<XRController>/{PrimaryAction}"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""XR"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -928,6 +1012,8 @@ namespace UnityEngine.InputSystem
             // Hub
             m_Hub = asset.FindActionMap("Hub", throwIfNotFound: true);
             m_Hub_Move = m_Hub.FindAction("Move", throwIfNotFound: true);
+            m_Hub_Click = m_Hub.FindAction("Click", throwIfNotFound: true);
+            m_Hub_Run = m_Hub.FindAction("Run", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -1216,11 +1302,15 @@ namespace UnityEngine.InputSystem
         private readonly InputActionMap m_Hub;
         private List<IHubActions> m_HubActionsCallbackInterfaces = new List<IHubActions>();
         private readonly InputAction m_Hub_Move;
+        private readonly InputAction m_Hub_Click;
+        private readonly InputAction m_Hub_Run;
         public struct HubActions
         {
             private @KaidanInput m_Wrapper;
             public HubActions(@KaidanInput wrapper) { m_Wrapper = wrapper; }
             public InputAction @Move => m_Wrapper.m_Hub_Move;
+            public InputAction @Click => m_Wrapper.m_Hub_Click;
+            public InputAction @Run => m_Wrapper.m_Hub_Run;
             public InputActionMap Get() { return m_Wrapper.m_Hub; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -1233,6 +1323,12 @@ namespace UnityEngine.InputSystem
                 @Move.started += instance.OnMove;
                 @Move.performed += instance.OnMove;
                 @Move.canceled += instance.OnMove;
+                @Click.started += instance.OnClick;
+                @Click.performed += instance.OnClick;
+                @Click.canceled += instance.OnClick;
+                @Run.started += instance.OnRun;
+                @Run.performed += instance.OnRun;
+                @Run.canceled += instance.OnRun;
             }
 
             private void UnregisterCallbacks(IHubActions instance)
@@ -1240,6 +1336,12 @@ namespace UnityEngine.InputSystem
                 @Move.started -= instance.OnMove;
                 @Move.performed -= instance.OnMove;
                 @Move.canceled -= instance.OnMove;
+                @Click.started -= instance.OnClick;
+                @Click.performed -= instance.OnClick;
+                @Click.canceled -= instance.OnClick;
+                @Run.started -= instance.OnRun;
+                @Run.performed -= instance.OnRun;
+                @Run.canceled -= instance.OnRun;
             }
 
             public void RemoveCallbacks(IHubActions instance)
@@ -1328,6 +1430,8 @@ namespace UnityEngine.InputSystem
         public interface IHubActions
         {
             void OnMove(InputAction.CallbackContext context);
+            void OnClick(InputAction.CallbackContext context);
+            void OnRun(InputAction.CallbackContext context);
         }
     }
 }

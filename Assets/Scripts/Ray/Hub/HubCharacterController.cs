@@ -19,6 +19,10 @@ namespace Hanako.Hub
 
         [SerializeField, SuffixLabel("x1000")]
         float walkSpeed = 2f;
+        
+        [SerializeField, SuffixLabel("x1000")]
+        float runSpeed = 3f;
+
 
         [Header("Rigs")]
         [SerializeField]
@@ -39,8 +43,10 @@ namespace Hanako.Hub
 
 
         Animator animator;
-        int int_motion, int_hands;
+        int int_motion, int_hands, boo_isRunning;
         const float WALK_SPEED_MULTIPLIER = 1000;
+        bool isRunning;
+        float currentWalkSpeed;
         Vector2 moveDirection;
         Rigidbody2D rb;
         Collider2D col;
@@ -51,6 +57,7 @@ namespace Hanako.Hub
             animator = gameObject.GetComponentInFamily<Animator>();
             int_motion = Animator.StringToHash(nameof(int_motion));
             int_hands = Animator.StringToHash(nameof(int_hands));
+            boo_isRunning = Animator.StringToHash(nameof(boo_isRunning));
             animator.SetLayerWeight(animator.GetLayerIndex(handsAnimatorLayerName), 1f);
 
             rb = gameObject.GetComponent<Rigidbody2D>();
@@ -59,16 +66,19 @@ namespace Hanako.Hub
 
             var minimapIcon = Instantiate(minimapIconPrefab, minimapIconParent);
             minimapIcon.Init(charID.Icon);
+
+            currentWalkSpeed = walkSpeed;
         }
 
         public void Init(HubCharacterBrain_Player brain)
         {
             brain.OnMove += Move;
+            brain.OnRun += Run;
         }
 
         private void Update()
         {
-            rb.AddForce(moveDirection * walkSpeed * WALK_SPEED_MULTIPLIER * Time.deltaTime);
+            rb.AddForce(moveDirection * currentWalkSpeed * WALK_SPEED_MULTIPLIER * Time.deltaTime);
         }
 
         void Move(Vector2 direction)
@@ -80,13 +90,16 @@ namespace Hanako.Hub
                 transform.localEulerAngles = new(transform.localEulerAngles.x, 180f, transform.localEulerAngles.z);
 
             if (direction == Vector2.zero)
-            {
                 animator.SetInteger(int_motion, (int)CharacterMotion.Idle);
-            }
             else
-            {
                 animator.SetInteger(int_motion, (int)CharacterMotion.Run);
-            }
+        }
+
+        void Run(bool isRunning)
+        {
+            this.isRunning = isRunning;
+            currentWalkSpeed = isRunning ? runSpeed : walkSpeed;
+            animator.SetBool(boo_isRunning, isRunning);
         }
 
         public Transform test;
