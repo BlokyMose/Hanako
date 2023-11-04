@@ -17,6 +17,8 @@ namespace Hanako
 
         private void Start()
         {
+           
+
             // 初めにすべてのオブジェクトを非表示にする
             foreach (var obj in objectsToFade)
             {
@@ -56,7 +58,7 @@ namespace Hanako
             score++;
             if (scoreText != null)
             {
-                scoreText.text = "スコア: " + score.ToString();
+                scoreText.text = "" + score.ToString();
             }
 
             yield return new WaitForSeconds(delayBetweenObjects);
@@ -80,6 +82,12 @@ namespace Hanako
             {
                 // ここに任意のアクションを追加
             }
+        }
+
+        // スコアを取得するためのメソッド
+        public int GetScore()
+        {
+            return score;
         }
     }
 }
