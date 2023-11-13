@@ -15,7 +15,8 @@ namespace Hanako.Hanako
     public class HanakoLevelManager : MonoBehaviour
     {
         public enum HanakoGameState { Init, Play, Won, Lost }
-
+        
+        [Title("")]
         [SerializeField]
         LevelInfoInitMode levelInfoInit = LevelInfoInitMode.SceneLoadingData;
 
@@ -238,25 +239,26 @@ namespace Hanako.Hanako
 
         void AdjustLevelInfo()
         {
-            if (levelInfoInit == LevelInfoInitMode.SceneLoadingData)
-            {
-                var sceneLoading = FindObjectOfType<SceneLoadingManager>();
-                if (sceneLoading != null)
-                {
-                    if (sceneLoading.SceneLoadingData.LevelInfoToLoad.GameType == GameType.Hanako)
-                    {
-                        levelInfo = sceneLoading.SceneLoadingData.LevelInfoToLoad;
-                        levelProperties = levelInfo.HanakoLevel;
-                    }
-                    else Debug.LogWarning("SceneLoadingData.LevelInfoToLoad doesn't match this gameType");
-                }
-                else Debug.LogWarning("Cannot find SceneLoadingManager");
-            }
+            var sceneLoading = FindObjectOfType<SceneLoadingManager>();
+            var allGamesInfoManager = FindObjectOfType<AllGamesInfoManager>();
+            var isUsingHub = sceneLoading != null && allGamesInfoManager != null && sceneLoading.SceneLoadingData.LastLoadedLevel == allGamesInfoManager.AllGamesInfo.HubLevelInfo;
 
+            if (isUsingHub || levelInfoInit == LevelInfoInitMode.SceneLoadingData)
+            {
+                if (sceneLoading == null)
+                    Debug.LogWarning("SceneLoadingManager doesn't exist in this scene");
+
+                else if (sceneLoading.SceneLoadingData.LevelInfoToLoad.GameType == GameType.Hanako)
+                {
+                    levelInfo = sceneLoading.SceneLoadingData.LevelInfoToLoad;
+                    levelProperties = levelInfo.HanakoLevel;
+                    allGamesInfoManager.AllGamesInfo.SetCurrentLevel(levelInfo);
+                }
+                else Debug.LogWarning("SceneLoadingData.LevelInfoToLoad doesn't match this gameType");
+            }
             else if (levelInfoInit == LevelInfoInitMode.LevelInfo && levelInfo != null && levelInfo.HanakoLevel != null)
             {
                 levelProperties = levelInfo.HanakoLevel;
-                var allGamesInfoManager = FindObjectOfType<AllGamesInfoManager>();
                 if (allGamesInfoManager != null)
                     allGamesInfoManager.AllGamesInfo.SetCurrentLevel(levelInfo);
             }
@@ -565,6 +567,14 @@ namespace Hanako.Hanako
         {
             if (killCount + exitCount >= enemies.Count)
                 WonGame();
+        }
+
+        [Button, PropertyOrder(-100)]
+        void RemoveLastLoadedLevel()
+        {
+            var sceneLoading = FindObjectOfType<SceneLoadingManager>();
+            if (sceneLoading != null)
+                sceneLoading.SceneLoadingData.ResetData();
         }
     }
 }

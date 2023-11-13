@@ -68,7 +68,8 @@ namespace Hanako
             var allGamesInfo = FindObjectOfType<AllGamesInfoManager>();
             if (allGamesInfo != null)
             {
-                allGamesInfo.AllGamesInfo.SetCurrentLevel(sceneLoadingData.LevelInfoToLoad);
+                if (sceneLoadingData.LevelInfoToLoad != null)
+                    allGamesInfo.AllGamesInfo.SetCurrentLevel(sceneLoadingData.LevelInfoToLoad);
                 StartCoroutine(allGamesInfo.AllGamesInfo.FadeMasterVolume(1f, toBlackDuration));
             }
 
@@ -84,5 +85,7 @@ namespace Hanako
             canvasGroup.blocksRaycasts = false;
             bg.SetActive(false);
         }
+
+        public void ResetData() => sceneLoadingData.ResetData();
     }
 }

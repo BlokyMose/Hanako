@@ -13,12 +13,16 @@ namespace Hanako
         string charName;
 
         [SerializeField]
+        string displayName;
+
+        [SerializeField]
         GameObject prefab;
 
         [SerializeField, PreviewField]
         Sprite icon;
 
         public string CharName { get => charName; }
+        public string DisplayName { get => displayName; }
         public GameObject Prefab { get => prefab; }
         public Sprite Icon { get => icon; }
     }

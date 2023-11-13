@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 162112bc2bea86047975e74752de83ff, type: 3}
+  m_Name: Dialogue_Ghost_1
+  m_EditorClassIdentifier: 
+  settings: {fileID: 11400000, guid: 4440c3a7b9bcb38459f5027fbb03c9be, type: 2}
+  charProperties:
+  - charID: {fileID: 11400000, guid: e63843cf3787a6346bd3c3c544ad3cca, type: 2}
+  - charID: {fileID: 11400000, guid: 2e1960e6ca102a74fa08d6aa9b709825, type: 2}
+  charPos: {fileID: 11400000, guid: 639ed81e4de65164d838137a14c1b266, type: 2}
+  textLines:
+  - charID: {fileID: 11400000, guid: 2e1960e6ca102a74fa08d6aa9b709825, type: 2}
+    text: "\u3053\u3093\u306B\u3061\u306F\uFF01"
+    faceAnimation: 21
+    bodyAnimation: 13
+    bubbleShape: 0
+    bubbleAnimation: 1
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+  - charID: {fileID: 11400000, guid: e63843cf3787a6346bd3c3c544ad3cca, type: 2}
+    text: "\u3060\u308C\uFF1F"
+    faceAnimation: 0
+    bodyAnimation: 0
+    bubbleShape: 1
+    bubbleAnimation: 1
+    textColor: {r: 0, g: 0, b: 0, a: 1}

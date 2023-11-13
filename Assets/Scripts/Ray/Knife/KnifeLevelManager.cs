@@ -297,6 +297,7 @@ namespace Hanako.Knife
 
         #region [Vars: Serialiazables]
 
+        [Title("")]
         [SerializeField]
         LevelInfoInitMode levelInfoInit = LevelInfoInitMode.SceneLoadingData;
 
@@ -431,31 +432,30 @@ namespace Hanako.Knife
 
         void AdjustLevelInfo()
         {
-            if (levelInfoInit == LevelInfoInitMode.SceneLoadingData)
-            {
-                var sceneLoading = FindObjectOfType<SceneLoadingManager>();
-                if (sceneLoading != null)
-                {
-                    if (sceneLoading.SceneLoadingData.LevelInfoToLoad.GameType == GameType.Knife)
-                    {
-                        levelInfo = sceneLoading.SceneLoadingData.LevelInfoToLoad;
-                        levelProperties = levelInfo.KnifeLevel;
-                    }
-                    else Debug.LogWarning("SceneLoadingData.LevelInfoToLoad doesn't match this gameType");
-                }
-                else Debug.LogWarning("Cannot find SceneLoadingManager");
-            }
+            var sceneLoading = FindObjectOfType<SceneLoadingManager>();
+            var allGamesInfoManager = FindObjectOfType<AllGamesInfoManager>();
+            var isUsingHub = sceneLoading != null && allGamesInfoManager != null && sceneLoading.SceneLoadingData.LastLoadedLevel == allGamesInfoManager.AllGamesInfo.HubLevelInfo;
 
-            if (levelInfo != null)
+            if (isUsingHub || levelInfoInit == LevelInfoInitMode.SceneLoadingData)
             {
-                levelProperties = levelInfo.KnifeLevel;
-                var allGamesInfoManager = FindObjectOfType<AllGamesInfoManager>();
-                if (allGamesInfoManager != null)
+                if (sceneLoading == null)
+                    Debug.LogWarning("SceneLoadingManager doesn't exist in this scene");
+
+                else if (sceneLoading.SceneLoadingData.LevelInfoToLoad.GameType == GameType.Knife)
                 {
+                    levelInfo = sceneLoading.SceneLoadingData.LevelInfoToLoad;
+                    levelProperties = levelInfo.KnifeLevel;
                     allGamesInfoManager.AllGamesInfo.SetCurrentLevel(levelInfo);
                 }
+                else Debug.LogWarning("SceneLoadingData.LevelInfoToLoad doesn't match this gameType");
             }
-            else Debug.LogWarning("LevelInfo is not set; Error might occur");
+            else if (levelInfoInit == LevelInfoInitMode.LevelInfo && levelInfo != null && levelInfo.KnifeLevel != null)
+            {
+                levelProperties = levelInfo.KnifeLevel;
+                if (allGamesInfoManager != null)
+                    allGamesInfoManager.AllGamesInfo.SetCurrentLevel(levelInfo);
+            }
+            else Debug.LogWarning("LevelInfo is not set or LevelInfo.KnifeLevel is not set; Error might occur");
 
             if (levelProperties == null) Debug.LogWarning("LevelProperties is not set; Error might occur");
         }
@@ -1128,5 +1128,12 @@ namespace Hanako.Knife
 
         #endregion
 
+        [Button, PropertyOrder(-100)]
+        void RemoveLastLoadedLevel()
+        {
+            var sceneLoading = FindObjectOfType<SceneLoadingManager>();
+            if (sceneLoading != null)
+                sceneLoading.SceneLoadingData.ResetData();
+        }
     }
 }

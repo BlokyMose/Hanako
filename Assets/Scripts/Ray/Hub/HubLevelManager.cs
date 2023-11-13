@@ -8,6 +8,9 @@ namespace Hanako.Hub
     public class HubLevelManager : MonoBehaviour
     {
         [SerializeField]
+        HubCharacterBrain_Player player;
+
+        [SerializeField]
         SceneLoadingManager sceneLoadingManager;
 
         [SerializeField]
@@ -26,7 +29,11 @@ namespace Hanako.Hub
         {
             var levelDoors = new List<HubLevelDoor>(FindObjectsByType<HubLevelDoor>(FindObjectsSortMode.None));
             foreach (var levelDoor in levelDoors)
+            {
                 levelDoor.Init(ShowLevelCanvas,HideLevelCanvas, colors);
+                if (levelDoor.LevelInfo == sceneLoadingManager.SceneLoadingData.LastLoadedLevel)
+                    player.transform.position = levelDoor.RespawnPos.position;
+            }
 
             levelCanvas.Init(LoadScene);
             levelCanvas.gameObject.SetActive(true);

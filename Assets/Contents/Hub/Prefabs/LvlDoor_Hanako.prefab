@@ -477,7 +477,7 @@ MonoBehaviour:
   - {x: 0.77568054, y: -0.49830627, z: 0}
   m_ShapePathHash: -1672998395
   m_Mesh: {fileID: 0}
-  m_InstanceId: -12678
+  m_InstanceId: -2402
 --- !u!1 &967355478
 GameObject:
   m_ObjectHideFlags: 0
@@ -873,6 +873,37 @@ MonoBehaviour:
   - {x: 0.5395763, y: 0.38508797, z: 0}
   - {x: 0.52326393, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
+--- !u!1 &1604113436
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1604113437}
+  m_Layer: 0
+  m_Name: respawnPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1604113437
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1604113436}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -3.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6307132119751599707}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2095433387
 GameObject:
   m_ObjectHideFlags: 0
@@ -943,6 +974,7 @@ Transform:
   - {fileID: 516781355}
   - {fileID: 2195918743915975582}
   - {fileID: 2095433388}
+  - {fileID: 1604113437}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -961,6 +993,7 @@ MonoBehaviour:
   levelInfo: {fileID: 11400000, guid: 0dbce9298e2c6464f9aa7419ee641e0f, type: 2}
   detectAreaOfLevelCanvas: {fileID: 1491581544986754837}
   detectAreaOfLevelPreview: {fileID: 9152237899143092252}
+  respawnPos: {fileID: 1604113437}
   levelInfoPreviewParent: {fileID: 5646184474459169662}
   levelInfoPreviewPrefab: {fileID: 4042505550682174993, guid: c0e62194a29c5334589e9274c180a2ce, type: 3}
   minimapIconPrefab: {fileID: 7442595211783752558, guid: a3003a6b3173be74caae908b4fbb758b, type: 3}

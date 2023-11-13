@@ -134,7 +134,7 @@ namespace Hanako.Knife
             IEnumerator Delay(float delay)
             {
                 yield return new WaitForSeconds(delay);
-                if (allGamesInfo != null)
+                if (allGamesInfo != null && allGamesInfo.CurrentLevel != null)
                 {
                     var currentLevel = allGamesInfo.CurrentLevel;
                     if (!currentLevel.HasShownTutorial && currentLevel.TutorialPreview.IsAutoShow)

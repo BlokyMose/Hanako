@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 162112bc2bea86047975e74752de83ff, type: 3}
+  m_Name: Dialogue_Jibakurei_Intro
+  m_EditorClassIdentifier: 
+  settings: {fileID: 11400000, guid: 4440c3a7b9bcb38459f5027fbb03c9be, type: 2}
+  charProperties:
+  - charID: {fileID: 11400000, guid: e63843cf3787a6346bd3c3c544ad3cca, type: 2}
+  - charID: {fileID: 11400000, guid: da6d348a10be80c4884bc14527fdc266, type: 2}
+  charPos: {fileID: 11400000, guid: 639ed81e4de65164d838137a14c1b266, type: 2}
+  textLines:
+  - charID: {fileID: 11400000, guid: da6d348a10be80c4884bc14527fdc266, type: 2}
+    text: "\u5927\u4E08\u592B\uFF1F"
+    faceAnimation: 43
+    bodyAnimation: 11
+    bubbleShape: 0
+    bubbleAnimation: 1
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+  - charID: {fileID: 11400000, guid: e63843cf3787a6346bd3c3c544ad3cca, type: 2}
+    text: "\u3042\u308C\uFF1F\u6BBA\u3055\u308C\u305F\u306E\u306B\uFF1F\n\u3069\u3053\uFF01\uFF1F"
+    faceAnimation: 42
+    bodyAnimation: 52
+    bubbleShape: 2
+    bubbleAnimation: 1
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+  - charID: {fileID: 11400000, guid: da6d348a10be80c4884bc14527fdc266, type: 2}
+    text: "\u3053\u3053\u306F\u3044\u3058\u3081\u3063\u5B50\u3092\n\u5C60\u308B\u72ED\u9593\u306E\u4E16\u754C"
+    faceAnimation: 22
+    bodyAnimation: 13
+    bubbleShape: 0
+    bubbleAnimation: 2
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+  - charID: {fileID: 11400000, guid: da6d348a10be80c4884bc14527fdc266, type: 2}
+    text: "\u5996\u602A\u9054\u3092\u624B\u4F1D\u3044\u9B42\u3092\n44\u500B\u96C6\u3081\u308C\u3070\n\u9858\u3044\u3092\u53F6\u3048\u308B\u305C\uFF01"
+    faceAnimation: 21
+    bodyAnimation: 14
+    bubbleShape: 0
+    bubbleAnimation: 2
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+  - charID: {fileID: 11400000, guid: e63843cf3787a6346bd3c3c544ad3cca, type: 2}
+    text: "\u305D\u306E\u8A71\u304C\u672C\u5F53\u306A\u3089\u3044\u3058\u3081\u3063\u5B50\u3082\n\u6BBA\u308C\u3066\u751F\u304D\u8FD4\u308C\u308B\u3063\u3066\u30B3\u30C8\uFF01\uFF1F"
+    faceAnimation: 43
+    bodyAnimation: 42
+    bubbleShape: 2
+    bubbleAnimation: 1
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+  - charID: {fileID: 11400000, guid: e63843cf3787a6346bd3c3c544ad3cca, type: 2}
+    text: "\u3084\u3063\u3066\u3084\u308B\uFF01\uFF01"
+    faceAnimation: 21
+    bodyAnimation: 14
+    bubbleShape: 2
+    bubbleAnimation: 2
+    textColor: {r: 0, g: 0, b: 0, a: 1}

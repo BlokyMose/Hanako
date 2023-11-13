@@ -22,13 +22,18 @@ namespace Hanako.Dialogue
 
         public void Show(CharID charID)
         {
-            charNameText.text = charID.CharName;
+            charNameText.text = !string.IsNullOrEmpty(charID.DisplayName) ? charID.DisplayName : charID.CharName;
             animator.SetBool(boo_show, true);
         }
 
         public void Hide()
         {
             animator.SetBool(boo_show, false);
+        }
+
+        private void Update()
+        {
+            transform.rotation = Quaternion.identity;
         }
     }
 }

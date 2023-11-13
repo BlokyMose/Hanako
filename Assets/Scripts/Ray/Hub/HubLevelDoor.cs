@@ -20,6 +20,10 @@ namespace Hanako.Hub
         ColliderProxy detectAreaOfLevelPreview;
 
         [SerializeField]
+        Transform respawnPos;
+
+        [Header("UI")]
+        [SerializeField]
         Transform levelInfoPreviewParent;
 
         [SerializeField]
@@ -38,6 +42,7 @@ namespace Hanako.Hub
         HubLevelInfoPreview currentLevelInfoPreview;
 
         public LevelInfo LevelInfo { get => levelInfo; }
+        public Transform RespawnPos { get => respawnPos; }
 
         void Awake()
         {
@@ -90,5 +95,6 @@ namespace Hanako.Hub
             currentLevelInfoPreview.Exit();
             OnHideLevelInfoPreview?.Invoke();
         }
+
     }
 }
