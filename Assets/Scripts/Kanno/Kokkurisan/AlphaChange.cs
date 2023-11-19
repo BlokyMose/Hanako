@@ -14,6 +14,7 @@ namespace Hanako
         private bool fading = false;
         private int score = 0; // スコアを管理
         public TMP_Text scoreText; // TextMeshProのテキストオブジェクトを関連付ける
+        public float playerMoveSpeedMultiplier = 1f;
 
         private void Start()
         {
@@ -59,6 +60,13 @@ namespace Hanako
             if (scoreText != null)
             {
                 scoreText.text = "" + score.ToString();
+            }
+
+            // プレイヤーの速度を遅くする
+            Player playerScript = FindObjectOfType<Player>();
+            if (playerScript != null)
+            {
+                playerScript.moveSpeed -= playerMoveSpeedMultiplier;
             }
 
             yield return new WaitForSeconds(delayBetweenObjects);
