@@ -13,6 +13,9 @@ namespace Hanako
         LevelInfo levelInfo;
 
         [SerializeField]
+        string playTimeParamName = "playTime";
+
+        [SerializeField]
         string scoreParamName = "score";
         bool isGameOver = false;
         float playTime = 0;
@@ -33,27 +36,9 @@ namespace Hanako
                 scoreCanvas.gameObject.SetActive(true);
                 scoreCanvas.Init(levelInfo, new List<ScoreDetail>()
                 {
-                    new ScoreDetail(scoreParamName, iScore),
-                    new ScoreDetail("playTime", (int)playTime)
+                    new ScoreDetail(playTimeParamName, (int)playTime),
+                    new ScoreDetail(scoreParamName, iScore)
                 });
-
-                //Time.timeScale = 0;
-
-                ////スコアが10未満の時のスコアを表示
-                //if (iScore < 10)
-                //{
-                //    GameEnd1.GameEndShowPanel1();
-                //}
-                ////スコアが10以上20未満の時スコアを表示
-                //if ((10 <= iScore) && (iScore < 20))
-                //{
-                //    GameEnd2.GameEndShowPanel2();
-                //}
-                ////スコアが20以上の時のスコアを表示
-                //if (20 <= iScore)
-                //{
-                //    GameEnd3.GameEndShowPanel3();
-                //}
             }
         }
 
