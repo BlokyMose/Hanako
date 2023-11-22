@@ -9,15 +9,15 @@ namespace Hanako
 {
     public class GameManager : MonoBehaviour
     {
-
+        public string scorePrefix = "score: ";
         public float countdownMinutes = 3;
 
-        private float countdownSeconds;
+        protected float countdownSeconds;
 
         public TextMeshProUGUI timeText;
 
         public TextMeshProUGUI txtScore;
-        int iScore = 0;
+        protected int iScore = 0;
 
         // Start is called before the first frame update
         void Start()
@@ -59,7 +59,7 @@ namespace Hanako
         {
             //スコアをカウントする
             iScore += 1;
-            txtScore.text = "スコア：" + iScore.ToString();
+            txtScore.text = scorePrefix + iScore.ToString();
         }
 
         private void OnTriggerEnter2D(Collider2D other)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Hanako
 {
-    public enum GameType { Hub = -1, Hanako, Knife, TekeTeke }
+    public enum GameType { Hub = -1, Hanako, Knife, TekeTeke, Kokkurisan }
 
     public enum CharacterMotion { 
         Die = -1, 

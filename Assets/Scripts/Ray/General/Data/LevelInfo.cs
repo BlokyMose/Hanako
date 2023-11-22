@@ -24,6 +24,12 @@ namespace Hanako
         [SerializeField, ShowIf("@" + nameof(gameType) + "==" + nameof(Hanako) + "." + nameof(GameType) + "." + nameof(GameType.Knife))]
         KnifeLevel knifeLevel;
 
+        [SerializeField, ShowIf("@" + nameof(gameType) + "==" + nameof(Hanako) + "." + nameof(GameType) + "." + nameof(GameType.TekeTeke))]
+        TekeLevel tekeLevel;
+
+        [SerializeField, ShowIf("@" + nameof(gameType) + "==" + nameof(Hanako) + "." + nameof(GameType) + "." + nameof(GameType.Kokkurisan))]
+        KokkuriLevel kokkuriLevel;
+
         [SerializeField]
         ScoreRules scoreRules;
 
@@ -41,6 +47,8 @@ namespace Hanako
             GameType.Hub => "To Hub",
             GameType.Hanako => HanakoLevel.LevelName,
             GameType.Knife => KnifeLevel.LevelName,
+            GameType.TekeTeke => TekeLevel.LevelName,
+            GameType.Kokkurisan => KokkuriLevel.LevelName,
             _=> ""
         }; }
         public int CurrentScore { get => runtimeData.CurrentScore; }
@@ -50,6 +58,8 @@ namespace Hanako
         public ScoreRules ScoreRules { get => scoreRules; }
         public HanakoLevel HanakoLevel { get => hanakoLevel; }
         public KnifeLevel KnifeLevel { get => knifeLevel; }
+        public TekeLevel TekeLevel { get => tekeLevel; }
+        public KokkuriLevel KokkuriLevel { get => kokkuriLevel; }
         public List<int> ScoreThresholds { get => scoreThresholds;  }
         public GameType GameType { get => gameType; }
         public TutorialPreview TutorialPreview { get => tutorialPreview;  }
