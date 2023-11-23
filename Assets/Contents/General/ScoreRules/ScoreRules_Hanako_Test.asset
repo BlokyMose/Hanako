@@ -17,16 +17,16 @@ MonoBehaviour:
   rules:
   - paramName: kill
     displayName: Kill
-    scoreMultiplier: 10
+    scoreMultiplier: 100
     fontColor: {r: 1, g: 1, b: 1, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'
   - paramName: multiKill
     displayName: Multi-kill
-    scoreMultiplier: 10
+    scoreMultiplier: 100
     fontColor: {r: 1, g: 1, b: 1, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'
   - paramName: playTime
     displayName: Play time
-    scoreMultiplier: -1
+    scoreMultiplier: 0
     fontColor: {r: 1, g: 0.5896226, b: 0.5896226, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'

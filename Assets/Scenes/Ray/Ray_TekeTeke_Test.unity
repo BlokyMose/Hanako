@@ -2115,8 +2115,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 708852204}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.84, y: 2.02, z: -10}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.84, y: 2.02, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2434,6 +2434,7 @@ MonoBehaviour:
   timeText: {fileID: 572260860}
   txtScore: {fileID: 609755504}
   levelInfo: {fileID: 11400000, guid: d47b0751209cf614c9a44410b502f1d7, type: 2}
+  playTimeParamName: playTime
   scoreParamName: score
 --- !u!1 &850311303 stripped
 GameObject:
@@ -2909,7 +2910,7 @@ GameObject:
   - component: {fileID: 1007429169}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
