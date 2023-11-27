@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Hanako
 {
-    public class Move : MonoBehaviour
+    public class TekeTeke_Move : MonoBehaviour
     {
 
         [SerializeField] private float moveSpeed = 0.5f;

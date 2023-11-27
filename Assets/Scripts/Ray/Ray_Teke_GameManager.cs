@@ -25,6 +25,9 @@ namespace Hanako
         {
             playTime += Time.deltaTime;
             countdownSeconds -= Time.deltaTime;
+
+            countdownSeconds = Mathf.Max(countdownSeconds, 0);
+
             var span = new TimeSpan(0, 0, (int)countdownSeconds);
             timeText.text = span.ToString(@"mm\:ss");
 
