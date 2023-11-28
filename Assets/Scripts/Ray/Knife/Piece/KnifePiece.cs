@@ -31,7 +31,7 @@ namespace Hanako.Knife
         KnifePieceInformation information;
 
         [SerializeField]
-        protected bool isInteractableDefault = true;
+        bool isInteractable = true;
 
         [SerializeField]
         protected List<InteractionProperties> interactionProperties = new();
@@ -49,8 +49,7 @@ namespace Hanako.Knife
         bool ignoreWarnings = false;
 
         protected KnifeLevelManager levelManager;
-
-        protected bool isInteractable = true;
+        
         public bool IsInteractable { get => isInteractable; }
         public KnifePieceInformation Information { get => information; }
         public Transform HeadPosForLogo { get => headPosForLogo != null ? headPosForLogo : transform; }
@@ -113,7 +112,7 @@ namespace Hanako.Knife
                     }
                 }
 
-                return isInteractableDefault;
+                return true;
             }
             else
             {

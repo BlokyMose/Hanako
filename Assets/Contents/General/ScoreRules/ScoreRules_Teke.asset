@@ -16,12 +16,12 @@ MonoBehaviour:
   closeToken: '}'
   rules:
   - paramName: score
-    displayName: Score
+    displayName: "\u30B9\u30B3\u30A2"
     scoreMultiplier: 20
     fontColor: {r: 1, g: 1, b: 1, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'
   - paramName: playTime
-    displayName: Play time
+    displayName: "\u6642\u9593"
     scoreMultiplier: 1
     fontColor: {r: 1, g: 0.47450984, b: 0.47450984, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'

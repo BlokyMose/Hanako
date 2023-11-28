@@ -16,17 +16,17 @@ MonoBehaviour:
   closeToken: '}'
   rules:
   - paramName: kill
-    displayName: Kill
+    displayName: "\u30AD\u30EB"
     scoreMultiplier: 150
     fontColor: {r: 1, g: 1, b: 1, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'
   - paramName: turn
-    displayName: Turn
+    displayName: "\u30BF\u30FC\u30F3"
     scoreMultiplier: -5
     fontColor: {r: 1, g: 0.4764151, b: 0.4764151, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'
   - paramName: playTime
-    displayName: Play time
+    displayName: "\u6642\u9593"
     scoreMultiplier: 0
     fontColor: {r: 1, g: 0.47450984, b: 0.47450984, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'

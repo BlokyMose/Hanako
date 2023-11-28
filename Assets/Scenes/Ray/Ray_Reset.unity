@@ -201,6 +201,7 @@ GameObject:
   m_Component:
   - component: {fileID: 517850508}
   - component: {fileID: 517850507}
+  - component: {fileID: 517850509}
   - component: {fileID: 517850506}
   m_Layer: 0
   m_Name: Reset
@@ -264,18 +265,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 517850506}
-        m_TargetAssemblyTypeName: UnityUtility.LoadScene, Assembly-CSharp
-        m_MethodName: Load
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!4 &517850508
 Transform:
   m_ObjectHideFlags: 0
@@ -291,6 +280,35 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &517850509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517850505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61504c852e7af0840abd40e336c935af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  invokeIn: 0
+  delay: 3
+  onInvoke:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 517850506}
+        m_TargetAssemblyTypeName: UnityUtility.LoadScene, Assembly-CSharp
+        m_MethodName: Load
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1001 &648006345
 PrefabInstance:
   m_ObjectHideFlags: 0

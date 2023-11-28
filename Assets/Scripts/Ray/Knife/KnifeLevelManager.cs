@@ -329,15 +329,18 @@ namespace Hanako.Knife
         [SerializeField]
         GameObject tileUnhoverColPrefab;
 
+        [SerializeField]
+        GameInfoCanvas gameInfoCanvas;
+
+        [SerializeField]
+        GameObject turnOrderUI;
+
         [Header("Game")]
         [SerializeField]
         float moveDuration = 1f;
 
         [SerializeField]
         AnimationCurve moveAnimationCurve;
-
-        [SerializeField]
-        GameInfoCanvas gameInfoCanvas;
 
         [SerializeField]
         Vector2 panAreaMax = new(4, 2);
@@ -615,12 +618,14 @@ namespace Hanako.Knife
 
         public void ShowTurnOrderTexts()
         {
+            turnOrderUI.SetActive(true);
             foreach (var piece in livingPieces)
                 piece.TurnOrderText.Show();
         }
 
         public void HideTurnOrderTexts()
         {
+            turnOrderUI.SetActive(false);
             foreach (var piece in livingPieces)
                 piece.TurnOrderText.Hide();
         }

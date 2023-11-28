@@ -29,7 +29,10 @@ namespace Hanako.Hub
         Animator soulIconPrefab;
 
         [SerializeField]
-        TextMeshProUGUI playTimeText;
+        TextMeshProUGUI scoreText;
+
+        [SerializeField]
+        TextMeshProUGUI authorText;
 
         [SerializeField]
         Image playBut;
@@ -127,9 +130,7 @@ namespace Hanako.Hub
                     soulIconAnimator.SetInteger(int_mode, (int)SoulIconState.Alive);
             }
 
-            playTimeText.text = levelInfo.PlayTime > 0f 
-                ? MathUtility.SecondsToTimeString(levelInfo.PlayTime)
-                : "";
+            scoreText.text = levelInfo.CurrentScore.ToString();
 
             showAudioSource.PlayAllClipsFromPack(sfxShowName);
 

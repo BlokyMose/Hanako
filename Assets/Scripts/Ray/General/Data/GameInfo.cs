@@ -10,7 +10,10 @@ namespace Hanako
     public class GameInfo : ScriptableObject
     {
         [SerializeField]
-        string gameName;
+        string gameID;
+
+        [SerializeField]
+        string gameDisplayName;
 
         [SerializeField]
         string sceneName;
@@ -27,7 +30,8 @@ namespace Hanako
         [SerializeField]
         GameObject loadingAnimation;
 
-        public string GameName { get => gameName; }
+        public string GameID { get => gameID; }
+        public string GameDisplayName { get => gameDisplayName; }
         public string SceneName { get => sceneName; set => sceneName = value; }
         public Sprite TitleLogo { get => titleLogo; }
         public Sprite TitleIcon { get => titleIcon; }

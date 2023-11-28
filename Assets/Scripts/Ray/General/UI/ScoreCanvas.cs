@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 using UnityUtility;
 
@@ -57,6 +58,9 @@ namespace Hanako
         [SerializeField]
         List<ScoreTower> scoreTowers = new();
 
+        [SerializeField]
+        List<GameObject> hiScoreRank = new();
+
 
         [Header("Buttons")]
         [SerializeField]
@@ -84,7 +88,7 @@ namespace Hanako
         [SerializeField]
         string sfxClickName = "sfxClick";
 
-        int int_mode, tri_confirm, boo_overScore;
+        int int_mode, tri_confirm, boo_overScore, boo_hiScore;
         Animator animator, againButAnimator, hubButAnimator;
 
         void Awake()
@@ -93,6 +97,7 @@ namespace Hanako
             int_mode = Animator.StringToHash(nameof(int_mode));
             tri_confirm = Animator.StringToHash(nameof(tri_confirm));
             boo_overScore = Animator.StringToHash(nameof(boo_overScore));
+            boo_hiScore= Animator.StringToHash(nameof(boo_hiScore));
 
             againButAnimator = againBut.GetComponent<Animator>();
             againBut.AddEventTriggers(
@@ -188,23 +193,53 @@ namespace Hanako
 
         public void Init(LevelInfo levelInfo, List<ScoreDetail> scoreDetails)
         {
+            var isHiScore = false;
             this.levelInfo = levelInfo;
             scoreDetailsParent.DestroyChildren();
+            UpdateUIAccordingTo(levelInfo);
+            CalculateScore(levelInfo, scoreDetails, out var score, out var soulCount, out var playTime);
+            if (levelInfo.CurrentScore < (int)score)
+            {
+                isHiScore = true;
+                SaveNewScore(levelInfo, score, soulCount, playTime);
+            }
+            StartCoroutine(AnimatingUI(isHiScore));
 
-            levelNameText.text = levelInfo.GameInfo.GameName + " - " + levelInfo.LevelName;
-            scoreText.text = levelInfo.CurrentScore.ToString();
+            #region [Methods]
 
-            for (int i = 0; i < scoreTowers.Count; i++)
-                if (i < levelInfo.ScoreThresholds.Count)
-                    scoreTowers[i].Threshold.text = levelInfo.ScoreThresholds[i].ToString();
+            void UpdateUIAccordingTo(LevelInfo levelInfo)
+            {
+                levelNameText.text = levelInfo.GameInfo.GameDisplayName + " - " + levelInfo.LevelName;
+                scoreText.text = levelInfo.CurrentScore.ToString();
+                for (int i = 0; i < scoreTowers.Count; i++)
+                    if (i < levelInfo.ScoreThresholds.Count)
+                        scoreTowers[i].Threshold.text = levelInfo.ScoreThresholds[i].ToString();
+            }
 
-            StartCoroutine(AnimatingUI());
-            IEnumerator AnimatingUI()
+            void CalculateScore(LevelInfo levelInfo, List<ScoreDetail> scoreDetails, out int score, out int soulCount, out int playTime)
+            {
+                score = 0;
+                playTime = GetValue(scoreDetails, "playTime");
+                soulCount = 0;
+
+                for (int i = 0; i < levelInfo.ScoreRules.Rules.Count; i++)
+                {
+                    var rule = levelInfo.ScoreRules.Rules[i];
+                    var toReceiveScore = GetValue(scoreDetails, rule.ParamName) * rule.ScoreMultiplier;
+                    score += toReceiveScore;
+                }
+
+                foreach (var threshold in levelInfo.ScoreThresholds)
+                    soulCount += score > threshold ? 1 : 0;
+
+            }
+
+            IEnumerator AnimatingUI(bool isHiScore)
             {
                 yield return new WaitForSeconds(1f);
 
-                var totalScore = 0f;
-                var totalPlayTime = GetValue(scoreDetails, "playTime");
+                var score = 0f;
+                var playTime = GetValue(scoreDetails, "playTime");
                 var filledTowerCount = 0;
                 if (levelInfo.ScoreRules.Rules.Count < 3)
                     audioSource.PlayOneClipFromPack(sfxRiser);
@@ -217,126 +252,132 @@ namespace Hanako
                     var rule = levelInfo.ScoreRules.Rules[i];
                     var toReceiveScore = GetValue(scoreDetails, rule.ParamName) * rule.ScoreMultiplier;
                     MakeScoreDetailText(scoreDetailTextPrefab, scoreDetailsParent, levelInfo.ScoreRules, rule, scoreDetails);
-                    
-                    yield return StartCoroutine(AnimatingScoreUI(totalScore, toReceiveScore));
 
-                    totalScore += toReceiveScore;
-                    scoreText.text = ((int)totalScore).ToString();
-                    filledTowerCount = FillTowers(levelInfo, totalScore);
+                    yield return StartCoroutine(AnimatingScoreUI(score, toReceiveScore));
+
+                    score += toReceiveScore;
+                    scoreText.text = ((int)score).ToString();
+                    filledTowerCount = FillTowers(levelInfo, score);
                     animator.SetTrigger(tri_confirm);
                     audioSource.PlayOneClipFromPack(sfxConfirmName);
                 }
 
-                if (totalScore >= levelInfo.ScoreThresholds.GetLast())
+                if (score >= levelInfo.ScoreThresholds.GetLast())
                     animator.SetBool(boo_overScore, true);
 
-                if (levelInfo.CurrentScore < (int)totalScore)
-                {
-                    var currentScore = (int)totalScore;
+                if (isHiScore)
+                    animator.SetBool(boo_hiScore, true);
+            }
 
-                    var currentSoulCount = levelInfo.CurrentSoulCount < filledTowerCount ? filledTowerCount : levelInfo.CurrentSoulCount;
-                    var playTime = totalPlayTime;
-                    levelInfo.SetRuntimeData(new(
-                        currentScore,
-                        currentSoulCount,
-                        playTime,
-                        true
-                        ));
+            void SaveNewScore(LevelInfo levelInfo, float score, int soulCount, int playTime)
+            {
+                var newScore = (int)score;
+                var newSoulCount = levelInfo.CurrentSoulCount < soulCount ? soulCount : levelInfo.CurrentSoulCount;
+                var newPlayTime = playTime;
+                levelInfo.SetRuntimeData(new(
+                    newScore,
+                    newSoulCount,
+                    newPlayTime,
+                    true
+                    ));
+            }
+
+            int GetValue(List<ScoreDetail> scoreDetails, string ruleName)
+            {
+                var valueDetail = scoreDetails.Find(x => x.ParamName == ruleName);
+                if (valueDetail != null)
+                    return valueDetail.Value;
+                else
+                {
+                    Debug.LogWarning("Cannot find rule with paramName: " + ruleName);
+                    return 0;
                 }
+            }
 
-                #region [Methods]
+            void MakeScoreDetailText(ScoreDetailText scoreDetailTextPrefab, Transform scoreDetailsParent, ScoreRules scoreRule, ScoreRules.Rule rule, List<ScoreDetail> scoreDetails)
+            {
+                var detailText = Instantiate(scoreDetailTextPrefab, scoreDetailsParent);
+                var detailTextContent = rule.DisplayFormat;
+                detailTextContent = detailTextContent.Replace(
+                    scoreRule.OpenToken + "displayName" + scoreRule.CloseToken,
+                    rule.DisplayName);
 
-                int GetValue(List<ScoreDetail> scoreDetails, string ruleName)
+                detailTextContent = detailTextContent.Replace(
+                    scoreRule.OpenToken + "scoreMultiplier" + scoreRule.CloseToken,
+                    rule.ScoreMultiplier.ToString());
+
+                var valueDetail = scoreDetails.Find(x => x.ParamName == rule.ParamName);
+                var value = valueDetail != null ? valueDetail.Value : 0;
+                detailTextContent = detailTextContent.Replace(
+                    scoreRule.OpenToken + "value" + scoreRule.CloseToken,
+                    value.ToString());
+
+                detailText.Init(detailTextContent, rule.FontColor);
+            }
+
+            int FillTowers(LevelInfo levelInfo, float score)
+            {
+                var scoreLeft = score;
+                int thresholdIndex = 0;
+                int filledTowerCount = 0;
+                foreach (var threshold in levelInfo.ScoreThresholds)
                 {
-                    var valueDetail = scoreDetails.Find(x => x.ParamName == ruleName);
-                    if (valueDetail != null)
-                        return valueDetail.Value;
-                    else
+                    var tower = scoreTowers[thresholdIndex];
+                    var previousThreshold = thresholdIndex > 0 ? levelInfo.ScoreThresholds[thresholdIndex - 1] : 0;
+                    thresholdIndex++;
+                    var relativeThreshold = threshold - previousThreshold;
+                    scoreLeft -= relativeThreshold;
+
+                    if (scoreLeft < 0)
                     {
-                        Debug.LogWarning("Cannot find rule with paramName: " + ruleName);
-                        return 0;
-                    }
-                }
-
-                void MakeScoreDetailText(ScoreDetailText scoreDetailTextPrefab, Transform scoreDetailsParent, ScoreRules scoreRule, ScoreRules.Rule rule, List<ScoreDetail> scoreDetails)
-                {
-                    var detailText = Instantiate(scoreDetailTextPrefab, scoreDetailsParent);
-                    var detailTextContent = rule.DisplayFormat;
-                    detailTextContent = detailTextContent.Replace(
-                        scoreRule.OpenToken + "displayName" + scoreRule.CloseToken,
-                        rule.DisplayName);
-
-                    detailTextContent = detailTextContent.Replace(
-                        scoreRule.OpenToken + "scoreMultiplier" + scoreRule.CloseToken,
-                        rule.ScoreMultiplier.ToString());
-
-                    var valueDetail = scoreDetails.Find(x => x.ParamName == rule.ParamName);
-                    var value = valueDetail != null ? valueDetail.Value : 0;
-                    detailTextContent = detailTextContent.Replace(
-                        scoreRule.OpenToken + "value" + scoreRule.CloseToken,
-                        value.ToString());
-
-                    detailText.Init(detailTextContent, rule.FontColor);
-                }
-
-                int FillTowers(LevelInfo levelInfo, float score)
-                {
-                    var scoreLeft = score;
-                    int thresholdIndex = 0;
-                    int filledTowerCount = 0;
-                    foreach (var threshold in levelInfo.ScoreThresholds)
-                    {
-                        var tower = scoreTowers[thresholdIndex];
-                        var previousThreshold = thresholdIndex > 0 ? levelInfo.ScoreThresholds[thresholdIndex - 1] : 0;
-                        thresholdIndex++;
-                        var relativeThreshold = threshold - previousThreshold;
-                        scoreLeft -= relativeThreshold;
-
-                        if (scoreLeft < 0)
-                        {
-                            tower.Fill.fillAmount = 1 - (-scoreLeft) / relativeThreshold;
-                            tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Dead);
-                            tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Idle);
-                            break;
-                        }
-                        else
-                        {
-                            if (thresholdIndex > scoreTowers.Count) break;
-                            tower.Fill.fillAmount = 1f;
-                            tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Alive);
-                            tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Active);
-                            filledTowerCount++;
-                        }
-                    }
-
-                    for (int i = thresholdIndex; i < scoreTowers.Count; i++)
-                    {
-                        var tower = scoreTowers[i];
-                        tower.Fill.fillAmount = 0;
+                        tower.Fill.fillAmount = 1 - (-scoreLeft) / relativeThreshold;
                         tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Dead);
                         tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Idle);
+                        break;
                     }
-
-                    return filledTowerCount;
-                }
-
-                IEnumerator AnimatingScoreUI(float previousTotalScore, float toReceiveScore)
-                {
-                    var time = 0f;
-                    var curve = AnimationCurve.Linear(0, 0, ruleAnimationDuration, toReceiveScore);
-                    var animatedScore = previousTotalScore;
-                    while (time < ruleAnimationDuration)
+                    else
                     {
-                        animatedScore = previousTotalScore + curve.Evaluate(time);
-                        scoreText.text = ((int)animatedScore).ToString();
-                        FillTowers(levelInfo, animatedScore);
-                        time += Time.deltaTime;
-                        yield return null;
+                        if (thresholdIndex > scoreTowers.Count) break;
+                        tower.Fill.fillAmount = 1f;
+                        tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Alive);
+                        tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Active);
+                        filledTowerCount++;
                     }
                 }
 
-                #endregion
+                for (int i = thresholdIndex; i < scoreTowers.Count; i++)
+                {
+                    var tower = scoreTowers[i];
+                    tower.Fill.fillAmount = 0;
+                    tower.SoulIcon.SetInteger(int_mode, (int)SoulIconState.Dead);
+                    tower.ThresholdAnimator.SetInteger(int_mode, (int)ThresholdTextAnimation.Idle);
+                }
+
+                return filledTowerCount;
             }
+
+            IEnumerator AnimatingScoreUI(float previousTotalScore, float toReceiveScore)
+            {
+                var time = 0f;
+                var curve = AnimationCurve.Linear(0, 0, ruleAnimationDuration, toReceiveScore);
+                var animatedScore = previousTotalScore;
+                while (time < ruleAnimationDuration)
+                {
+                    animatedScore = previousTotalScore + curve.Evaluate(time);
+                    scoreText.text = ((int)animatedScore).ToString();
+                    FillTowers(levelInfo, animatedScore);
+                    time += Time.deltaTime;
+                    yield return null;
+                }
+            }
+
+            #endregion
+
+        }
+
+        void ShowHiScore()
+        {
+            animator.SetBool(boo_hiScore, true);
         }
     }
 }

@@ -65,6 +65,13 @@ namespace Hanako.Knife
         [SerializeField]
         TextMeshProUGUI tutorialText;
         
+        [Header("Retry")]
+        [SerializeField]
+        Image retryBut;
+
+        [SerializeField]
+        TextMeshProUGUI retryText;
+
         [Header("Exit")]
         [SerializeField]
         Image exitBut;
@@ -75,9 +82,12 @@ namespace Hanako.Knife
         [SerializeField]
         LevelInfo hubLevelInfo;
 
+        [SerializeField]
+        GameObject preventClick;
+
         List<Animator> functionalButs = new();
         int int_mode, tri_click;
-        Animator pauseButAnimator, sfxButAnimator, bgmButAnimator, tutorialButAnimator, exitButAnimator;
+        Animator pauseButAnimator, sfxButAnimator, bgmButAnimator, tutorialButAnimator, retryButAnimator, exitButAnimator;
         bool isInPause = false;
 
         void Awake()
@@ -95,8 +105,9 @@ namespace Hanako.Knife
             sfxButAnimator = sfxBut.GetComponentInFamily<Animator>();
             bgmButAnimator = bgmBut.GetComponentInFamily<Animator>();
             tutorialButAnimator = tutorialBut.GetComponentInFamily<Animator>();
+            retryButAnimator = retryBut.GetComponentInFamily<Animator>();
             exitButAnimator = exitBut.GetComponentInFamily<Animator>();
-            functionalButs = new() { sfxButAnimator, bgmButAnimator, tutorialButAnimator, exitButAnimator };
+            functionalButs = new() { sfxButAnimator, bgmButAnimator, tutorialButAnimator, retryButAnimator, exitButAnimator };
 
             pauseBut.AddEventTrigger(Show, EventTriggerType.PointerEnter);
             hitAreaHide.AddEventTrigger(Hide, EventTriggerType.PointerEnter);
@@ -115,6 +126,11 @@ namespace Hanako.Knife
                 onEnter: () => { HoverBut(tutorialButAnimator); },
                 onExit: () => { IdleBut(tutorialButAnimator); },
                 onClick: () => { ClickBut(tutorialButAnimator); ShowTutorialCanvas(); } );
+
+            retryBut.AddEventTriggers(
+                onEnter: () => { HoverBut(retryButAnimator); },
+                onExit: () => { IdleBut(retryButAnimator); },
+                onClick: () => { ClickBut(retryButAnimator); RetryGame(); } );
 
             exitBut.AddEventTriggers(
                 onEnter: () => { HoverBut(exitButAnimator); },
@@ -153,6 +169,7 @@ namespace Hanako.Knife
                 HideBut(but);
             isInPause = false;
             audioSource.PlayOneClipFromPack(openSFXName);
+            preventClick.SetActive(true);
         }
 
         public void Show()
@@ -164,6 +181,7 @@ namespace Hanako.Knife
             foreach (var but in functionalButs)
                 IdleBut(but);
             audioSource.PlayOneClipFromPack(openSFXName);
+            preventClick.SetActive(false);
         }
 
         public void HideBut(Animator animator)
@@ -263,16 +281,31 @@ namespace Hanako.Knife
             if (allGamesInfo == null) return;
 
             var currentLevel = allGamesInfo.CurrentLevel;
-            currentLevel.SetRuntimeData(new(currentLevel.CurrentSoulCount, currentLevel.CurrentScore, currentLevel.PlayTime, true));
+            currentLevel.SetRuntimeData(new(currentLevel.CurrentScore, currentLevel.CurrentSoulCount, currentLevel.PlayTime, true));
             var tutorialCanvas = Instantiate(tutorialCanvasPrefab);
             tutorialCanvas.Init(currentLevel.GameInfo.TutorialInfo, currentLevel.TutorialPreview);
         }
 
         public void ExitGame()
         {
+            var allGamesInfo = FindObjectOfType<AllGamesInfoManager>();
+            var isCurrentLevelHub = allGamesInfo != null && allGamesInfo.AllGamesInfo.CurrentLevel == hubLevelInfo;
             var sceneLoadingManager = FindObjectOfType<SceneLoadingManager>();
             if (sceneLoadingManager != null)
-                sceneLoadingManager.LoadScene(hubLevelInfo);
+            {
+                if (isCurrentLevelHub)
+                    Application.Quit();
+                else
+                    sceneLoadingManager.LoadScene(hubLevelInfo);
+            }
+        }
+
+        public void RetryGame()
+        {
+            var sceneLoading = FindObjectOfType<SceneLoadingManager>();
+            var allGamesInfo = FindObjectOfType<AllGamesInfoManager>();
+            if (sceneLoading != null && allGamesInfo != null)
+                sceneLoading.LoadScene(allGamesInfo.AllGamesInfo.CurrentLevel);
         }
     }
 }

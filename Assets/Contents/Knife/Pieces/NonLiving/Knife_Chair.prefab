@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8968403188171059170}
   - component: {fileID: 3411194582848312137}
   m_Layer: 0
-  m_Name: Knife_Table
+  m_Name: Knife_Chair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,6 +67,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: df1ded9012d50ee4dba5996f322ec5e1, type: 2}
   headPosForLogo: {fileID: 5044341945299617149}
   headPosOffset: {x: 0, y: 0, z: -4.5}
+  ignoreWarnings: 0
 --- !u!1 &2935957607660870465
 GameObject:
   m_ObjectHideFlags: 0
@@ -78,6 +79,7 @@ GameObject:
   - component: {fileID: 5044341945299617149}
   - component: {fileID: 3684521733988133000}
   - component: {fileID: 2040927737934981692}
+  - component: {fileID: 5712077500364258331}
   m_Layer: 0
   m_Name: sr
   m_TagString: Untagged
@@ -141,7 +143,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 0cb4c5d101b604648bf2fde018af5b45, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f318d80d4165f634fb2864036082af55, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -172,6 +174,24 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+--- !u!114 &5712077500364258331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2935957607660870465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c6967b32b08f044bbfb4c82bd26ee51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isActive: 1
+  sr: {fileID: 0}
+  sprites:
+  - {fileID: 21300000, guid: f318d80d4165f634fb2864036082af55, type: 3}
+  - {fileID: 21300000, guid: b29368fea57a2904d8fc92ad2fee05d0, type: 3}
+  - {fileID: 21300000, guid: ea200c16c4b53e94bbb8a228a640e90a, type: 3}
 --- !u!1 &5779452168355592442
 GameObject:
   m_ObjectHideFlags: 0

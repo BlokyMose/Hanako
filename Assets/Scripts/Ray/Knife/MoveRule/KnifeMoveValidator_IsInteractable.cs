@@ -13,8 +13,8 @@ namespace Hanako.Knife
         public override bool Validate(ColRow colRow, PieceCache thisPiece, List<PieceCache> allPieces, KnifeLevel levelProperties)
         {
             var foundPiece = GetPieceOf(colRow, allPieces);
-            if (foundPiece != null && foundPiece.Piece.IsInteractable)
-                return !reverseResult;
+            if (foundPiece != null)
+                return foundPiece.Piece.IsInteractable ? !reverseResult : reverseResult;
 
             return true;
         }

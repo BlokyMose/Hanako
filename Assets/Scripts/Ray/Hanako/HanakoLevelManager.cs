@@ -321,11 +321,16 @@ namespace Hanako.Hanako
                         destinationIDCounter.Add(destinationComponent.ID, 0);
 
                     if (destinationGO.TryGetComponent<HanakoInteractable_Toilet>(out var toilet))
-                        toilet.Init(LostGame, PlayBloodSplatter, AddMultiKillCount);
+                        toilet.Init(LostGame, PlayBloodSplatter, OnEnemiesKilled);
                     
                     destinationComponent.Init(colors, icons, () => GameState, destinations.Count, destinationIDCounter[destinationComponent.ID]);
 
                     destinations.Add(destinationComponent);
+
+                    void OnEnemiesKilled(int killCount)
+                    {
+                        if (killCount > 1) AddMultiKillCount();
+                    }
                 }
                 return destinations;
             }
@@ -552,7 +557,7 @@ namespace Hanako.Hanako
             CheckWinningCondition();
         }
 
-        void AddMultiKillCount(int enemiesKilledCount)
+        void AddMultiKillCount()
         {
             multiKillCount++;
         }

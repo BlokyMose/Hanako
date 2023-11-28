@@ -104,6 +104,7 @@ namespace Hanako
 
         public void AddPlayTime(float increment) => playTime += increment;
 
+        [Button]
         public void ResetAllRuntimeData()
         {
             playTime = 0;
