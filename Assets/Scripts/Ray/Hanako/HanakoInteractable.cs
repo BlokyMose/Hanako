@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityUtility;
 using static Hanako.Hanako.HanakoIcons;
 using static Hanako.Hanako.HanakoEnemy;
+using TMPro;
 
 namespace Hanako.Hanako
 {
@@ -13,6 +14,9 @@ namespace Hanako.Hanako
     [RequireComponent(typeof(Animator))]
     public class HanakoInteractable : MonoBehaviour
     {
+        [SerializeField]
+        protected string actionName;
+
         [Header("Detect Area")]
         [SerializeField]
         protected HighlightMode detectAreaHighlightMode = HighlightMode.Attackable;
@@ -50,9 +54,11 @@ namespace Hanako.Hanako
         [SerializeField]
         protected HanakoIcons icons;
 
-        protected Animator animator, detectAreaAnimator, actionIconAnimator;
+        protected Animator animator, detectAreaAnimator;
         protected SpriteRendererColorSetter colorSetter;
+        protected Animator actionIconAnimator;
         protected SpriteRenderer actionIconSR;
+        protected TextMeshProUGUI actionIconText;
         protected int int_mode, tri_transition;
         protected bool isHovering;
         protected HashSet<HanakoEnemy> enemiesInDetectArea = new();
@@ -73,6 +79,8 @@ namespace Hanako.Hanako
                 var actionIconGO = Instantiate(actionIconPrefab, actionIconParent);
                 actionIconAnimator = actionIconGO.GetComponent<Animator>();
                 actionIconSR = actionIconGO.GetComponentInChildren<SpriteRenderer>();
+                actionIconText = actionIconGO.GetComponentInChildren<TextMeshProUGUI>();
+                actionIconText.text = actionName;
                 colorSetter.RemoveSR(actionIconSR);
             }
 
@@ -140,6 +148,7 @@ namespace Hanako.Hanako
         {
             actionIconSR.sprite = GetActionIcon;
             actionIconSR.color = colors.PlayerColor;
+            actionIconText.color = colors.PlayerColor;
             actionIconAnimator.SetInteger(int_mode, (int)GetActionIconAnimation);
             actionIconAnimator.SetTrigger(tri_transition);
         }

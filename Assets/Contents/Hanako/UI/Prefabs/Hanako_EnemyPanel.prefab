@@ -147,11 +147,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6a1d9c05a095614db1988b1cb7009bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  warningTime: 0.75
   hideAnimationDuration: 0.65
   icon: {fileID: 1847094236123637014}
   destinationParent: {fileID: 1847094236585808181}
   destinationIconPrefab: {fileID: 2556459833309228722, guid: 4d60432d16ca5ba41b24dee03d6bd9d5, type: 3}
   loadingBar: {fileID: 3912137896625293587}
+  loadingBarBG: {fileID: 1847094234950081417}
 --- !u!1 &1847094234950081412
 GameObject:
   m_ObjectHideFlags: 0
@@ -714,7 +716,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.75, g: 0.75, b: 0.75, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.2509804}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

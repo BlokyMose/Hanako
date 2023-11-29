@@ -230,7 +230,7 @@ namespace Hanako
                 }
 
                 foreach (var threshold in levelInfo.ScoreThresholds)
-                    soulCount += score > threshold ? 1 : 0;
+                    soulCount += score >= threshold ? 1 : 0;
 
             }
 

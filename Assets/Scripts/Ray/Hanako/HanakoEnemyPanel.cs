@@ -11,6 +11,9 @@ namespace Hanako.Hanako
     public class HanakoEnemyPanel : MonoBehaviour
     {
         [SerializeField]
+        float warningTime = 1f;
+
+        [SerializeField]
         float hideAnimationDuration = 0.65f;
 
         [Header("Components")]
@@ -25,6 +28,9 @@ namespace Hanako.Hanako
 
         [SerializeField]
         Image loadingBar;
+
+        [SerializeField]
+        Image loadingBarBG;
 
         Animator animator;
         int boo_show;
@@ -93,17 +99,24 @@ namespace Hanako.Hanako
             Destroy(gameObject, hideAnimationDuration);
         }
 
-        public void FillLoadingBar(float duration, Color color)
+        public void FillLoadingBar(float duration, Color color, Color warningColor)
         {
             StartCoroutine(Update());
             IEnumerator Update()
             {
-                var time = 0f;
+                var time = duration;
+                var isWarning = false;
                 loadingBar.color = color;
-                while (time < duration)
+                while (time > 0)
                 {
                     loadingBar.fillAmount = time / duration;
-                    time += Time.deltaTime;
+                    if (!isWarning && time < warningTime)
+                    {
+                        isWarning = true;
+                        loadingBarBG.color = warningColor;
+                    }
+
+                    time -= Time.deltaTime;
                     yield return null;
                 }
             }

@@ -14,6 +14,12 @@ namespace Hanako.Hanako
     {
         [Header("Toilet")]
         [SerializeField]
+        string actionNameAttack;
+
+        [SerializeField]
+        string actionNameMove;
+
+        [SerializeField]
         Transform postAttackPos;
 
         [SerializeField]
@@ -107,6 +113,7 @@ namespace Hanako.Hanako
 
             if (Occupation == OccupationMode.Player)
             {
+                actionName = actionNameAttack;
                 ChangeColor(colors.PlayerColor);
                 isHighligthingEnemies = true;
                 foreach (var enemy in enemiesDetecting)
@@ -117,6 +124,12 @@ namespace Hanako.Hanako
 
                 detectAreaAnimator.SetInteger(int_mode, (int)DetectAreaAnimation.Show);
             }
+            else
+            {
+                actionName = actionNameMove;
+            }
+
+            actionIconText.text = actionName;
         }
 
         public override void Unhover()

@@ -28,8 +28,12 @@ namespace Hanako.Hanako
         [SerializeField]
         Color attackableColor;
 
+        [Header("Loading Bar")]
         [SerializeField]
         Color loadingBarColor;
+
+        [SerializeField]
+        Color loadingBarWarningColor;
 
         public Color PlayerColor { get => playerColor; }
         public Color OccupiedColor { get => occupiedColor; }
@@ -37,5 +41,6 @@ namespace Hanako.Hanako
         public Color DetectingColor { get => detectingColor; }
         public Color AttackableColor { get => attackableColor; }
         public Color LoadingBarColor { get => loadingBarColor; }
+        public Color LoadingBarWarningColor { get => loadingBarWarningColor; }
     }
 }

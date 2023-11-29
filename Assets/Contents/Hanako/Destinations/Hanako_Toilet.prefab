@@ -9034,6 +9034,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aef1d05d4145ec94cb1c51cdc9753ebb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionName: 
   detectAreaHighlightMode: 2
   detectArea: {fileID: 8766103292353666645}
   destinationUIPrefab: {fileID: 5820015688587343391, guid: 86424fdd2775feb49b6c282531f54b7b, type: 3}
@@ -9045,6 +9046,8 @@ MonoBehaviour:
   sfxClickName: sfxClick
   colors: {fileID: 11400000, guid: 6102d7a27386579438b02c77b50398cb, type: 2}
   icons: {fileID: 11400000, guid: 412fb811343455e408bf58163ef50f30, type: 2}
+  actionNameAttack: "\u653B\u6483"
+  actionNameMove: "\u79FB\u52D5"
   postAttackPos: {fileID: 7550228198596661633}
   hanakoFront: {fileID: 2474811787580174555}
   vfxSuccessfulAttack: {fileID: 7887203778979705224, guid: cbdcbb4eed8844f4d872d36a93b1c9e0, type: 3}

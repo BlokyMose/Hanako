@@ -436,7 +436,7 @@ namespace Hanako.Hanako
                 int index = 0;
                 foreach (var enemy in enemySequence.Sequence)
                 {
-                    enemyList.StartLoadingBarOfFirstPanel(enemy.Delay, colors.LoadingBarColor);
+                    enemyList.StartLoadingBarOfFirstPanel(enemy.Delay, colors.LoadingBarColor, colors.LoadingBarWarningColor);
                     yield return new WaitForSeconds(enemy.Delay);
                     enemies[index].StartInitialMove();
                     enemyList.RemoveFirstPanel();

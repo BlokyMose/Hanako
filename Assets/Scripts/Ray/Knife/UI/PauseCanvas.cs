@@ -65,6 +65,13 @@ namespace Hanako.Knife
         [SerializeField]
         TextMeshProUGUI tutorialText;
         
+        [Header("Intro")]
+        [SerializeField]
+        Image introBut;
+
+        [SerializeField]
+        TextMeshProUGUI introText;
+
         [Header("Retry")]
         [SerializeField]
         Image retryBut;
@@ -83,11 +90,14 @@ namespace Hanako.Knife
         LevelInfo hubLevelInfo;
 
         [SerializeField]
+        LevelInfo introLevelInfo;
+
+        [SerializeField]
         GameObject preventClick;
 
         List<Animator> functionalButs = new();
         int int_mode, tri_click;
-        Animator pauseButAnimator, sfxButAnimator, bgmButAnimator, tutorialButAnimator, retryButAnimator, exitButAnimator;
+        Animator pauseButAnimator, sfxButAnimator, bgmButAnimator, tutorialButAnimator, introButAnimator, retryButAnimator, exitButAnimator;
         bool isInPause = false;
 
         void Awake()
@@ -105,9 +115,10 @@ namespace Hanako.Knife
             sfxButAnimator = sfxBut.GetComponentInFamily<Animator>();
             bgmButAnimator = bgmBut.GetComponentInFamily<Animator>();
             tutorialButAnimator = tutorialBut.GetComponentInFamily<Animator>();
+            introButAnimator = introBut.GetComponentInFamily<Animator>();
             retryButAnimator = retryBut.GetComponentInFamily<Animator>();
             exitButAnimator = exitBut.GetComponentInFamily<Animator>();
-            functionalButs = new() { sfxButAnimator, bgmButAnimator, tutorialButAnimator, retryButAnimator, exitButAnimator };
+            functionalButs = new() { sfxButAnimator, bgmButAnimator, tutorialButAnimator, introButAnimator, retryButAnimator, exitButAnimator };
 
             pauseBut.AddEventTrigger(Show, EventTriggerType.PointerEnter);
             hitAreaHide.AddEventTrigger(Hide, EventTriggerType.PointerEnter);
@@ -127,6 +138,11 @@ namespace Hanako.Knife
                 onExit: () => { IdleBut(tutorialButAnimator); },
                 onClick: () => { ClickBut(tutorialButAnimator); ShowTutorialCanvas(); } );
 
+            introBut.AddEventTriggers(
+                onEnter: () => { HoverBut(introButAnimator); },
+                onExit: () => { IdleBut(introButAnimator); },
+                onClick: () => { ClickBut(introButAnimator); GoToIntroScene(); } );
+
             retryBut.AddEventTriggers(
                 onEnter: () => { HoverBut(retryButAnimator); },
                 onExit: () => { IdleBut(retryButAnimator); },
@@ -139,12 +155,17 @@ namespace Hanako.Knife
 
             hitAreaHide.gameObject.SetActive(false);
             pauseButAnimator.SetInteger(int_mode, (int)ButMode.Idle);
+
         }
 
         void Start()
         {
             UpdateBGMVolumeText();
             UpdateSFXVolumeText();
+            if (IsCurrentLevelHub())
+                retryBut.transform.parent.gameObject.SetActive(false);
+            else
+                introBut.transform.parent.gameObject.SetActive(false);
 
             StartCoroutine(Delay(delayAutoShowTutorial));
             IEnumerator Delay(float delay)
@@ -286,14 +307,17 @@ namespace Hanako.Knife
             tutorialCanvas.Init(currentLevel.GameInfo.TutorialInfo, currentLevel.TutorialPreview);
         }
 
+        bool IsCurrentLevelHub()
+        {
+            return allGamesInfo != null && allGamesInfo.CurrentLevel == hubLevelInfo;
+        }
+
         public void ExitGame()
         {
-            var allGamesInfo = FindObjectOfType<AllGamesInfoManager>();
-            var isCurrentLevelHub = allGamesInfo != null && allGamesInfo.AllGamesInfo.CurrentLevel == hubLevelInfo;
             var sceneLoadingManager = FindObjectOfType<SceneLoadingManager>();
             if (sceneLoadingManager != null)
             {
-                if (isCurrentLevelHub)
+                if (IsCurrentLevelHub())
                     Application.Quit();
                 else
                     sceneLoadingManager.LoadScene(hubLevelInfo);
@@ -303,9 +327,16 @@ namespace Hanako.Knife
         public void RetryGame()
         {
             var sceneLoading = FindObjectOfType<SceneLoadingManager>();
-            var allGamesInfo = FindObjectOfType<AllGamesInfoManager>();
             if (sceneLoading != null && allGamesInfo != null)
-                sceneLoading.LoadScene(allGamesInfo.AllGamesInfo.CurrentLevel);
+                sceneLoading.LoadScene(allGamesInfo.CurrentLevel);
+        }
+
+        public void GoToIntroScene()
+        {
+            var sceneLoading = FindObjectOfType<SceneLoadingManager>();
+            if (sceneLoading != null)
+                sceneLoading.LoadScene(introLevelInfo);
+
         }
     }
 }

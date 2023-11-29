@@ -67,9 +67,9 @@ namespace Hanako.Hanako
             panels.RemoveAt(0);
         }
 
-        public void StartLoadingBarOfFirstPanel(float duration, Color color)
+        public void StartLoadingBarOfFirstPanel(float duration, Color color, Color warningColor)
         {
-            panels[0].FillLoadingBar(duration, color);
+            panels[0].FillLoadingBar(duration, color, warningColor);
         }
 
         public void AddPanel(HanakoEnemyID id, List<DestinationProperties> destinations, float? initScale = null)
