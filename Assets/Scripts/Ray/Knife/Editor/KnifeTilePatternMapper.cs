@@ -336,7 +336,7 @@ namespace Hanako.Knife
                     yield return new EditorWaitForSeconds(delay);
 
                     foreach (var toHighlight in toHighlightPieces)
-                        toHighlight.tile.Tile.Unhovered();
+                        toHighlight.tile.Tile.Idle();
                 }
             }
 

@@ -49,6 +49,7 @@ namespace Hanako.Knife
         Vector2 previousPos;
         bool canHover = true;
         bool canPan = true;
+        Coroutine corShowPossibleMoves;
 
         protected override void Awake()
         {
@@ -145,24 +146,26 @@ namespace Hanako.Knife
                 if (tileCheckResult.IsValid)
                 {
                     hoveredValidTile = hoveredTile;
+                    levelManager.HidePossibleMoves();
 
                     // Hovering a tile with a piece
                     if (tileCheckResult.IsInteractable)
                     {
-                        hoveredTile.Hovered(colors.TileActionColor);
+                        hoveredTile.Hovered(colors.TileActionColor, false);
                     }
 
                     // Hovering a tile with no piece, but can be moved into
                     else
                     {
-                        hoveredTile.Hovered(colors.TileValidMoveColor);
+                        hoveredTile.Hovered(colors.TileValidMoveColor, false);
                     }
                 }
 
                 // Hovering a tile that cannot be reached
                 else
                 {
-                    hoveredTile.Hovered(colors.TileInvalidMoveColor);
+                    levelManager.ShowPossibleMoves();
+                    hoveredTile.Hovered(colors.TileInvalidMoveColor, false);
                     hoveredValidTile = null;
                 }
 
@@ -173,9 +176,7 @@ namespace Hanako.Knife
                         var livingPieceCache = levelManager.GetLivingPiece(tilePiece as KnifePiece_Living);
                         var color = tilePiece == levelManager.PlayerPiece ? colors.TileValidMoveColor : colors.TileOtherValidMoveColor;
                         foreach (var validTile in livingPieceCache.ValidTilesByMoveRule)
-                        {
                             validTile.Tile.Hovered(color);
-                        }
 
                         levelManager.ShowTurnOrderTexts();
                     }
@@ -204,13 +205,11 @@ namespace Hanako.Knife
                 {
                     var livingPieceCache = levelManager.GetLivingPiece(tilePiece as KnifePiece_Living);
                     foreach (var validTile in livingPieceCache.ValidTilesByMoveRule)
-                    {
-                        validTile.Tile.Unhovered();
-                    }
+                        validTile.Tile.Idle();
                 }
             }
 
-            tile.Unhovered();
+            tile.Idle();
             audioSourceKnife.PlayOneClipFromPack(sfxTileFallName);
             hoveredTile = null;
             hoveredValidTile = null;
@@ -218,6 +217,14 @@ namespace Hanako.Knife
                 infoCanvas.SetDefaultInfo();
 
             levelManager.HideTurnOrderTexts();
+
+            corShowPossibleMoves = this.RestartCoroutine(Delay(1f), corShowPossibleMoves);
+            IEnumerator Delay(float delay)
+            {
+                yield return new WaitForSeconds(delay);
+                if (hoveredTile == null)
+                    levelManager.ShowPossibleMoves();
+            }
         }
 
         public void PleaseClick(Action<KnifeTile> onClick)

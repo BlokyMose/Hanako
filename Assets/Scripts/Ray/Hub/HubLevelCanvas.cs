@@ -23,16 +23,16 @@ namespace Hanako.Hub
         TextMeshProUGUI levelNameText;
 
         [SerializeField]
+        TextMeshProUGUI gameSummaryText;
+
+        [SerializeField]
         Transform soulIconParent;
 
         [SerializeField]
         Animator soulIconPrefab;
 
         [SerializeField]
-        TextMeshProUGUI scoreText;
-
-        [SerializeField]
-        TextMeshProUGUI authorText;
+        List<TextMeshProUGUI> leaderboardTexts = new();
 
         [SerializeField]
         Image playBut;
@@ -121,6 +121,7 @@ namespace Hanako.Hub
 
             titleLogo.sprite = levelInfo.GameInfo.TitleLogo;
             levelNameText.text = levelNamePrefix + levelInfo.LevelName;
+            gameSummaryText.text = levelInfo.GameInfo.GameSummary;
 
             soulIconParent.DestroyChildren();
             for (int i = 0; i < levelInfo.MaxSoulCount; i++)
@@ -130,7 +131,25 @@ namespace Hanako.Hub
                     soulIconAnimator.SetInteger(int_mode, (int)SoulIconState.Alive);
             }
 
-            scoreText.text = levelInfo.CurrentScore.ToString();
+            var allGamesInfo = FindObjectOfType<AllGamesInfoManager>();
+            if (allGamesInfo != null)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    if (levelInfo.Leaderboard.Count > i)
+                    {
+                        var score = levelInfo.Leaderboard[i].Score;
+                        var playerID = levelInfo.Leaderboard[i].PlayerID;
+                        var playerData = allGamesInfo.AllGamesInfo.GetPlayerData(playerID);
+                        var playerDisplayName = playerData != null ? playerData.DisplayName : "anon";
+                        leaderboardTexts[i].text = $"{score} - {playerDisplayName}";
+                    }
+                    else
+                    {
+                        leaderboardTexts[i].text = "n/a";
+                    }
+                }
+            }
 
             showAudioSource.PlayAllClipsFromPack(sfxShowName);
 

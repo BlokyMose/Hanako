@@ -3,13 +3,16 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityUtility;
 using static Cinemachine.DocumentationSortingAttribute;
 using static Hanako.Knife.KnifeLevel;
+using static Hanako.Knife.KnifeLevelManager;
 using static UnityEngine.Rendering.DebugUI.Table;
+using Color = UnityEngine.Color;
 
 namespace Hanako.Knife
 {
@@ -391,6 +394,7 @@ namespace Hanako.Knife
         GameObject player;
         int playerControllerID = 0;
         KnifePiece_Player playerPiece;
+        LivingPieceCache playerPieceCache;
         int killCount = 0;
         float playTime;
         Coroutine corPlayTime;
@@ -489,6 +493,7 @@ namespace Hanako.Knife
             
             void OnPlayerTurn()
             {
+                ShowPossibleMoves();
                 sfxAudioSource.PlayOneClipFromPack(sfxRoundTransition);
                 playerCursor.PleaseClick(OnClickDone);
                 void OnClickDone(KnifeTile tile)
@@ -499,6 +504,9 @@ namespace Hanako.Knife
 
             void OnNextRound()
             {
+                foreach (var tile in tiles)
+                    tile.Tile.Idle();
+
                 UpdateTurnOrderTexts();
                 this.OnNextRound?.Invoke(turnManager.CurrentRoundIndex);
             }
@@ -507,6 +515,18 @@ namespace Hanako.Knife
             {
 
             }
+        }
+
+        public void ShowPossibleMoves()
+        {
+            foreach (var validTile in playerPieceCache.ValidTilesByMoveRule)
+                validTile.Tile.Hinted(colors.TileHintMoveColor);
+        }
+
+        public void HidePossibleMoves()
+        {
+            foreach (var validTile in playerPieceCache.ValidTilesByMoveRule)
+                validTile.Tile.Idle();
         }
 
         public bool IsWinningConditionFulfilled()
@@ -605,12 +625,12 @@ namespace Hanako.Knife
             }
 
             var turnOrder = 1;
-            foreach (var turn in turnManager.currentRound.turns)
+            foreach (var piece in turnManager.currentRound.turns)
             {
-                if (turn.TurnOrderText.GetText() == "")
-                    turn.TurnOrderText.SetText(turnOrder.ToString());
+                if (piece.TurnOrderText.GetText() == "")
+                    piece.TurnOrderText.SetText(turnOrder.ToString());
                 else
-                    turn.TurnOrderText.SetText(turn.TurnOrderText.GetText()+","+turnOrder.ToString());
+                    piece.TurnOrderText.SetText(piece.TurnOrderText.GetText()+","+turnOrder.ToString());
 
                 turnOrder++;
             }
@@ -909,7 +929,8 @@ namespace Hanako.Knife
             playerPieceLivingComponent.Init(moveDuration, moveAnimationCurve);
             var playerTurnOrderText = Instantiate(turnOrderTextPrefab, player.transform);
             playerTurnOrderText.Init(playerPieceLivingComponent.TurnOrderTextOffset);
-            livingPieces.Add(new(playerControllerID, player, playerTile.ColRow, playerPieceLivingComponent, this, playerTurnOrderText));
+            playerPieceCache = new(playerControllerID, player, playerTile.ColRow, playerPieceLivingComponent, this, playerTurnOrderText);
+            livingPieces.Add(playerPieceCache);
 
             int pieceControllerID = 1;
             foreach (var piece in levelProperties.PiecesPattern.Pieces)

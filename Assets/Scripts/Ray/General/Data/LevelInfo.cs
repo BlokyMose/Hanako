@@ -64,6 +64,7 @@ namespace Hanako
         public GameType GameType { get => gameType; }
         public TutorialPreview TutorialPreview { get => tutorialPreview;  }
         public bool HasShownTutorial { get => runtimeData.HasShownTutorial; }
+        public List<LeaderboardItem> Leaderboard { get => runtimeData.Leaderboard; }
 
         public void ResetRuntimeData()
         {

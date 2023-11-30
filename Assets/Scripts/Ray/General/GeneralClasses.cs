@@ -39,6 +39,43 @@ namespace Hanako
     }
 
     [Serializable]
+    public class LeaderboardItem
+    {
+        [SerializeField]
+        int score;
+        [SerializeField]
+        string playerID;
+
+        public LeaderboardItem(int score, string playerID)
+        {
+            this.score = score;
+            this.playerID = playerID;
+        }
+
+        public int Score { get => score; }
+        public string PlayerID { get => playerID; }
+    }
+
+    [Serializable]
+    public class PlayerID
+    {
+        [SerializeField]
+        string displayName;
+
+        [SerializeField]
+        string id;
+
+        public PlayerID(string displayName, string id)
+        {
+            this.displayName = displayName;
+            this.id = id;
+        }
+
+        public string DisplayName { get => displayName; }
+        public string ID { get => id; }
+    }
+
+    [Serializable]
     public class LevelRuntimeData
     {
         [SerializeField]
@@ -53,18 +90,41 @@ namespace Hanako
         [SerializeField]
         bool hasShownTutorial = false;
 
-        public LevelRuntimeData(int currentScore = 0, int currentSoulCount = 0,  float playTime = 0, bool hasShownTutorial = false)
+        [SerializeField]
+        List<LeaderboardItem> leaderboard = new();
+
+        public LevelRuntimeData(int currentScore = 0, int currentSoulCount = 0,  float playTime = 0, bool hasShownTutorial = false, List<LeaderboardItem> leaderboard = null)
         {
             this.currentScore = currentScore;
             this.currentSoulCount = currentSoulCount;
             this.playTime = playTime;
             this.hasShownTutorial = hasShownTutorial;
+            this.leaderboard = leaderboard != null ? leaderboard : new();
         }
-
 
         public int CurrentScore { get => currentScore; }
         public int CurrentSoulCount { get => currentSoulCount; }
         public float PlayTime { get => playTime; }
         public bool HasShownTutorial { get => hasShownTutorial; }
+        public List<LeaderboardItem> Leaderboard { get => leaderboard; }
+
+        public void AddLeaderboardItem(LeaderboardItem newItem)
+        {
+            var previousRecordItem = Leaderboard.Find(x => x.PlayerID == newItem.PlayerID);
+            if (previousRecordItem != null)
+                if (previousRecordItem.Score < newItem.Score)
+                    Leaderboard.Remove(previousRecordItem);
+                else 
+                    return;
+            
+            for (int i = 0; i < Leaderboard.Count; i++)
+                if (newItem.Score > Leaderboard[i].Score)
+                {
+                    Leaderboard.Insert(i, newItem);
+                    return;
+                }
+
+            Leaderboard.Add(newItem);
+        }
     }
 }

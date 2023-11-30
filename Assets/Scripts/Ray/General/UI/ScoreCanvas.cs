@@ -61,6 +61,9 @@ namespace Hanako
         [SerializeField]
         List<GameObject> hiScoreRank = new();
 
+        [SerializeField]
+        List<TextMeshProUGUI> leaderboardTexts = new();
+
 
         [Header("Buttons")]
         [SerializeField]
@@ -88,7 +91,7 @@ namespace Hanako
         [SerializeField]
         string sfxClickName = "sfxClick";
 
-        int int_mode, tri_confirm, boo_overScore, boo_hiScore;
+        int int_mode, tri_confirm, boo_overScore, boo_hiScore, boo_leaderboard;
         Animator animator, againButAnimator, hubButAnimator;
 
         void Awake()
@@ -97,7 +100,8 @@ namespace Hanako
             int_mode = Animator.StringToHash(nameof(int_mode));
             tri_confirm = Animator.StringToHash(nameof(tri_confirm));
             boo_overScore = Animator.StringToHash(nameof(boo_overScore));
-            boo_hiScore= Animator.StringToHash(nameof(boo_hiScore));
+            boo_hiScore = Animator.StringToHash(nameof(boo_hiScore));
+            boo_leaderboard = Animator.StringToHash(nameof(boo_leaderboard));
 
             againButAnimator = againBut.GetComponent<Animator>();
             againBut.AddEventTriggers(
@@ -214,6 +218,26 @@ namespace Hanako
                 for (int i = 0; i < scoreTowers.Count; i++)
                     if (i < levelInfo.ScoreThresholds.Count)
                         scoreTowers[i].Threshold.text = levelInfo.ScoreThresholds[i].ToString();
+
+                var allGamesInfo = FindObjectOfType<AllGamesInfoManager>();
+                if (allGamesInfo != null)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        if (levelInfo.Leaderboard.Count > i)
+                        {
+                            var score = levelInfo.Leaderboard[i].Score;
+                            var playerID = levelInfo.Leaderboard[i].PlayerID;
+                            var playerData = allGamesInfo.AllGamesInfo.GetPlayerData(playerID);
+                            var playerDisplayName = playerData != null ? playerData.DisplayName : "anon";
+                            leaderboardTexts[i].text = $"{score} - {playerDisplayName}";
+                        }
+                        else
+                        {
+                            leaderboardTexts[i].text = "n/a";
+                        }
+                    }
+                }
             }
 
             void CalculateScore(LevelInfo levelInfo, List<ScoreDetail> scoreDetails, out int score, out int soulCount, out int playTime)
@@ -267,6 +291,9 @@ namespace Hanako
 
                 if (isHiScore)
                     animator.SetBool(boo_hiScore, true);
+
+                yield return new WaitForSeconds(1f);
+                animator.SetBool(boo_leaderboard, true);
             }
 
             void SaveNewScore(LevelInfo levelInfo, float score, int soulCount, int playTime)
@@ -375,9 +402,5 @@ namespace Hanako
 
         }
 
-        void ShowHiScore()
-        {
-            animator.SetBool(boo_hiScore, true);
-        }
     }
 }

@@ -15,6 +15,9 @@ namespace Hanako
         [SerializeField]
         string gameDisplayName;
 
+        [SerializeField, Multiline]
+        string gameSummary;
+
         [SerializeField]
         string sceneName;
 
@@ -32,6 +35,7 @@ namespace Hanako
 
         public string GameID { get => gameID; }
         public string GameDisplayName { get => gameDisplayName; }
+        public string GameSummary { get => gameSummary; }
         public string SceneName { get => sceneName; set => sceneName = value; }
         public Sprite TitleLogo { get => titleLogo; }
         public Sprite TitleIcon { get => titleIcon; }

@@ -43,6 +43,9 @@ namespace Hanako
         [SerializeField]
         LevelInfo currentLevel;
 
+        [SerializeField]
+        List<PlayerID> playerIDs = new();
+
         [Header("Audio Settings")]
         [SerializeField]
         AudioMixer audioMixer;
@@ -161,5 +164,9 @@ namespace Hanako
             }
         }
 
+        public PlayerID GetPlayerData(string id)
+        {
+            return playerIDs.Find(x => x.ID == id);
+        }
     }
 }

@@ -24,6 +24,9 @@ namespace Hanako.Knife
         Color tileValidMoveColor = Color.green;
 
         [SerializeField]
+        Color tileHintMoveColor = Color.green;
+
+        [SerializeField]
         Color tileActionColor = Color.magenta;
 
         [SerializeField]
@@ -34,6 +37,7 @@ namespace Hanako.Knife
 
         public Color TileInvalidMoveColor { get => tileInvalidMoveColor; }
         public Color TileValidMoveColor { get => tileValidMoveColor; }
+        public Color TileHintMoveColor { get => tileHintMoveColor; }
         public Color TileActionColor { get => tileActionColor; }
         public Color TileClickColor { get => tileClickColor; }
         public Color TileNotMyTurnColor { get => tileNotMyTurnColor; }
