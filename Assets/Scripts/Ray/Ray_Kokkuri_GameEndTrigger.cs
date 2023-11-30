@@ -7,6 +7,10 @@ namespace Hanako
 {
     public class Ray_Kokkuri_GameEndTrigger : MonoBehaviour
     {
+
+        [SerializeField]
+        PlayerCursor cursor;
+        
         [SerializeField]
         LevelInfo levelInfo;
 
@@ -26,6 +30,8 @@ namespace Hanako
         {
             foreach (var col in cols)
                 col.OnEnter += OnEnter;
+
+            cursor.gameObject.SetActive(false);
         }
 
         private void Update()
@@ -47,6 +53,8 @@ namespace Hanako
                     new ScoreDetail(playTimeParamName, (int)playTime),
                     new ScoreDetail(scoreParamName, score)
                 });
+
+                cursor.gameObject.SetActive(true);
             }
         }
     }
