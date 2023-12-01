@@ -64,6 +64,13 @@ namespace Hanako.Knife
 
         [SerializeField]
         TextMeshProUGUI tutorialText;
+
+        [Header("Leaderboard")]
+        [SerializeField]
+        Image leaderboardBut;
+
+        [SerializeField]
+        TextMeshProUGUI leaderboardText;
         
         [Header("Intro")]
         [SerializeField]
@@ -97,7 +104,7 @@ namespace Hanako.Knife
 
         List<Animator> functionalButs = new();
         int int_mode, tri_click;
-        Animator pauseButAnimator, sfxButAnimator, bgmButAnimator, tutorialButAnimator, introButAnimator, retryButAnimator, exitButAnimator;
+        Animator pauseButAnimator, sfxButAnimator, bgmButAnimator, tutorialButAnimator, leaderboardButAnimator, introButAnimator, retryButAnimator, exitButAnimator;
         bool isInPause = false;
 
         void Awake()
@@ -115,10 +122,11 @@ namespace Hanako.Knife
             sfxButAnimator = sfxBut.GetComponentInFamily<Animator>();
             bgmButAnimator = bgmBut.GetComponentInFamily<Animator>();
             tutorialButAnimator = tutorialBut.GetComponentInFamily<Animator>();
+            leaderboardButAnimator = leaderboardBut.GetComponentInFamily<Animator>();
             introButAnimator = introBut.GetComponentInFamily<Animator>();
             retryButAnimator = retryBut.GetComponentInFamily<Animator>();
             exitButAnimator = exitBut.GetComponentInFamily<Animator>();
-            functionalButs = new() { sfxButAnimator, bgmButAnimator, tutorialButAnimator, introButAnimator, retryButAnimator, exitButAnimator };
+            functionalButs = new() { sfxButAnimator, bgmButAnimator, tutorialButAnimator, leaderboardButAnimator, introButAnimator, retryButAnimator, exitButAnimator };
 
             pauseBut.AddEventTrigger(Show, EventTriggerType.PointerEnter);
             hitAreaHide.AddEventTrigger(Hide, EventTriggerType.PointerEnter);
@@ -137,6 +145,11 @@ namespace Hanako.Knife
                 onEnter: () => { HoverBut(tutorialButAnimator); },
                 onExit: () => { IdleBut(tutorialButAnimator); },
                 onClick: () => { ClickBut(tutorialButAnimator); ShowTutorialCanvas(); } );
+
+            leaderboardBut.AddEventTriggers(
+                onEnter: () => { HoverBut(leaderboardButAnimator); },
+                onExit: () => { IdleBut(leaderboardButAnimator); },
+                onClick: () => { ClickBut(leaderboardButAnimator); ShowLeaderboardCanvas(); } );
 
             introBut.AddEventTriggers(
                 onEnter: () => { HoverBut(introButAnimator); },
@@ -163,9 +176,14 @@ namespace Hanako.Knife
             UpdateBGMVolumeText();
             UpdateSFXVolumeText();
             if (IsCurrentLevelHub())
+            {
                 retryBut.transform.parent.gameObject.SetActive(false);
+            }
             else
+            {
                 introBut.transform.parent.gameObject.SetActive(false);
+                leaderboardBut.transform.parent.gameObject.SetActive(false);
+            }
 
             StartCoroutine(Delay(delayAutoShowTutorial));
             IEnumerator Delay(float delay)
@@ -305,6 +323,15 @@ namespace Hanako.Knife
             currentLevel.SetRuntimeData(new(currentLevel.CurrentScore, currentLevel.CurrentSoulCount, currentLevel.PlayTime, true));
             var tutorialCanvas = Instantiate(tutorialCanvasPrefab);
             tutorialCanvas.Init(currentLevel.GameInfo.TutorialInfo, currentLevel.TutorialPreview);
+        }
+
+        public void ShowLeaderboardCanvas()
+        {
+            if (allGamesInfo == null) return;
+
+            var leaderboardCanvas = FindObjectOfType<LeaderboardCanvas>();
+            if (leaderboardCanvas != null)
+                leaderboardCanvas.Show();
         }
 
         bool IsCurrentLevelHub()

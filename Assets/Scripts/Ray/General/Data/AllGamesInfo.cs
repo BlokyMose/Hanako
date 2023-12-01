@@ -102,6 +102,7 @@ namespace Hanako
         }
 
         public LevelInfo CurrentLevel { get => currentLevel; }
+        public List<PlayerID> PlayerIDs { get => playerIDs;  }
 
         public void SetCurrentLevel(LevelInfo levelInfo) => this.currentLevel = levelInfo;
 
