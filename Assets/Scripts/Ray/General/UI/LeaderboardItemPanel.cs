@@ -29,14 +29,15 @@ namespace Hanako
         TextMeshProUGUI scoreTextPrefab;
 
         [SerializeField]
-        List<GameInfo> gameInfosOrder = new();
+        List<GameInfo> gameInfos = new();
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="gameScores">Make sure the scoreText is displayed in order with the header</param>
-        public void Init(int rank, string name, int totalScore, Dictionary<string, int> gameScores)
+        public void Init(int rank, string name, int totalScore, Dictionary<string, int> gameScores, List<GameInfo> gameInfos)
         {
+            this.gameInfos = gameInfos;
             scoreTextsParent.DestroyChildren();
 
             if (rank > rankIcons.Count)
@@ -51,10 +52,10 @@ namespace Hanako
 
             nameText.text = name;
             totalScoreText.text = totalScore.ToString();
-            for (int i = 0; i < gameInfosOrder.Count; i++)
+            for (int i = 0; i < gameInfos.Count; i++)
             {
                 var scoreText = Instantiate(scoreTextPrefab, scoreTextsParent);
-                if (gameScores.TryGetValue(gameInfosOrder[i].GameID, out var score))
+                if (gameScores.TryGetValue(gameInfos[i].GameID, out var score))
                     scoreText.text = score.ToString();
                 else
                     scoreText.text = "0";

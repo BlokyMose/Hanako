@@ -31,6 +31,7 @@ namespace Hanako
         Vector2 cursorMoveDeltaRaw;
         bool isClicking, isShifting;
         KaidanInput inputs;
+        bool canMove = true;
 
         private void Awake()
         {
@@ -94,6 +95,7 @@ namespace Hanako
 
         public void OnMove(InputAction.CallbackContext context)
         {
+            if (!canMove) return;
             OnMoveInput?.Invoke(context.ReadValue<Vector2>());
         }
 
@@ -110,5 +112,8 @@ namespace Hanako
                 OnShiftStateInput?.Invoke(isShifting);
             }
         }
+
+        public void EnableMove() => canMove = true;
+        public void DisableMove() => canMove = false;
     }
 }
