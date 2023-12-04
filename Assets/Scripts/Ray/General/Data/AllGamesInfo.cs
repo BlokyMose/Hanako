@@ -46,6 +46,12 @@ namespace Hanako
         [SerializeField]
         List<PlayerID> playerIDs = new();
 
+        [SerializeField]
+        PlayerID currentPlayerID;
+
+        [SerializeField]
+        GameMode currentGameMode;
+
         [Header("Audio Settings")]
         [SerializeField]
         AudioMixer audioMixer;
@@ -103,6 +109,8 @@ namespace Hanako
 
         public LevelInfo CurrentLevel { get => currentLevel; }
         public List<PlayerID> PlayerIDs { get => playerIDs;  }
+        public PlayerID CurrentPlayerID { get => currentPlayerID; }
+        public GameMode CurrentGameMode { get => currentGameMode; }
 
         public void SetCurrentLevel(LevelInfo levelInfo) => this.currentLevel = levelInfo;
 
@@ -170,5 +178,18 @@ namespace Hanako
             return playerIDs.Find(x => x.ID == id);
         }
 
+        public void Login(PlayerID playerID)
+        {
+            var samePlayer = playerIDs.Find(x => x.ID == playerID.ID);
+            if (samePlayer != null)
+            {
+                currentPlayerID = samePlayer;
+            }
+            else
+            {
+                playerIDs.Add(playerID);
+                currentPlayerID = playerID;
+            }
+        }
     }
 }

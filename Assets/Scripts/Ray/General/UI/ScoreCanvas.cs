@@ -119,6 +119,9 @@ namespace Hanako
                 onClick: OnClickHubBut
                 );
 
+            foreach (var text in hiScoreRank)
+                text.SetActive(false);
+
             #region [Methods: Again But]
 
 
@@ -197,28 +200,29 @@ namespace Hanako
 
         public void Init(LevelInfo levelInfo, List<ScoreDetail> scoreDetails)
         {
-            var isHiScore = false;
+            var hiScore = -1;
             this.levelInfo = levelInfo;
             scoreDetailsParent.DestroyChildren();
-            UpdateUIAccordingTo(levelInfo);
+            UpdateDescriptions(levelInfo);
             CalculateScore(levelInfo, scoreDetails, out var score, out var soulCount, out var playTime);
-            if (levelInfo.CurrentScore < (int)score)
-            {
-                isHiScore = true;
-                SaveNewScore(levelInfo, score, soulCount, playTime);
-            }
-            StartCoroutine(AnimatingUI(isHiScore));
+            hiScore = CheckHiScore(levelInfo, score);
+            SaveNewScore(levelInfo, score, soulCount, playTime);
+            UpdateLeaderboard(levelInfo);
+            StartCoroutine(AnimatingUI(hiScore));
 
             #region [Methods]
 
-            void UpdateUIAccordingTo(LevelInfo levelInfo)
+            void UpdateDescriptions(LevelInfo levelInfo)
             {
                 levelNameText.text = levelInfo.GameInfo.GameDisplayName + " - " + levelInfo.LevelName;
                 scoreText.text = levelInfo.CurrentScore.ToString();
                 for (int i = 0; i < scoreTowers.Count; i++)
                     if (i < levelInfo.ScoreThresholds.Count)
                         scoreTowers[i].Threshold.text = levelInfo.ScoreThresholds[i].ToString();
+            }
 
+            void UpdateLeaderboard(LevelInfo levelInfo)
+            {
                 var allGamesInfo = FindObjectOfType<AllGamesInfoManager>();
                 if (allGamesInfo != null)
                 {
@@ -258,7 +262,7 @@ namespace Hanako
 
             }
 
-            IEnumerator AnimatingUI(bool isHiScore)
+            IEnumerator AnimatingUI(int hiScore)
             {
                 yield return new WaitForSeconds(1f);
 
@@ -289,24 +293,75 @@ namespace Hanako
                 if (score >= levelInfo.ScoreThresholds.GetLast())
                     animator.SetBool(boo_overScore, true);
 
-                if (isHiScore)
+                if (hiScore > -1)
+                {
                     animator.SetBool(boo_hiScore, true);
+                    if (hiScore > 0)
+                        hiScoreRank.GetAt(hiScore-1, 0).SetActive(true);
+                }
 
                 yield return new WaitForSeconds(1f);
                 animator.SetBool(boo_leaderboard, true);
             }
 
-            void SaveNewScore(LevelInfo levelInfo, float score, int soulCount, int playTime)
+            int CheckHiScore(LevelInfo levelInfo, int score)
             {
-                var newScore = (int)score;
-                var newSoulCount = levelInfo.CurrentSoulCount < soulCount ? soulCount : levelInfo.CurrentSoulCount;
-                var newPlayTime = playTime;
-                levelInfo.SetRuntimeData(new(
-                    newScore,
-                    newSoulCount,
-                    newPlayTime,
-                    true
-                    ));
+                var hiScore = -1;
+                var allGamesInfoManager = FindObjectOfType<AllGamesInfoManager>();
+                if (allGamesInfoManager == null) return hiScore;
+                var allGamesInfo = allGamesInfoManager.AllGamesInfo;    
+
+                if (allGamesInfo.CurrentGameMode == GameMode.Solo && levelInfo.CurrentScore < score)
+                {
+                    hiScore = 0;
+                }
+                else if (allGamesInfo.CurrentGameMode == GameMode.Arcade)
+                {
+                    for (int i = 0; i < 3; i++)
+                        if (levelInfo.Leaderboard[i].Score < score)
+                            return i + 1;
+                }
+                return hiScore;
+            }
+
+            void SaveNewScore(LevelInfo levelInfo, int score, int soulCount, int playTime)
+            {
+                var allGamesInfoManager = FindObjectOfType<AllGamesInfoManager>();
+                if (allGamesInfoManager == null) return;
+                var allGamesInfo = allGamesInfoManager.AllGamesInfo;
+
+                if (allGamesInfo.CurrentGameMode == GameMode.Solo && levelInfo.CurrentScore < score)
+                {
+                    var newScore = score;
+                    var newSoulCount = levelInfo.CurrentSoulCount < soulCount ? soulCount : levelInfo.CurrentSoulCount;
+                    var newPlayTime = playTime;
+                    levelInfo.SetRuntimeData(new(
+                        newScore,
+                        newSoulCount,
+                        newPlayTime,
+                        true
+                        ));
+                }
+
+                else if (allGamesInfo.CurrentGameMode == GameMode.Arcade)
+                {
+                    var recurringPlayer = levelInfo.Leaderboard.Find(x => x.PlayerID == allGamesInfo.CurrentPlayerID.ID);
+                    if (recurringPlayer != null)
+                    {
+                        if (recurringPlayer.Score >= score)
+                            return;
+                        levelInfo.Leaderboard.Remove(recurringPlayer);
+                    }
+
+                    for (int i = 0; i < levelInfo.Leaderboard.Count; i++)
+                    {
+                        if (levelInfo.Leaderboard[i].Score < score)
+                        {
+                            levelInfo.Leaderboard.Insert(i, new(score, allGamesInfo.CurrentPlayerID.ID));
+                            break;
+                        }
+                    }
+                }
             }
 
             int GetValue(List<ScoreDetail> scoreDetails, string ruleName)
