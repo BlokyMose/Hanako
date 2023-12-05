@@ -7,17 +7,19 @@ using UnityEngine.EventSystems;
 
 namespace UnityUtility
 {
-    [RequireComponent(typeof(Animator))]
     public class AutoAnimatorParamSetter : AutoInvoke
     {
         [SerializeField]
-        List<GameplayUtilityClass.AnimatorParameterStatic> parameters = new List<GameplayUtilityClass.AnimatorParameterStatic>();
-
         Animator animator;
+
+        [SerializeField]
+        List<GameplayUtilityClass.AnimatorParameterStatic> parameters = new List<GameplayUtilityClass.AnimatorParameterStatic>();
 
         protected override void Awake()
         {
-            animator = GetComponent<Animator>();
+            if (animator == null)
+                animator = GetComponent<Animator>();
+
             foreach (var param in parameters)
                 param.Init();
 

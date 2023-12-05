@@ -317,7 +317,8 @@ namespace Hanako
                 }
                 else if (allGamesInfo.CurrentGameMode == GameMode.Arcade)
                 {
-                    for (int i = 0; i < 3; i++)
+                    var hiScoredPlayerCount = levelInfo.Leaderboard.Count > 3 ? 3 : levelInfo.Leaderboard.Count;
+                    for (int i = 0; i < hiScoredPlayerCount; i++)
                         if (levelInfo.Leaderboard[i].Score < score)
                             return i + 1;
                 }
