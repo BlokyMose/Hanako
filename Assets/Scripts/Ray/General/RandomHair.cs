@@ -39,7 +39,7 @@ namespace Hanako
             srHairFront.sprite = frontHairProperties.Sprite;
             if (frontHairProperties.UseHairBack)
                 srHairBack.sprite = backHairs.GetRandom();
-            else
+            else if (srHairBack != null)
                 srHairBack.sprite = null;
         }
     }

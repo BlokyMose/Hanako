@@ -6,7 +6,7 @@ namespace Hanako
 {
     public class StudentSpawner : MonoBehaviour
     {
-        [SerializeField] private GameObject deskPrefab;
+        [SerializeField] private new List<GameObject> prefabs;
 
        // [SerializeField] private float deskYPos1 = 0.6f;
         [SerializeField] private float deskYPos2 = -0.6f;
@@ -65,7 +65,7 @@ namespace Hanako
 
                     for (int i = 0; i < initialObstacleToSpawn; i++)
                     {
-                        newObstacle = Instantiate(deskPrefab);
+                        newObstacle = Instantiate(prefabs[Random.Range(0, prefabs.Count)]);
 
                         newObstacle.transform.SetParent(transform);
 
@@ -121,12 +121,7 @@ namespace Hanako
                     break;
 
                 
-
-                
             }
-
-
-
 
             newObstacle.transform.position = obstacleSpawnPos;
         }

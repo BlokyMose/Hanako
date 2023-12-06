@@ -2501,7 +2501,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54197bcd209eeb7409517294847a81e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deskPrefab: {fileID: 7417656446582972674, guid: 52402af9aed17784f97b4d35540a87e1, type: 3}
+  prefabs:
+  - {fileID: 7417656446582972674, guid: 52402af9aed17784f97b4d35540a87e1, type: 3}
+  - {fileID: 179124105132635710, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
   deskYPos2: -1.33
   minSpawnWaitTime: 2
   maxSpawnWaitTime: 3
@@ -5212,3 +5214,60 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 778643cdec5cd6f4c851312987599613, type: 3}
+--- !u!1001 &8034856926334272751
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 179124105132635710, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_Name
+      value: TekeEnemy_StudentBoy
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472704013275745815, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_RootOrder
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472704013275745815, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -5.3440003
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472704013275745815, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -5.6070004
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472704013275745815, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472704013275745815, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472704013275745815, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472704013275745815, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472704013275745815, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472704013275745815, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472704013275745815, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472704013275745815, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a3aaeb868d2e31248bde7276f9ec3dfe, type: 3}
