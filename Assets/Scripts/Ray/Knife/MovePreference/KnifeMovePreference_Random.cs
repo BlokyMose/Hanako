@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Encore.Utility;
+using static Hanako.Knife.KnifeLevelManager;
 
 namespace Hanako.Knife
 {
@@ -10,9 +11,14 @@ namespace Hanako.Knife
     public class KnifeMovePreference_Random : KnifeMovePreference
     {
 
-        public override void Evaluate(List<KnifePiece_Enemy.PrefferedTile> tiles, int influence, KnifeLevelManager.PieceCache thisPiece, List<KnifeLevelManager.PieceCache> allPieces, KnifeLevel levelProperties)
+        public override void Evaluate(
+            List<KnifePiece_Enemy.PrefferedTile> prefferedTiles,
+            List<TileCache> validTiles,
+            int influence,
+            PieceCache thisPiece,
+            KnifeLevelManager levelManager)
         {
-            foreach (var tile in tiles)
+            foreach (var tile in prefferedTiles)
                 tile.AddInfluence(influence);
         }
 

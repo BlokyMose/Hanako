@@ -268,7 +268,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   information: {fileID: 11400000, guid: 437d9b20ec63cd14d949f3c9196c6e44, type: 2}
   isInteractable: 0
-  interactionProperties: []
+  interactionProperties:
+  - componentType: {fileID: 0}
+    isInteractable: 0
+    interactions: []
   headPosForLogo: {fileID: 2376324212090549045}
   headPosOffset: {x: 0, y: 0, z: -4.5}
   ignoreWarnings: 0

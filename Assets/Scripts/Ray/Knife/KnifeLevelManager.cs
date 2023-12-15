@@ -8,10 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityUtility;
-using static Cinemachine.DocumentationSortingAttribute;
 using static Hanako.Knife.KnifeLevel;
-using static Hanako.Knife.KnifeLevelManager;
-using static UnityEngine.Rendering.DebugUI.Table;
 using Color = UnityEngine.Color;
 
 namespace Hanako.Knife
@@ -39,6 +36,46 @@ namespace Hanako.Knife
             public GameObject GO { get => go; }
             public SpriteRenderer SR { get => sr;  }
             public KnifeTile Tile { get => tile; }
+        }
+
+        public class TileGrid
+        {
+            public List<List<TileCache>> Tiles { get; private set; }
+
+
+            public TileGrid()
+            {
+                Tiles = new();
+            }
+
+            public TileGrid(List<List<TileCache>> tiles)
+            {
+                Tiles = tiles;
+            }
+
+            public TileCache GetTile(int col, int row)
+            {
+                if (col < 0 || row < 0 || Tiles.Count - 1 < row || Tiles[row].Count - 1 < col)
+                    return null;
+                return Tiles[row][col];
+            }
+
+            public TileCache GetTile(KnifeTile knifeTile)
+            {
+                foreach (var row in Tiles)
+                    foreach (var col in row)
+                        if (col.Tile == knifeTile) return col;
+                return null;
+            }
+
+            public TileCache GetLastTile() => Tiles[^1][^1];
+
+            public void LoopTiles(Func<TileCache, bool> onLoop)
+            {
+                foreach (var row in Tiles)
+                    foreach (var col in row)
+                        if (!onLoop(col)) return;
+            }
         }
 
         public class WallCache
@@ -120,7 +157,7 @@ namespace Hanako.Knife
             public void UpdateCache(ColRow colRow)
             {
                 this.colRow = colRow;
-                validTilesByMoveRule = LivingPiece.MoveRule.GetValidTiles(this, levelManager.Pieces, levelManager.LevelProperties, levelManager.Tiles);
+                validTilesByMoveRule = LivingPiece.MoveRule.GetValidTiles(this, levelManager.Pieces, levelManager.LevelProperties, levelManager.tileGrid);
             }
 
             public TileCheckResult CheckTile(KnifeTile tile)
@@ -131,8 +168,8 @@ namespace Hanako.Knife
                     {
                         if (tile.TryGetPiece(out var tilePiece))
                         {
-                            var isValid = tilePiece.CheckValidityAgainst(levelManager.GetPiece(tilePiece), levelManager.GetTile(tile), this, levelManager.GetTile(colRow));
-                            var isInteratable = tilePiece.CheckInteractabilityAgainst(levelManager.GetPiece(tilePiece), levelManager.GetTile(tile), this, levelManager.GetTile(colRow));
+                            var isValid = tilePiece.CheckValidityAgainst(this);
+                            var isInteratable = tilePiece.CheckInteractabilityAgainst(this);
                             return new TileCheckResult(isValid, isInteratable);
                         }
                         else
@@ -385,7 +422,8 @@ namespace Hanako.Knife
 
         List<WallCache> leftWalls = new();
         List<WallCache> rightWalls = new();
-        List<TileCache> tiles = new();
+        //List<TileCache> tiles = new();
+        TileGrid tileGrid;
         List<PieceCache> pieces = new();
         List<LivingPieceCache> livingPieces = new();
         List<LivingPieceCache> diedPieces = new();
@@ -402,7 +440,7 @@ namespace Hanako.Knife
         public KnifeLevel LevelProperties { get => levelProperties; }
         public void SetLevelProperties(KnifeLevel newLevel) => levelProperties = newLevel;
         public KnifeColors Colors { get => colors;  }
-        public List<TileCache> Tiles { get => tiles; }
+        public TileGrid Tiles { get => tileGrid; }
         public List<PieceCache> Pieces { get => pieces; }
         public List<LivingPieceCache> LivingPieces { get => livingPieces; }
         public float MoveDuration { get => moveDuration; }
@@ -504,9 +542,7 @@ namespace Hanako.Knife
 
             void OnNextRound()
             {
-                foreach (var tile in tiles)
-                    tile.Tile.Idle();
-
+                tileGrid.LoopTiles((tile) => { tile.Tile.Idle(); return true; });
                 UpdateTurnOrderTexts();
                 this.OnNextRound?.Invoke(turnManager.CurrentRoundIndex);
             }
@@ -593,10 +629,11 @@ namespace Hanako.Knife
         {
             foreach (var piece in pieces)
             {
-                foreach (var tile in tiles)
+                tileGrid.LoopTiles(OnLoop);
+                bool OnLoop(TileCache tile)
                 {
                     if (tile.Tile.TryGetPiece(out var foundPiece) &&
-                        foundPiece == piece.Piece)
+                       foundPiece == piece.Piece)
                     {
                         piece.SetColRow(tile.ColRow);
                         var livingPiece = GetLivingPiece(piece.ControllerID);
@@ -604,8 +641,9 @@ namespace Hanako.Knife
                         {
                             livingPiece.UpdateCache(tile.ColRow);
                         }
-                        break;
+                        return false;
                     }
+                    return true;
                 }
             }
 
@@ -678,10 +716,11 @@ namespace Hanako.Knife
         public void GenerateLevelMap()
         {
             levelPos.DestroyImmediateChildren();
-            tiles = new();
+            tileGrid = new();
 
             for (int row = 0; row < levelProperties.LevelSize.row; row++)
             {
+                tileGrid.Tiles.Add(new());
                 for (int col = 0; col < levelProperties.LevelSize.col; col++)
                 {
                     var tileGO = InstantiateTile(
@@ -702,7 +741,8 @@ namespace Hanako.Knife
 
                     var tileComponent = tileGO.GetComponent<KnifeTile>();
                     tileComponent.SortingGroup.sortingOrder = -row - col;
-                    tiles.Add(new TileCache(new(col, row), tileGO, tileComponent.SR, tileComponent));
+                    var tileCache = new TileCache(new(col, row), tileGO, tileComponent.SR, tileComponent);
+                    tileGrid.Tiles[row].Add(tileCache);
                 }
             }
 
@@ -753,14 +793,14 @@ namespace Hanako.Knife
 
         public void GenerateLevelWalls()
         {
-            if (tiles.Count == 0)
+            if (tileGrid.Tiles.Count == 0)
             {
                 Debug.LogWarning("Generate level map first before generate walls");
                 return;
             }
 
             float yOffset =  levelProperties.TileHeightHalf;
-            var mostTopTile = tiles.GetLast();
+            var mostTopTile = tileGrid.GetLastTile();
             var wallsParent = new GameObject("__WALLS__");
             var sortingGroup = wallsParent.AddComponent<SortingGroup>();
             sortingGroup.sortingOrder = mostTopTile.Tile.SortingGroup.sortingOrder - 1;
@@ -809,7 +849,7 @@ namespace Hanako.Knife
         
         public void GenerateLevelBottomWalls()
         {
-            if (tiles.Count == 0)
+            if (tileGrid.Tiles.Count == 0)
             {
                 Debug.LogWarning("Generate level map first before generate walls");
                 return;
@@ -818,8 +858,8 @@ namespace Hanako.Knife
             for (int i = 0; i < levelProperties.BottomWallStoriesCount; i++)
             {
                 var yOffset = levelProperties.WallSize.y + levelProperties.TileSize.y + (levelProperties.WallSize.y * i);
-                var mostBottomTile = tiles[0];
-                var mostTopTile = tiles.GetLast();
+                var mostBottomTile = tileGrid.Tiles[0][0];
+                var mostTopTile = tileGrid.GetLastTile();
                 var wallsParent = new GameObject("__BOTTOM_WALLS__"+i);
                 var sortingGroup = wallsParent.AddComponent<SortingGroup>();
                 sortingGroup.sortingOrder = mostTopTile.Tile.SortingGroup.sortingOrder - (2+i); // BottomWalls should be behind Walls
@@ -886,26 +926,30 @@ namespace Hanako.Knife
         public void GenerateColRowTexts()
         {
             const string DEBUG_TEXT = "__DEBUG_TEXT__";
-            if (tiles.Count == 0) GenerateLevelMap();
+            if (tileGrid.Tiles.Count == 0) GenerateLevelMap();
 
-            foreach (var cell in tiles)
+            tileGrid.LoopTiles(OnLoop);
+
+            bool OnLoop(TileCache tile)
             {
-                var previousText = cell.GO.transform.Find(DEBUG_TEXT);
+                var previousText = tile.GO.transform.Find(DEBUG_TEXT);
                 if (previousText != null)
                     DestroyImmediate(previousText.gameObject);
 
-                var canvas = Instantiate(TileColRowCanvas, cell.GO.transform);
+                var canvas = Instantiate(TileColRowCanvas, tile.GO.transform);
                 canvas.name = DEBUG_TEXT;
                 var textComponent = canvas.GetComponentInFamily<TextMeshProUGUI>();
-                textComponent.text = $"{cell.ColRow.col}, r{cell.ColRow.row}";
-                if (cell.ColRow.row % 2 == 0)
+                textComponent.text = $"{tile.ColRow.col}, r{tile.ColRow.row}";
+                if (tile.ColRow.row % 2 == 0)
                     textComponent.color = Color.yellow;
+
+                return true;
             }
         }
 
         public void GeneratePieces()
         {
-            if (tiles.Count == 0)
+            if (tileGrid.Tiles.Count == 0)
             {
                 Debug.LogWarning("Please generate map before generate pieces");
                 return;
@@ -915,7 +959,7 @@ namespace Hanako.Knife
             var playerTile = GetTile(levelProperties.PiecesPattern.PlayerColRow);
             if (playerTile == null)
             {
-                playerTile = tiles[0];
+                playerTile = tileGrid.Tiles[0][0];
                 Debug.LogWarning("Cannot generate piece on: "+ levelProperties.PiecesPattern.PlayerColRow.row+", Col: "+ levelProperties.PiecesPattern.PlayerColRow.col);
             }
             playerTile.Tile.SetAsParentOf(player);
@@ -1001,26 +1045,28 @@ namespace Hanako.Knife
 
         public TileCache GetTile(ColRow colRow)
         {
-            foreach (var tile in tiles)
-            {
-                if (tile.ColRow.IsEqual(colRow))
-                {
-                    return tile;
-                }
-            }
-            return null;
+            return tileGrid.GetTile(colRow.col, colRow.row);
         }        
         
         public TileCache GetTile(KnifeTile knifeTile)
         {
-            foreach (var tile in tiles)
+            return tileGrid.GetTile(knifeTile);
+        }
+
+        public TileCache GetTile(PieceCache pieceCache)
+        {
+            TileCache foundTile = null;
+            tileGrid.LoopTiles(OnLoop);
+            bool OnLoop(TileCache tile)
             {
-                if (tile.Tile == knifeTile)
+                if (tile.Tile.TryGetPiece(out var tilePiece) && tilePiece == pieceCache.Piece)
                 {
-                    return tile;
+                    foundTile = tile;
+                    return false;
                 }
+                return true;
             }
-            return null;
+            return foundTile;
         }
 
         public PieceCache GetPiece(int controllerID)

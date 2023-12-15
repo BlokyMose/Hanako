@@ -28991,6 +28991,10 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 857910864}
+    - target: {fileID: 2664303243332086620, guid: 57b35991edbf827478eff8a541ac9130, type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2664303243332086621, guid: 57b35991edbf827478eff8a541ac9130, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -31488,10 +31492,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3684521733988133000, guid: cc70221428b1b494e8d408be8c5016fe, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: f318d80d4165f634fb2864036082af55, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cc70221428b1b494e8d408be8c5016fe, type: 3}
 --- !u!1 &7068212454266323913
@@ -31630,10 +31630,6 @@ PrefabInstance:
       propertyPath: vfxDie.vfx
       value: 
       objectReference: {fileID: 1063769458}
-    - target: {fileID: 7490274530775935953, guid: bcd43602d8084e04689f55d107e6f219, type: 3}
-      propertyPath: m_Name
-      value: StudentBoy_Random
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bcd43602d8084e04689f55d107e6f219, type: 3}
 --- !u!1001 &7184614158074169158

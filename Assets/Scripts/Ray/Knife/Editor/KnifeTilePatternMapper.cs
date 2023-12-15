@@ -139,8 +139,7 @@ namespace Hanako.Knife
             if (isGenerateTiles)
             {
                 levelManager.GenerateLevelMap();
-                foreach (var tile in levelManager.Tiles)
-                    tile.Tile.CallAwake();
+                levelManager.Tiles.LoopTiles((tile) => { tile.Tile.CallAwake(); return true; });
             }
 
             if (isGeneratePieces)
@@ -162,7 +161,7 @@ namespace Hanako.Knife
                 var playerTile = levelManager.GetTile(levelManager.LevelProperties.PiecesPattern.PlayerColRow);
                 if (playerTile == null)
                 {
-                    playerTile = levelManager.Tiles[0];
+                    playerTile = levelManager.Tiles.Tiles[0][0];
                     Debug.LogWarning("Cannot generate piece on: " + levelManager.LevelProperties.PiecesPattern.PlayerColRow.row + ", Col: " + levelManager.LevelProperties.PiecesPattern.PlayerColRow.col);
                 }
                 player.transform.parent = piecesGO.transform;
@@ -292,16 +291,18 @@ namespace Hanako.Knife
         {
             pieceMap = new();
             var allPieces = new List<KnifePiece>(FindObjectsOfType<KnifePiece>());
-            var allTiles = levelManager.Tiles;
+            var tileGrid = levelManager.Tiles;
             foreach (var piece in allPieces)
             {
-                foreach (var tile in allTiles)
+                tileGrid.LoopTiles(OnLoop);
+                bool OnLoop(TileCache tile)
                 {
                     if (Vector2.Distance(piece.transform.position, tile.Tile.transform.position) < accuracy)
                     {
                         pieceMap.Add(new(piece.gameObject.GetInstanceID(), piece, tile, tile.ColRow));
-                        break;
+                        return false;
                     }
+                    return true;
                 }
             }
             HighlightDifferentMapTiles();

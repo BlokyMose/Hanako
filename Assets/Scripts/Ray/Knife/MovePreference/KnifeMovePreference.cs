@@ -12,6 +12,11 @@ namespace Hanako.Knife
         [SerializeField]
         string preferenceName;
 
-        public abstract void Evaluate(List<PrefferedTile> tiles, int influence, PieceCache thisPiece, List<PieceCache> allPieces, KnifeLevel levelProperties);
+        public abstract void Evaluate(
+            List<PrefferedTile> prefferedTiles, 
+            List<TileCache> valideTiles,
+            int influence, 
+            PieceCache thisPiece, 
+            KnifeLevelManager levelManager);
     }
 }

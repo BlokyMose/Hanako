@@ -40,7 +40,7 @@ namespace Hanako.Knife
 
             public void AddInfluence(int influence)
             {
-                this.influence = influence;
+                this.influence += influence;
             }
         }
 
@@ -64,14 +64,25 @@ namespace Hanako.Knife
             var validMoves = moveRule.GetValidMoves(pieceCache, levelManager.Pieces, levelManager.LevelProperties);
             if (validMoves.Count > 0)
             {
+                var validTiles = new List<TileCache>();
                 var prefferedTiles = new List<PrefferedTile>();
+                
                 foreach (var validMove in validMoves)
-                    prefferedTiles.Add(new PrefferedTile(levelManager.GetTile(validMove), 0));
+                {
+                    var validTile = levelManager.GetTile(validMove);
+                    validTiles.Add(validTile);
+                    prefferedTiles.Add(new PrefferedTile(validTile, 0));
+                }
 
                 foreach (var preference in movePreferences)
-                    preference.MovePreference.Evaluate(prefferedTiles, preference.Influence, pieceCache, levelManager.Pieces, levelManager.LevelProperties);
+                    preference.MovePreference.Evaluate(
+                        prefferedTiles, 
+                        validTiles, 
+                        preference.Influence, 
+                        pieceCache, 
+                        levelManager);
                 
-                PrefferedTile highestInfluenceTile = prefferedTiles[0];
+                var highestInfluenceTile = prefferedTiles[0];
                 for (int i = 1; i < prefferedTiles.Count; i++)
                     if (prefferedTiles[i].Influence > highestInfluenceTile.Influence)
                         highestInfluenceTile = prefferedTiles[i];

@@ -15,6 +15,9 @@ namespace Hanako.Knife
         [SerializeField]
         float distanceToStartMoveAnimation = 1f;
 
+        [SerializeField]
+        int maximumMove = 1;
+
         public override void Interact(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile, KnifeLevelManager levelManager)
         {
             if (otherPiece is LivingPieceCache)
@@ -34,6 +37,8 @@ namespace Hanako.Knife
                     }
 
                     var moveColRow = ColRow.SubstractBetween(myTile.ColRow, otherPiece.ColRow);
+                    moveColRow.row = moveColRow.row > maximumMove ? maximumMove : moveColRow.row;
+                    moveColRow.col = moveColRow.col > maximumMove ? maximumMove : moveColRow.col;
                     var targetColRow = ColRow.AddBetween(myTile.ColRow, moveColRow);
                     var targetTile = levelManager.GetTile(targetColRow);
                     MoveToTile(myPiece, targetTile.Tile, otherLivingPiece.LivingPiece.MoveDuration);
@@ -113,6 +118,9 @@ namespace Hanako.Knife
         public override bool CheckInteractabilityAgainst(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile, KnifeLevelManager levelManager)
         {
             var moveColRow = ColRow.SubstractBetween(myPiece.ColRow, otherPiece.ColRow);
+            moveColRow.row = moveColRow.row > maximumMove ? maximumMove : moveColRow.row;
+            moveColRow.col = moveColRow.col > maximumMove ? maximumMove : moveColRow.col;
+
             var targetColRow = ColRow.AddBetween(myPiece.ColRow, moveColRow);
 
             if (levelManager.TryGetTile(targetColRow, out var foundTile))

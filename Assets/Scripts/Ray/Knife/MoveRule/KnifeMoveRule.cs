@@ -12,28 +12,32 @@ namespace Hanako.Knife
         [SerializeField]
         string ruleName;
 
+        public abstract List<ColRow> ValidMoves { get; protected set; }
+
         public abstract List<ColRow> GetValidMoves(PieceCache thisPiece, List<PieceCache> allPieces, KnifeLevel levelProperties);
 
-        public virtual List<TileCache> GetValidTiles(PieceCache thisPiece, List<PieceCache> allPieces, KnifeLevel levelProperties, List<TileCache> allTiles)
+        public virtual List<TileCache> GetValidTiles(PieceCache thisPiece, List<PieceCache> allPieces, KnifeLevel levelProperties, TileGrid tileGrid)
         {
             var validMoves = GetValidMoves(thisPiece, allPieces, levelProperties);
             var validTiles = new List<TileCache>();
             foreach (var validMove in validMoves)
             {
-                foreach (var tile in allTiles)
+                tileGrid.LoopTiles(OnLoop);
+                bool OnLoop(TileCache tile)
                 {
                     if (validMove.IsEqual(tile.ColRow))
                     {
                         validTiles.Add(tile);
-                        break;
+                        return false;
                     }
+                    return true;
                 }
             }
 
             return validTiles;
         }
 
-        public virtual bool IsValidTile(PieceCache thisPiece, List<PieceCache> allPieces, KnifeLevel levelProperties, List<TileCache> allTiles, KnifeTile targetTile)
+        public virtual bool IsValidTile(PieceCache thisPiece, List<PieceCache> allPieces, KnifeLevel levelProperties, TileGrid allTiles, KnifeTile targetTile)
         {
             var validTiles = GetValidTiles(thisPiece, allPieces, levelProperties, allTiles);
             foreach (var validTile in validTiles)

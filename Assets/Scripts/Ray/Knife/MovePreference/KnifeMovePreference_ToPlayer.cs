@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Encore.Utility;
 using static Hanako.Knife.KnifeLevel;
+using static Hanako.Knife.KnifeLevelManager;
 
 namespace Hanako.Knife
 {
@@ -13,15 +14,20 @@ namespace Hanako.Knife
         [SerializeField]
         int maximumDistanceToPlayer = 1;
 
-        public override void Evaluate(List<KnifePiece_Enemy.PrefferedTile> tiles, int influence, KnifeLevelManager.PieceCache thisPiece, List<KnifeLevelManager.PieceCache> allPieces, KnifeLevel levelProperties)
+        public override void Evaluate(
+            List<KnifePiece_Enemy.PrefferedTile> prefferedTiles,
+            List<TileCache> validTiles,
+            int influence,
+            PieceCache thisPiece,
+            KnifeLevelManager levelManager)
         {
             var playerColRow = new ColRow(0, 0);
-            foreach (var piece in allPieces)
+            foreach (var piece in levelManager.Pieces)
             {
                 if (piece.Piece is KnifePiece_Player)
                 {
                     playerColRow = piece.ColRow;
-                    foreach (var tile in tiles)
+                    foreach (var tile in prefferedTiles)
                     {
                         if (ColRow.DistanceBetween(tile.Tile.ColRow, playerColRow) <= maximumDistanceToPlayer)
                             tile.AddInfluence(influence);

@@ -59,14 +59,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   information: {fileID: 11400000, guid: 9f3849a3860e61e40b437250b58ed85e, type: 2}
-  isInteractableDefault: 1
+  isInteractable: 1
   interactionProperties:
-  - componentType: {fileID: 0}
+  - componentType: {fileID: 7314053359128261936, guid: c5ab08977bead534a8d4c63e56401294, type: 3}
     isInteractable: 1
     interactions:
     - {fileID: 11400000, guid: a9cc62709d3f08c488065fc700698745, type: 2}
   headPosForLogo: {fileID: 5876825365931092600}
   headPosOffset: {x: 0, y: 0, z: -3}
+  ignoreWarnings: 0
 --- !u!1 &4553467079336358980
 GameObject:
   m_ObjectHideFlags: 0

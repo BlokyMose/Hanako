@@ -15,6 +15,9 @@ namespace Hanako.Knife
         [SerializeField]
         List<KnifeMoveValidator> validators = new();
 
+        public List<KnifeMoveValidator> Validators { get => validators; }
+        public override List<ColRow> ValidMoves { get => validMoves; protected set => validMoves = value; }
+
         public override List<ColRow> GetValidMoves(PieceCache thisPiece, List<PieceCache> allPieces, KnifeLevel levelProperties)
         {
             var validMoves = new List<ColRow>();

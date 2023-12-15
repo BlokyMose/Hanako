@@ -80,15 +80,19 @@ namespace Hanako.Knife
             this.levelManager = levelManager;
         }
 
-        public virtual bool CheckValidityAgainst(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile)
+        public virtual bool CheckValidityAgainst(PieceCache otherPiece)
         {
-            return CheckInteractabilityAgainst(myPiece, myTile, otherPiece, otherTile);
+            return CheckInteractabilityAgainst(otherPiece);
         }
 
-        public virtual bool CheckInteractabilityAgainst(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile)
+        public virtual bool CheckInteractabilityAgainst(PieceCache otherPiece)
         {
             if (isInteractable)
             {
+                var myPiece = levelManager.GetPiece(this);
+                var myTile = levelManager.GetTile(myPiece);
+                var otherTile = levelManager.GetTile(otherPiece);
+
                 foreach (var ip in interactionProperties)
                 {
                     if (ip.ComponentType == null ||
