@@ -12985,6 +12985,7 @@ MonoBehaviour:
   onInvoke:
     m_PersistentCalls:
       m_Calls: []
+  animator: {fileID: 0}
   parameters:
   - paramName: int_motion
     dataType: 1
@@ -13716,7 +13717,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 069f1f4e016760344a4b77e778950888, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelInfoInit: 0
+  levelInfoInit: 2
   levelInfo: {fileID: 11400000, guid: 80495a53f175b704f86136e5a54bdd19, type: 2}
   levelProperties: {fileID: 11400000, guid: 9415832ee09bdb84a9ca70d0bf61514a, type: 2}
   isAutoStart: 0
