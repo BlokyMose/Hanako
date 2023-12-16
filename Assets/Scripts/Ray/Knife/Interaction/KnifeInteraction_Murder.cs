@@ -22,6 +22,7 @@ namespace Hanako.Knife
                 {
                     yield return new WaitForSeconds(otherLivingPiece.LivingPiece.MoveDuration * 0.25f);
                     otherLivingPiece.LivingPiece.Attack();
+                    myLivingPiece.Die();
                     myLivingPiece.LivingPiece.Die(otherLivingPiece);
                 }
             }

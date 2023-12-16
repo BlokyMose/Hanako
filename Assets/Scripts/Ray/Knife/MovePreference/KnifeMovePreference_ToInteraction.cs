@@ -63,12 +63,12 @@ namespace Hanako.Knife
                     var x = tile.ColRow.col;
                     var y = tile.ColRow.row;
                     var isObstacle = false;
-                    if (tile.Tile.TryGetPiece(out var piece))
+                    if (tile.Tile.TryGetPiece(out var tilePiece))
                     {
-                        if (!piece.IsInteractable)
+                        if (!tilePiece.IsInteractable)
                             isObstacle = true;
-                        else if (!piece.CheckInteractabilityAgainst(thisPiece))
-                            isObstacle = false;
+                        else if (!tilePiece.CheckInteractabilityAgainst(thisPiece))
+                            isObstacle = true;
                     } 
 
                     rowList.Add(new(x, y, isObstacle));
@@ -82,12 +82,13 @@ namespace Hanako.Knife
                 aStarValidMoves.Add(new(move.col, move.row));
 
             var shortestPathAStar = AStar.Grid.GetShortestPath(aStarNodes, aStarStartPos, aStarEndPos, aStarValidMoves);
-
             foreach (var node in shortestPathAStar)
             {
                 var foundTile = tileGrid.GetTile(node.Pos.x, node.Pos.y);
                 if (foundTile != null)
+                {
                     shortestPath.Add(foundTile);
+                }
             }
 
             return shortestPath;

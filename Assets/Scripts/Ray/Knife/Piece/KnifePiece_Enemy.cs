@@ -87,13 +87,9 @@ namespace Hanako.Knife
                     if (prefferedTiles[i].Influence > highestInfluenceTile.Influence)
                         highestInfluenceTile = prefferedTiles[i];
                 levelManager.TryMovePieceToTile(this, highestInfluenceTile.Tile.Tile);
-
-                //var preferredTile = movePreferences[0].MovePreference.GetPrefferedTile(validMoves, pieceCache, levelManager.Pieces, levelManager.LevelProperties, levelManager.Tiles);
-                //levelManager.TryMovePieceToTile(this, preferredTile);
             }
             else
             {
-                // Piece failed to move
                 Debug.LogWarning("Failed to move to preffered tile");
                 SetActState(PieceActingState.PostActing);
             }

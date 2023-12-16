@@ -148,6 +148,9 @@ namespace Hanako.Knife
             KnifeTurnOrderText orderText;
             public KnifeTurnOrderText TurnOrderText => orderText;
 
+            bool isAlive = true;
+            public bool IsAlive => isAlive;
+
             public LivingPieceCache(int controllerID, GameObject go, ColRow colRow, KnifePiece piece, KnifeLevelManager levelManager, KnifeTurnOrderText orderText) : base(controllerID, go, colRow, piece, levelManager)
             {
                 this.orderText = orderText;
@@ -182,6 +185,8 @@ namespace Hanako.Knife
             }
 
             public bool HasValidTile() => validTilesByMoveRule.Count > 0;
+            public void Die() => isAlive = false;
+            public void Ressurect() => isAlive = true;
         }
 
         public class TurnManager
@@ -268,6 +273,7 @@ namespace Hanako.Knife
                     {
                         OnPlayerTurn?.Invoke();
                     }
+
                     currentPiece.LivingPiece.PlaseAct(GoToNextMovingPiece);
 
                 }
@@ -282,17 +288,22 @@ namespace Hanako.Knife
                 return currentRound.turns.Count == 1;
             }
 
-            public void RemovePiece(LivingPieceCache piece)
+            public void RemoveFutureTurnsInEveryRoundOfPiece(LivingPieceCache piece)
             {
-                foreach (var round in rounds)
+                var maxRoundIndex = piece.IsAlive ? currentRoundIndex : currentRoundIndex - 1;
+                for (int roundIndex = rounds.Count - 1; roundIndex >= 0; roundIndex--)
                 {
-                    for (int i = round.turns.Count - 1; i >= 0; i--)
-                        if (round.turns[i] == piece)
-                            round.turns.RemoveAt(i);
+                    var round = rounds[roundIndex];
+                    if (roundIndex == maxRoundIndex)
+                        break;
+
+                    for (int turnIndex = round.turns.Count - 1; turnIndex >= 0; turnIndex--)
+                        if (round.turns[turnIndex] == piece)
+                            round.turns.RemoveAt(turnIndex);
                 }
             }
 
-            public void RemoveTurnOf(LivingPieceCache targetPiece, int count = 1)
+            public void RemoveTurnOfPiece(LivingPieceCache targetPiece, int count = 1)
             {
                 if (count <= 0) return;
 
@@ -422,7 +433,6 @@ namespace Hanako.Knife
 
         List<WallCache> leftWalls = new();
         List<WallCache> rightWalls = new();
-        //List<TileCache> tiles = new();
         TileGrid tileGrid;
         List<PieceCache> pieces = new();
         List<LivingPieceCache> livingPieces = new();
@@ -591,7 +601,7 @@ namespace Hanako.Knife
                     }
                     else
                     {
-                        piece.LivingPiece.Die(piece);
+                        //piece.LivingPiece.Die(piece);
                     }
                 }
             }
@@ -652,7 +662,7 @@ namespace Hanako.Knife
 
         public void RemoveTurnOf(LivingPieceCache targetPiece, int count = 1)
         {
-            turnManager.RemoveTurnOf(targetPiece, count);
+            turnManager.RemoveTurnOfPiece(targetPiece, count);
         }
 
         void UpdateTurnOrderTexts()
@@ -986,6 +996,7 @@ namespace Hanako.Knife
                     pieceGO.transform.localScale = Vector2.one;
                     pieceGO.transform.localPosition = new(0, 0);
                     var pieceComponent = pieceGO.GetComponent<KnifePiece>();
+                    pieceGO.name = $"{pieceControllerID}_{pieceComponent.Information.PieceName}";
                     pieces.Add(new(pieceControllerID, pieceGO, piece.ColRow, pieceComponent, this));
                     pieceComponent.Init(this);
 
@@ -1134,19 +1145,19 @@ namespace Hanako.Knife
         }
 
 
-        bool RemoveLivingPiece(KnifePiece_Living targetPiece, out LivingPieceCache foundCache)
+        bool RemoveLivingPiece(KnifePiece_Living targetPiece, out LivingPieceCache foundPiece)
         {
             for (int livingPieceIndex = livingPieces.Count - 1; livingPieceIndex >= 0; livingPieceIndex--)
             {
                 if (livingPieces[livingPieceIndex].Piece == targetPiece)
                 {
-                    foundCache = livingPieces[livingPieceIndex];
-                    turnManager.RemovePiece(foundCache);
+                    foundPiece = livingPieces[livingPieceIndex];
+                    turnManager.RemoveFutureTurnsInEveryRoundOfPiece(foundPiece);
                     livingPieces.RemoveAt(livingPieceIndex);
                     return true;
                 }
             }
-            foundCache = null;
+            foundPiece = null;
             return false;
         }
 
@@ -1159,6 +1170,7 @@ namespace Hanako.Knife
                 if (piece.LivingPiece == targetPiece)
                 {
                     foundPiece = piece;
+                    foundPiece.Ressurect();
                     diedPieces.Remove(piece);
                     break;
                 }
@@ -1172,10 +1184,11 @@ namespace Hanako.Knife
 
         public void MoveLivingPieceToDeadList(KnifePiece_Living targetPiece)
         {
-            var foundLivingCache = GetLivingPiece(targetPiece);
             RemovePiece(targetPiece);
+            var foundLivingCache = GetLivingPiece(targetPiece);
             if (foundLivingCache != null)
             {
+                Debug.Log("Dead list: "+targetPiece.gameObject.name);
                 foundLivingCache.TurnOrderText.Hide();
                 diedPieces.Add(foundLivingCache);
                 targetPiece.transform.parent = null;
@@ -1186,10 +1199,11 @@ namespace Hanako.Knife
 
         public void MoveLivingPieceToEscapeList(KnifePiece_Living targetPiece)
         {
-            var foundLivingCache = GetLivingPiece(targetPiece);
             RemovePiece(targetPiece);
+            var foundLivingCache = GetLivingPiece(targetPiece);
             if (foundLivingCache != null)
             {
+                Debug.Log("ESC list: "+targetPiece.gameObject.name);
                 foundLivingCache.TurnOrderText.Hide();
                 escapedPieces.Add(foundLivingCache);
                 targetPiece.transform.parent = null;

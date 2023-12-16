@@ -215,6 +215,7 @@ namespace Hanako.Knife
         public virtual void Die(LivingPieceCache otherPiece)
         {
             isAlive = false;
+            RemoveFromTile();
             levelManager.MoveLivingPieceToDeadList(this);
             
             if (otherPiece.Piece.transform.position.x > transform.position.x)

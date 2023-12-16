@@ -139,5 +139,10 @@ namespace Hanako.Knife
                 }
             }
         }
+
+        public void RemoveFromTile()
+        {
+            transform.parent = null;
+        }
     }
 }
