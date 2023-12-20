@@ -11,7 +11,7 @@ namespace Hanako.Knife
         [System.Serializable]
         public class Information
         {
-            public enum InformationShowMode { Hide, Panel }
+            public enum InformationShowMode { Hide, AlwaysShow, ShowIfValid }
 
             [SerializeField]
             string name;
@@ -22,6 +22,10 @@ namespace Hanako.Knife
             [SerializeField]
             InformationShowMode showMode = InformationShowMode.Hide;
 
+
+            public Information()
+            {
+            }
 
             public Information(string name, string desc, Sprite logo, InformationShowMode showMode)
             {

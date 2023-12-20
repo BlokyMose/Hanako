@@ -349,8 +349,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 6.330002, y: 15.330002}
-  m_SizeDelta: {x: -55.15, y: -73.16}
+  m_AnchoredPosition: {x: 5.949997, y: 13.449997}
+  m_SizeDelta: {x: -65.47, y: -79.49}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2141367032267882831
 CanvasRenderer:
@@ -373,14 +373,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 2100000, guid: 5c04056c9f2216247875d4401791d560, type: 2}
-  m_Color: {r: 0.40850836, g: 0.6415094, b: 0.41048983, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: cf08a174e1a836c4e864937d03692c91, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 66af7ff296a0c6d47a09911102f96965, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -751,8 +751,6 @@ MonoBehaviour:
   coloredImages:
   - {fileID: 8570808071683694694}
   - {fileID: 803362986161876774}
-  animator: {fileID: 5043550317680176066}
-  transitionVariantCount: 3
 --- !u!1 &6831904620820567034
 GameObject:
   m_ObjectHideFlags: 0
@@ -788,8 +786,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 6.4300003, y: 15.479996}
-  m_SizeDelta: {x: -66.43, y: -83.55}
+  m_AnchoredPosition: {x: 5.949997, y: 13.82}
+  m_SizeDelta: {x: -65.47, y: -80.24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6831904620820566983
 CanvasRenderer:
@@ -1018,7 +1016,6 @@ GameObject:
   - component: {fileID: 6831904621805286809}
   - component: {fileID: 6831904621805286810}
   - component: {fileID: 6831904621805286808}
-  - component: {fileID: 5043550317680176066}
   m_Layer: 5
   m_Name: Logo
   m_TagString: Untagged
@@ -1101,23 +1098,3 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
---- !u!95 &5043550317680176066
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6831904621805286812}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: fd9e74308ca97fe449cb1b1f15159c02, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0

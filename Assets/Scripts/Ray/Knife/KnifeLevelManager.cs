@@ -383,9 +383,6 @@ namespace Hanako.Knife
         [SerializeField]
         GameInfoCanvas gameInfoCanvas;
 
-        [SerializeField]
-        GameObject turnOrderUI;
-
         [Header("Game")]
         [SerializeField]
         float moveDuration = 1f;
@@ -520,7 +517,7 @@ namespace Hanako.Knife
             GenerateLevelMap();
             GeneratePieces();
             playerCursor.Init(this, playerControllerID, GenerateTileUnhoverCols());
-
+            HideTurnOrderTexts();
             StartGame();
         }
 
@@ -686,14 +683,12 @@ namespace Hanako.Knife
 
         public void ShowTurnOrderTexts()
         {
-            turnOrderUI.SetActive(true);
             foreach (var piece in livingPieces)
                 piece.TurnOrderText.Show();
         }
 
         public void HideTurnOrderTexts()
         {
-            turnOrderUI.SetActive(false);
             foreach (var piece in livingPieces)
                 piece.TurnOrderText.Hide();
         }
@@ -1144,7 +1139,6 @@ namespace Hanako.Knife
             }
         }
 
-
         bool RemoveLivingPiece(KnifePiece_Living targetPiece, out LivingPieceCache foundPiece)
         {
             for (int livingPieceIndex = livingPieces.Count - 1; livingPieceIndex >= 0; livingPieceIndex--)
@@ -1184,30 +1178,28 @@ namespace Hanako.Knife
 
         public void MoveLivingPieceToDeadList(KnifePiece_Living targetPiece)
         {
-            RemovePiece(targetPiece);
             var foundLivingCache = GetLivingPiece(targetPiece);
             if (foundLivingCache != null)
             {
-                Debug.Log("Dead list: "+targetPiece.gameObject.name);
                 foundLivingCache.TurnOrderText.Hide();
                 diedPieces.Add(foundLivingCache);
                 targetPiece.transform.parent = null;
                 AddKillCount();
                 OnLivingPieceDied?.Invoke(targetPiece);
             }
+            RemovePiece(targetPiece);
         }
 
         public void MoveLivingPieceToEscapeList(KnifePiece_Living targetPiece)
         {
-            RemovePiece(targetPiece);
             var foundLivingCache = GetLivingPiece(targetPiece);
             if (foundLivingCache != null)
             {
-                Debug.Log("ESC list: "+targetPiece.gameObject.name);
                 foundLivingCache.TurnOrderText.Hide();
                 escapedPieces.Add(foundLivingCache);
                 targetPiece.transform.parent = null;
             }
+            RemovePiece(targetPiece);
         }
 
 

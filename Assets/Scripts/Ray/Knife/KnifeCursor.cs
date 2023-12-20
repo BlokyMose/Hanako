@@ -138,6 +138,8 @@ namespace Hanako.Knife
 
             hoveredTile = tile;
             var tilePiece = hoveredTile.GetPiece();
+            var characterIsFlippedX = tilePiece != null && tilePiece.transform.localEulerAngles.y == 180;
+
             audioSourceKnife.PlayOneClipFromPack(sfxTileRiseName);
 
             if (isMyTurn)
@@ -152,12 +154,16 @@ namespace Hanako.Knife
                     if (tileCheckResult.IsInteractable)
                     {
                         hoveredTile.Hovered(colors.TileActionColor, false);
+                        if (infoCanvas != null)
+                            infoCanvas.SetInformation(tilePiece, true, characterIsFlippedX);
                     }
 
                     // Hovering a tile with no piece, but can be moved into
                     else
                     {
                         hoveredTile.Hovered(colors.TileValidMoveColor, false);
+                        if (infoCanvas != null)
+                            infoCanvas.SetInformationOnEmptyMoveableTile();
                     }
                 }
 
@@ -167,6 +173,14 @@ namespace Hanako.Knife
                     levelManager.ShowPossibleMoves();
                     hoveredTile.Hovered(colors.TileInvalidMoveColor, false);
                     hoveredValidTile = null;
+
+                    if (infoCanvas != null)
+                    {
+                        if (tilePiece != null)
+                            infoCanvas.SetInformation(tilePiece, false, characterIsFlippedX);
+                        else
+                            infoCanvas.SetInformationOnEmptyUnmoveableTile();
+                    }
                 }
 
                 if (tilePiece != null)
@@ -177,8 +191,6 @@ namespace Hanako.Knife
                         var color = tilePiece == levelManager.PlayerPiece ? colors.TileValidMoveColor : colors.TileOtherValidMoveColor;
                         foreach (var validTile in livingPieceCache.ValidTilesByMoveRule)
                             validTile.Tile.Hovered(color);
-
-                        levelManager.ShowTurnOrderTexts();
                     }
                 }
             }
@@ -188,12 +200,6 @@ namespace Hanako.Knife
             {
                 hoveredTile.Hovered(colors.TileNotMyTurnColor);
                 hoveredValidTile = null;
-            }
-
-            if (infoCanvas != null && tilePiece != null)
-            {
-                var characterIsFlippedX = tilePiece.transform.localEulerAngles.y == 180;
-                infoCanvas.SetInformation(tilePiece, characterIsFlippedX);
             }
         }
 
@@ -213,17 +219,17 @@ namespace Hanako.Knife
             audioSourceKnife.PlayOneClipFromPack(sfxTileFallName);
             hoveredTile = null;
             hoveredValidTile = null;
-            if (infoCanvas != null )
-                infoCanvas.SetDefaultInfo();
-
-            levelManager.HideTurnOrderTexts();
-
-            corShowPossibleMoves = this.RestartCoroutine(Delay(1f), corShowPossibleMoves);
+            
+            corShowPossibleMoves = this.RestartCoroutine(Delay(0.33f), corShowPossibleMoves);
             IEnumerator Delay(float delay)
             {
                 yield return new WaitForSeconds(delay);
                 if (hoveredTile == null)
+                {
                     levelManager.ShowPossibleMoves();
+                    if (infoCanvas != null)
+                        infoCanvas.SetInformationOnNoTileSelected();
+                }
             }
         }
 

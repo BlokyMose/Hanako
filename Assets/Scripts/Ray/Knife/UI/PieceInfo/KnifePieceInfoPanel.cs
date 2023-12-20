@@ -16,18 +16,33 @@ namespace Hanako.Knife
             public string desc;
             Color? color;
             public Color? Color => color != null ? color : hasDefaultColor ? defaultColor : null;
-
             [SerializeField]
             bool hasDefaultColor = false;
-
             [SerializeField]
             Color defaultColor = new (1,1,1,1);
+            public Sprite logo;
 
-            public Information(string name, string desc, Color? color = null)
+            public Information(string name, string desc, Color? color = null, Sprite logo = null)
             {
                 this.name = name;
                 this.desc = desc;
                 this.color = color;
+                this.logo = logo;
+            }
+
+            public Information(KnifePieceInformation info)
+            {
+                this.name = info.PieceName;
+                this.desc = info.Desc;
+                this.color = info.Color;
+                this.logo = logo;
+            }
+
+            public Information(KnifeInteraction.Information info)
+            {
+                this.name = info.Name;
+                this.desc = info.Desc;
+                this.logo = info.Logo;
             }
         }
 
@@ -47,19 +62,11 @@ namespace Hanako.Knife
         [SerializeField]
         List<Image> coloredImages = new();
 
-        [SerializeField]
-        Animator animator;
 
-        [SerializeField]
-        int transitionVariantCount = 3;
-
-        int tri_transition, int_variant;
         bool isCleared = false;
 
         private void Awake()
         {
-            tri_transition = Animator.StringToHash(nameof(tri_transition));
-            int_variant = Animator.StringToHash(nameof(int_variant));
             Clear();
         }
 
@@ -69,16 +76,15 @@ namespace Hanako.Knife
 
             nameText.text = info.name;
             descTetx.text = info.desc;
+            
+            if (info.logo!=null)
+                logoImage.sprite = info.logo;
 
             if (info.Color != null)
                 foreach (var image in coloredImages)
                     image.color = (Color)info.Color;
 
-            if (animator != null)
-            {
-                animator.SetInteger(int_variant, Random.Range(0, transitionVariantCount));
-                animator.SetTrigger(tri_transition);
-            }
+
 
             RefreshCanvas();
         }
@@ -104,10 +110,7 @@ namespace Hanako.Knife
             isCleared = true;
 
             FlipXLogo(false);
-            if (animator != null)
-            {
-                animator.SetTrigger(tri_transition);
-            }
+
             RefreshCanvas();
         }
     }

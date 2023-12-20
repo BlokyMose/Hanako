@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityUtility;
+using static Hanako.Knife.KnifeInteraction.Information;
 using static Hanako.Knife.KnifePieceInfoPanel;
 
 namespace Hanako.Knife
@@ -34,7 +35,7 @@ namespace Hanako.Knife
         KnifePieceInfoPanel profilePanel;
 
         [SerializeField]
-        KnifePieceInfoPanel interactionPanelPrefab;
+        List<KnifePieceInfoPanel> interactionPanels = new();
 
         [SerializeField]
         HorizontalOrVerticalLayoutGroup allPanelsParent;
@@ -46,8 +47,28 @@ namespace Hanako.Knife
         [SerializeField]
         List<DefaultInfo> defaultInfos = new();
 
+        [SerializeField]
+        DefaultInfo moveableTileInfo = new();
+
+        [SerializeField]
+        DefaultInfo noTileSelectedInfo = new();
+
+        [SerializeField]
+        KnifeInteraction.Information moveInteractionInfo = new();
+
+        [SerializeField]
+        KnifeInteraction.Information invalidMoveInteractionInfo = new();
+
         public KnifePieceInfoPanel ProfilePanel { get => profilePanel; }
 
+        [Header("Animation")]
+        [SerializeField]
+        Animator animator;
+
+        [SerializeField]
+        int transitionVariantCount = 3;
+
+        int tri_transition, int_variant;
         Transform profileCameraPos;
         Vector3 profileCameraOffset;
         List<HorizontalOrVerticalLayoutGroup> layoutGroups = new();
@@ -55,41 +76,49 @@ namespace Hanako.Knife
         void Awake()
         {
             layoutGroups = new() { interactionsParent, allPanelsParent };
+            tri_transition = Animator.StringToHash(nameof(tri_transition));
+            int_variant = Animator.StringToHash(nameof(int_variant));
         }
 
         void Start()
         {
-            SetDefaultInfo();
+            SetInformationOnNoTileSelected();
         }
 
-        public void SetInformation(KnifePiece knifePiece, bool headLogoFlipX = false)
+        public void SetInformation(KnifePiece knifePiece, bool isMoveable, bool headLogoFlipX = false)
         {
+            PlayAnimationTransition();
+            DeactivateAllInteractionInfoPanels();
+            if (!isMoveable)
+                SetInteractionInfoOnInvalidMove();
+
             var info = knifePiece.Information;
             if (info != null)
             {
                 var headPosOffset = new Vector3((headLogoFlipX ? -1 : 1) * knifePiece.HeadPosOffset.x, knifePiece.HeadPosOffset.y, knifePiece.HeadPosOffset.z);
-                profilePanel.SetInformation(new(info.PieceName, info.Desc, info.Color));
+                profilePanel.SetInformation(new(info));
                 profileCameraPos = knifePiece.HeadPosForLogo;
                 profileCameraOffset = headPosOffset;
                 profilePanel.FlipXLogo(headLogoFlipX);
             }
-            else
-            {
-            }
 
+            var interactionPanelIndex = 0;
             foreach (var interactionProperties in knifePiece.Interactions)
             {
                 foreach (var interaction in interactionProperties.Interactions)
                 {
                     var interactionInfo = interaction.GetInformation();
-                    if (interactionInfo.ShowMode == KnifeInteraction.Information.InformationShowMode.Panel)
+                    if (interactionPanelIndex < interactionPanels.Count && (
+                        interactionInfo.ShowMode == InformationShowMode.AlwaysShow ||
+                        (interactionInfo.ShowMode == InformationShowMode.ShowIfValid && isMoveable))
+                        )
                     {
-                        var infoPanel = Instantiate(interactionPanelPrefab, interactionsParent.transform);
-                        infoPanel.SetInformation(new(interactionInfo.Name, interactionInfo.Desc));
+                        interactionPanels[interactionPanelIndex].gameObject.SetActive(true);
+                        interactionPanels[interactionPanelIndex].SetInformation(new(interactionInfo));
+                        interactionPanelIndex++;
                     }
                 }
             }
-
 
             StartCoroutine(Delay(0.05f));
             IEnumerator Delay(float delay)
@@ -100,15 +129,68 @@ namespace Hanako.Knife
             }
         }
 
-        public void SetDefaultInfo()
+        private void DeactivateAllInteractionInfoPanels()
         {
-            interactionsParent.transform.DestroyChildren();
+            foreach (var interactionPanel in interactionPanels)
+                interactionPanel.gameObject.SetActive(false);
+        }
+
+        public void SetInformationOnEmptyUnmoveableTile()
+        {
+            PlayAnimationTransition();
+            SetInteractionInfoOnInvalidMove();
+
             var useFirstIndex = Random.Range(0, 10) < 9;
             var defaultInfo = useFirstIndex ? defaultInfos[0] : defaultInfos.GetRandom();
             profilePanel.SetInformation(defaultInfo.Info);
             profileCameraPos = defaultInfo.LogoPos;
             profileCameraOffset = defaultInfo.Offset;
             RefreshCanvas();
+        }
+        
+        public void SetInformationOnEmptyMoveableTile()
+        {
+            PlayAnimationTransition();
+            SetInteractionInfoOnMoveable();
+
+            profilePanel.SetInformation(moveableTileInfo.Info);
+            profileCameraPos = moveableTileInfo.LogoPos;
+            profileCameraOffset = moveableTileInfo.Offset;
+
+            RefreshCanvas();
+        }
+
+        public void SetInformationOnNoTileSelected()
+        {
+            PlayAnimationTransition();
+            DeactivateAllInteractionInfoPanels();
+
+            profilePanel.SetInformation(noTileSelectedInfo.Info);
+            profileCameraPos = noTileSelectedInfo.LogoPos;
+            profileCameraOffset = noTileSelectedInfo.Offset;
+            RefreshCanvas();
+        }
+
+        public void SetInteractionInfoOnMoveable()
+        {
+            DeactivateAllInteractionInfoPanels();
+
+            if (moveInteractionInfo.ShowMode == InformationShowMode.AlwaysShow)
+            {
+                interactionPanels[0].gameObject.SetActive(true);
+                interactionPanels[0].SetInformation(new(moveInteractionInfo));
+            }
+        }
+
+        public void SetInteractionInfoOnInvalidMove()
+        {
+            DeactivateAllInteractionInfoPanels();
+
+            if (invalidMoveInteractionInfo.ShowMode == InformationShowMode.AlwaysShow)
+            {
+                interactionPanels[0].gameObject.SetActive(true);
+                interactionPanels[0].SetInformation(new(invalidMoveInteractionInfo));
+            }
         }
 
         public void RefreshCanvas()
@@ -120,6 +202,11 @@ namespace Hanako.Knife
                 layoutGroup.enabled = true;
         }
 
+        void PlayAnimationTransition()
+        {
+            animator.SetInteger(int_variant, Random.Range(0, transitionVariantCount));
+            animator.SetTrigger(tri_transition);
+        }
 
         void Update()
         {

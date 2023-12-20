@@ -21,6 +21,8 @@ namespace Hanako.Knife
                 IEnumerator WaitToBeAttackThenDie()
                 {
                     yield return new WaitForSeconds(otherLivingPiece.LivingPiece.MoveDuration * 0.25f);
+                    
+                    // TODO: stream line die to only one code
                     otherLivingPiece.LivingPiece.Attack();
                     myLivingPiece.Die();
                     myLivingPiece.LivingPiece.Die(otherLivingPiece);

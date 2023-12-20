@@ -33,6 +33,10 @@ namespace Hanako.Knife
         [SerializeField]
         RoundCheckBox roundCheckBoxPrefab;
 
+        [Header("Turns")]
+        [SerializeField]
+        Image showTurnOrderHitArea;
+
         List<TargetCheckBox> targetCheckBoxes = new();
         List<RoundCheckBox> roundCheckBoxes = new();
         int tri_red;
@@ -48,6 +52,19 @@ namespace Hanako.Knife
                 levelManager.OnStartGame += () => { OnStartGame(levelManager); };
                 levelManager.OnLivingPieceDied += Eliminate;
                 levelManager.OnNextRound += (roundIndex) => { PlayRedAnimation(); CheckRound(); };
+
+                showTurnOrderHitArea.AddEventTrigger(OnEnterTurnOrderHitArea, UnityEngine.EventSystems.EventTriggerType.PointerEnter);
+                showTurnOrderHitArea.AddEventTrigger(OnExitTurnOrderHitArea, UnityEngine.EventSystems.EventTriggerType.PointerExit);
+
+                void OnEnterTurnOrderHitArea()
+                {
+                    levelManager.ShowTurnOrderTexts();
+                }
+
+                void OnExitTurnOrderHitArea()
+                {
+                    levelManager.HideTurnOrderTexts();
+                }
             }
         }
 
