@@ -17,6 +17,7 @@ namespace Hanako
         bool isStarted = false;
 
         public void StartGame() => isStarted=true;
+        public void EndGame() => isStarted = false;
 
         private void Update()
         {

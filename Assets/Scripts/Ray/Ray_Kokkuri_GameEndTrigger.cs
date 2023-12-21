@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityUtility;
 
 namespace Hanako
@@ -23,6 +24,9 @@ namespace Hanako
         [SerializeField]
         List<ColliderProxy> cols = new();
 
+        [SerializeField]
+        UnityEvent onEndGame;
+
         bool gameEnded;
         float playTime = 0;
 
@@ -31,12 +35,16 @@ namespace Hanako
             foreach (var col in cols)
                 col.OnEnter += OnEnter;
 
-            cursor.gameObject.SetActive(false);
         }
 
         private void Update()
         {
             playTime += Time.deltaTime;
+        }
+
+        public void StartGame()
+        {
+            cursor.gameObject.SetActive(false);
         }
 
         void OnEnter(Collider2D other)
@@ -55,6 +63,7 @@ namespace Hanako
                 });
 
                 cursor.gameObject.SetActive(true);
+                onEndGame.Invoke();
             }
         }
     }

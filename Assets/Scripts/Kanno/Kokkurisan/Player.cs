@@ -8,6 +8,10 @@ namespace Hanako
     {
         public float moveSpeed = 5f; // プレイヤーの初期速度
         private Rigidbody2D rb;
+        bool isStarted = false;
+
+        public void StartGame() => isStarted = true;
+        public void EndGame() => isStarted = false;
 
         private void Start()
         {
@@ -16,6 +20,9 @@ namespace Hanako
 
         private void Update()
         {
+            if (!isStarted)
+                return;
+
             // マウスの位置を取得
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mousePos.z = 0f;

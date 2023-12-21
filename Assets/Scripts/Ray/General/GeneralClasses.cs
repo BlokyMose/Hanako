@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -125,6 +126,34 @@ namespace Hanako
                 }
 
             Leaderboard.Add(newItem);
+        }
+    }
+
+    [Serializable]
+    public class ActionIconPack
+    {
+        [SerializeField]
+        Sprite icon;
+        public Sprite Icon => icon;
+
+        [SerializeField]
+        bool isOverrideColor = false;
+        public bool IsOverrideColor => isOverrideColor;
+
+        [SerializeField, ShowIf(nameof(isOverrideColor))]
+        Color color = Color.white;
+        public Color Color => color;
+
+        [SerializeField]
+        ActionIconMode animation;
+        public ActionIconMode Animation => animation;
+
+        public ActionIconPack(Sprite icon, bool isOverrideColor, Color color, ActionIconMode animation)
+        {
+            this.icon = icon;
+            this.isOverrideColor = isOverrideColor;
+            this.color = color;
+            this.animation = animation;
         }
     }
 }

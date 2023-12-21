@@ -29,7 +29,7 @@ namespace Hanako.Hanako
 
         public Animator GetDetectAreaAnimator() => detectAreaAnimator;
         protected override Sprite GetActionIcon => icons.DistractionIcon;
-        protected override HanakoIcons.ActionIconMode GetActionIconAnimation => icons.DistractionAnimation;
+        protected override ActionIconMode GetActionIconAnimation => icons.DistractionAnimation;
 
         protected override void Awake()
         {

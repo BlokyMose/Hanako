@@ -25,5 +25,6 @@ namespace Hanako
     public enum SolidButtonState { Pressed, Idle, Hover }
     public enum LevelInfoInitMode { SceneLoadingData, LevelInfo, LevelProperties }
     public enum DetectAreaAnimation { Hide, Show }
+    public enum ActionIconMode { Hide, Tilting, Nodding, Beating, Nodding_Horizontal }
 
 }

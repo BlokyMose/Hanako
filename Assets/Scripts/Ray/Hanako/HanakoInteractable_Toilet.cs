@@ -69,7 +69,7 @@ namespace Hanako.Hanako
         event Action<int> OnEnemiesKilled;
 
         protected override Sprite GetActionIcon => Occupation == OccupationMode.Player ? icons.AttackIcon : icons.ArrownDownIcon;
-        protected override HanakoIcons.ActionIconMode GetActionIconAnimation => Occupation == OccupationMode.Player ? icons.AttackAnimation : icons.ArrowDownAnimation;
+        protected override ActionIconMode GetActionIconAnimation => Occupation == OccupationMode.Player ? icons.AttackAnimation : icons.ArrowDownAnimation;
 
         protected override void Awake()
         {

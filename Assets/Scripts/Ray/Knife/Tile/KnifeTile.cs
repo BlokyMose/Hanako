@@ -27,8 +27,14 @@ namespace Hanako.Knife
         [SerializeField]
         Collider2D col;
 
+        [SerializeField]
+        SpriteRenderer interactionIconSR;
+
+        [SerializeField]
+        Animator interactionIconAnimator;
+
         Animator animator;
-        int int_mode;
+        int int_mode, tri_transition;
         TileAnimationMode animationMode = TileAnimationMode.Idle;
         float animatingColorDuration = 1f;
 
@@ -37,10 +43,11 @@ namespace Hanako.Knife
         public Transform PieceParent { get => pieceParent; }
         Coroutine corAnimatingColor;
 
-        private void Awake()
+        void Awake()
         {
             animator = GetComponent<Animator>();
             int_mode = Animator.StringToHash(nameof(int_mode));
+            tri_transition = Animator.StringToHash(nameof(tri_transition));
 
             if (useSRAsPieceParent || (!useSRAsPieceParent && pieceParent == null))
             {
@@ -64,7 +71,7 @@ namespace Hanako.Knife
 
         public void CallAwake() => Awake();
 
-        public void Hovered(Color tileColor, bool animateColor = true)
+        public void Hovered(Color tileColor, bool animateColor = true, ActionIconPack interactionIcon = null)
         {
             sr.color = tileColor;
             if (animateColor)
@@ -74,6 +81,15 @@ namespace Hanako.Knife
 
             animationMode = TileAnimationMode.Hovered;
             animator.SetInteger(int_mode, (int)animationMode);
+
+            if (interactionIcon != null)
+            {
+                interactionIconSR.sprite = interactionIcon.Icon;
+                if (interactionIcon.IsOverrideColor)
+                    interactionIconSR.color = interactionIcon.Color;
+                interactionIconAnimator.SetInteger(int_mode, (int)interactionIcon.Animation);
+                interactionIconAnimator.SetTrigger(tri_transition);
+            }
         }
 
         public void Idle(Color? tileColor = null)
@@ -82,6 +98,8 @@ namespace Hanako.Knife
             this.StopCoroutineIfExists(corAnimatingColor);
             animationMode = TileAnimationMode.Idle;
             animator.SetInteger(int_mode, (int)animationMode);
+            interactionIconAnimator.SetInteger(int_mode, (int)ActionIconMode.Hide);
+            interactionIconAnimator.SetTrigger(tri_transition);
         }
 
         public void Hinted(Color tileColor, bool animateColor = true)
@@ -94,6 +112,9 @@ namespace Hanako.Knife
 
             animationMode = TileAnimationMode.Idle;
             animator.SetInteger(int_mode, (int)animationMode);
+            interactionIconAnimator.SetInteger(int_mode, (int)ActionIconMode.Hide);
+            interactionIconAnimator.SetTrigger(tri_transition);
+
         }
 
         public void Clicked(Color tileColor)
@@ -102,6 +123,9 @@ namespace Hanako.Knife
             this.StopCoroutineIfExists(corAnimatingColor);
             animationMode = TileAnimationMode.Clicked;
             animator.SetInteger(int_mode, (int)animationMode);
+            interactionIconAnimator.SetInteger(int_mode, (int)ActionIconMode.Hide);
+            interactionIconAnimator.SetTrigger(tri_transition);
+
         }
 
         public void SetAsParentOf(GameObject child)

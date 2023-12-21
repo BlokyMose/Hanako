@@ -18,8 +18,6 @@ namespace Hanako
 
         private void Start()
         {
-           
-
             // 初めにすべてのオブジェクトを非表示にする
             foreach (var obj in objectsToFade)
             {
@@ -28,8 +26,17 @@ namespace Hanako
                 obj.GetComponent<Renderer>().material.color = currentColor;
             }
 
+        }
+
+        public void StartGame()
+        {
             // 最初のオブジェクトをフェードイン開始
             StartCoroutine(FadeInObject(currentIndex));
+        }
+
+        public void EndGame()
+        {
+            StopAllCoroutines();
         }
 
         IEnumerator FadeInObject(int index)
@@ -80,15 +87,6 @@ namespace Hanako
             else
             {
                 fading = false;
-            }
-        }
-
-        private void Update()
-        {
-            // フェードが終了したら何か特別なアクションを実行できます
-            if (!fading)
-            {
-                // ここに任意のアクションを追加
             }
         }
 

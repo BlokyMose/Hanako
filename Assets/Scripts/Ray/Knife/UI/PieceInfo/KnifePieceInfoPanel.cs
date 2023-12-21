@@ -35,7 +35,6 @@ namespace Hanako.Knife
                 this.name = info.PieceName;
                 this.desc = info.Desc;
                 this.color = info.Color;
-                this.logo = logo;
             }
 
             public Information(KnifeInteraction.Information info)
@@ -61,7 +60,6 @@ namespace Hanako.Knife
 
         [SerializeField]
         List<Image> coloredImages = new();
-
 
         bool isCleared = false;
 

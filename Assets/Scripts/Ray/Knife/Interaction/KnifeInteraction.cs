@@ -47,6 +47,11 @@ namespace Hanako.Knife
         [SerializeField]
         Information information;
 
+        [SerializeField]
+        ActionIconPack iconPack;
+
+        public ActionIconPack IconPack { get => iconPack;  }
+
         public virtual Information GetInformation()
         {
             return information;

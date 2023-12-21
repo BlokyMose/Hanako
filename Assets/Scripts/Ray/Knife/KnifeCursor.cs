@@ -4,8 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.VFX;
 using UnityUtility;
 using static Hanako.Knife.KnifeLevelManager;
 
@@ -40,6 +38,13 @@ namespace Hanako.Knife
         [SerializeField]
         string sfxTileFallName = "sfxTileFall";
 
+        [Header("Interaction Default")]
+        [SerializeField]
+        ActionIconPack interactionMovePack;
+
+        [SerializeField]
+        ActionIconPack interactionInvalidMovePack;
+
         KnifeTile hoveredTile, hoveredValidTile;
         KnifeLevelManager levelManager;
         int controllerID;
@@ -54,6 +59,9 @@ namespace Hanako.Knife
         protected override void Awake()
         {
             base.Awake();
+
+            interactionInvalidMovePack = new(interactionInvalidMovePack.Icon, true, colors.TileInvalidMoveColor.ChangeAlpha(.5f), interactionInvalidMovePack.Animation);
+            interactionMovePack = new(interactionMovePack.Icon, true, colors.TileValidMoveColor.ChangeAlpha(.5f), interactionMovePack.Animation);
         }
 
         public void Init(KnifeLevelManager levelManager, int controllerID, List<Collider2D> tileUnhoverCols)
@@ -153,7 +161,7 @@ namespace Hanako.Knife
                     // Hovering a tile with a piece
                     if (tileCheckResult.IsInteractable)
                     {
-                        hoveredTile.Hovered(colors.TileActionColor, false);
+                        hoveredTile.Hovered(colors.TileActionColor, false, GetActionIconPack(tilePiece.Interactions));
                         if (infoCanvas != null)
                             infoCanvas.SetInformation(tilePiece, true, characterIsFlippedX);
                     }
@@ -161,7 +169,7 @@ namespace Hanako.Knife
                     // Hovering a tile with no piece, but can be moved into
                     else
                     {
-                        hoveredTile.Hovered(colors.TileValidMoveColor, false);
+                        hoveredTile.Hovered(colors.TileValidMoveColor, false, interactionMovePack);
                         if (infoCanvas != null)
                             infoCanvas.SetInformationOnEmptyMoveableTile();
                     }
@@ -171,7 +179,7 @@ namespace Hanako.Knife
                 else
                 {
                     levelManager.ShowPossibleMoves();
-                    hoveredTile.Hovered(colors.TileInvalidMoveColor, false);
+                    hoveredTile.Hovered(colors.TileInvalidMoveColor, false, interactionInvalidMovePack);
                     hoveredValidTile = null;
 
                     if (infoCanvas != null)
@@ -201,6 +209,14 @@ namespace Hanako.Knife
                 hoveredTile.Hovered(colors.TileNotMyTurnColor);
                 hoveredValidTile = null;
             }
+        }
+
+        private ActionIconPack GetActionIconPack(List<KnifePiece.InteractionProperties> interactions)
+        {
+            if (interactions.Count == 0 || interactions[0].Interactions.Count == 0) 
+                return null;
+            var iconPack = interactions[0].Interactions[0].IconPack;
+            return new ActionIconPack(iconPack.Icon, true, colors.TileActionColor.ChangeAlpha(.5f), iconPack.Animation);
         }
 
         void Unhover(KnifeTile tile)

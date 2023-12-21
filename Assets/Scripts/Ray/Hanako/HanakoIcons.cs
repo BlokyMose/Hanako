@@ -10,8 +10,6 @@ namespace Hanako.Hanako
 
     public class HanakoIcons : ScriptableObject
     {
-        public enum ActionIconMode { Hide, Tilting, Nodding, Beating }
-
         [SerializeField, PreviewField]
         Sprite arrownDownIcon;
 
