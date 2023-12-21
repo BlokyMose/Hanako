@@ -13,7 +13,9 @@ namespace Hanako
 
         public float span = 3f;
         private float currentTime = 0f;
-
+        bool isStarted = false;
+        public void StartGame() => isStarted = true;
+        public void EndGame() => isStarted = false;
         // Start is called before the first frame update
         void Start()
         {
@@ -23,6 +25,8 @@ namespace Hanako
         // Update is called once per frame
         void Update()
         {
+            if (!isStarted)
+                return;
             //àÍíËéûä‘Ç≤Ç∆Ç…ë¨ìxè„è∏
             transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
 
@@ -40,6 +44,9 @@ namespace Hanako
 
         private void FixedUpdate()
         {
+            if (!isStarted)
+                return;
+
             MoveCharactor();
         }
 

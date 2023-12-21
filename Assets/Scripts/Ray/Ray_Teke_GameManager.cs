@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Hanako
 {
@@ -17,12 +18,23 @@ namespace Hanako
 
         [SerializeField]
         string scoreParamName = "score";
+
+        [SerializeField]
+        UnityEvent onEndGame;
+
         bool isGameOver = false;
         float playTime = 0;
+        bool isStarted = false;
+
+        public void StartGame() => isStarted = true;
+        public void EndGame() => isStarted = false;
 
         // Update is called once per frame
         void Update()
         {
+            if (!isStarted)
+                return;
+
             playTime += Time.deltaTime;
             countdownSeconds -= Time.deltaTime;
 
@@ -42,6 +54,7 @@ namespace Hanako
                     new ScoreDetail(playTimeParamName, (int)playTime),
                     new ScoreDetail(scoreParamName, iScore)
                 });
+                onEndGame.Invoke();
             }
         }
 

@@ -29,7 +29,9 @@ namespace Hanako
         [SerializeField] private List<GameObject> deskPool;
 
         [SerializeField] private int initialObstacleToSpawn = 5;
-
+        bool isStarted = false;
+        public void StartGame() => isStarted = true;
+        public void EndGame() => isStarted = false;
         private void Awake()
         {
             mainCamera = Camera.main;
@@ -46,6 +48,8 @@ namespace Hanako
         // Update is called once per frame
         void Update()
         {
+            if (!isStarted)
+                return;
             ObstacleSpawning();
         }
 

@@ -11,10 +11,6 @@ namespace Hanako
 
         private BoxCollider2D targetCollider;
 
-
-
-
-
         void Start()
         {
             targetCollider = null;
@@ -24,8 +20,6 @@ namespace Hanako
         void Update()
         {
             MovePlayer(); //プレイヤーを動かすメソッドを呼び出す
-
-            
         }
 
         void MovePlayer()

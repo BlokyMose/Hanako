@@ -23,6 +23,9 @@ namespace Hanako
         [SerializeField] private float generateLevelWaitTime = 11f;
 
         private float waitTime;
+        bool isStarted = false;
+        public void StartGame() => isStarted = true;
+        public void EndGame() => isStarted = false;
 
         void Start()
         {
@@ -33,6 +36,9 @@ namespace Hanako
         // Update is called once per frame
         void Update()
         {
+            if (!isStarted)
+                return;
+
             CheckForBackGround();
         }
 
