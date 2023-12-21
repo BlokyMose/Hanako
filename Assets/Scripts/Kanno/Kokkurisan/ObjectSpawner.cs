@@ -14,9 +14,15 @@ namespace Hanako
         public float objectLifetime = 5.0f; // オブジェクトの寿命（秒）
 
         private float timer = 0.0f;
+        bool isStarted = false;
+
+        public void StartGame() => isStarted=true;
 
         private void Update()
         {
+            if (!isStarted)
+                return;
+
             // タイマーを更新
             timer += Time.deltaTime;
 
