@@ -121,6 +121,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: d1a0c199e9846794abcd5dff0d7b1c0b, type: 2}
   headPosForLogo: {fileID: 0}
   headPosOffset: {x: 0.1, y: 0, z: -2.5}
+  goToPreview: {fileID: 293897078196641965}
   ignoreWarnings: 0
   moveRule: {fileID: 11400000, guid: d313773fded261b49a6a3b4b5d9921ee, type: 2}
   animator: {fileID: 0}
@@ -809,6 +810,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a7c112b1501906548bb08293ad81bbb1, type: 3}
+--- !u!1 &293897078196641965 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3493621528880527784, guid: a7c112b1501906548bb08293ad81bbb1, type: 3}
+  m_PrefabInstance: {fileID: 3778510812968851717}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &293897078196641966 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3493621528880527787, guid: a7c112b1501906548bb08293ad81bbb1, type: 3}

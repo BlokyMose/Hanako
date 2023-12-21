@@ -44,6 +44,9 @@ namespace Hanako.Knife
         [SerializeField, LabelText("Offset")]
         Vector3 headPosOffset = new(0, 0.25f, -3f);
 
+        [SerializeField]
+        GameObject goToPreview;
+
         [Header("Debug")]
         [SerializeField]
         bool ignoreWarnings = false;
@@ -54,6 +57,8 @@ namespace Hanako.Knife
         public KnifePieceInformation Information { get => information; }
         public Transform HeadPosForLogo { get => headPosForLogo != null ? headPosForLogo : transform; }
         public Vector3 HeadPosOffset { get => headPosOffset; }
+        public GameObject GOToPreview => goToPreview != null ? goToPreview : gameObject;
+        public Vector3 GOToPreviewOffset => goToPreview != null ? goToPreview.transform.localPosition : Vector3.zero;
 
         public bool HasInteraction(KnifeInteraction targetInteraction)
         {

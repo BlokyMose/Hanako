@@ -12,9 +12,9 @@ namespace Hanako.Knife
         [SerializeField]
         int count = 1;
 
-        public override void Interacted(LivingPieceCache otherPiece, TileCache myTile, KnifeLevelManager levelManager)
+        public override void Interacted(LivingPieceCache interactorPiece, TileCache interactedTile, KnifeLevelManager levelManager)
         {
-            levelManager.RemoveTurnOf(otherPiece, count);
+            levelManager.RemoveTurnOf(interactorPiece, count);
         }
     }
 }

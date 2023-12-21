@@ -6,6 +6,10 @@ namespace Hanako.Knife
 {
     public abstract class KnifeAbility : ScriptableObject
     {
-        public abstract void Interacted(KnifeLevelManager.LivingPieceCache otherPiece, KnifeLevelManager.TileCache myTile, KnifeLevelManager levelManager);
+        public abstract void Interacted(KnifeLevelManager.LivingPieceCache interactorPiece, KnifeLevelManager.TileCache interactedTile, KnifeLevelManager levelManager);
+        public virtual void Preview(KnifeLevelManager.LivingPieceCache interactorPiece, KnifeLevelManager.TileCache interactedTile, KnifeLevelManager levelManager)
+        {
+
+        }
     }
 }

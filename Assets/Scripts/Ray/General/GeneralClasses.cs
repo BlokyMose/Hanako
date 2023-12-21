@@ -132,7 +132,7 @@ namespace Hanako
     [Serializable]
     public class ActionIconPack
     {
-        [SerializeField]
+        [SerializeField, PreviewField]
         Sprite icon;
         public Sprite Icon => icon;
 

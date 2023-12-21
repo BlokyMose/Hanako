@@ -459,6 +459,7 @@ namespace Hanako.Knife
         public int RoundCount { get => turnManager != null ? turnManager.CurrentRoundIndex : 0; }
         public float PlayTime { get => playTime;  }
         public KnifePiece_Player PlayerPiece { get => playerPiece; }
+        public LivingPieceCache PlayerPieceCache { get => playerPieceCache; set => playerPieceCache = value; }
 
         #endregion
 

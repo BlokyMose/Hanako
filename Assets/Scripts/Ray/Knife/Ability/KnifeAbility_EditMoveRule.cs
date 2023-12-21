@@ -12,9 +12,9 @@ namespace Hanako.Knife
         [SerializeField]
         KnifeMoveRule moveRule;
 
-        public override void Interacted(LivingPieceCache otherPiece, TileCache myTile, KnifeLevelManager levelManager)
+        public override void Interacted(LivingPieceCache interactorPiece, TileCache interactedTile, KnifeLevelManager levelManager)
         {
-            otherPiece.LivingPiece.MoveRule = moveRule;
+            interactorPiece.LivingPiece.MoveRule = moveRule;
         }
     }
 }

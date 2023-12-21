@@ -57,12 +57,16 @@ namespace Hanako.Knife
             return information;
         }
 
-        public abstract void Interact(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile, KnifeLevelManager levelManager);
+        public abstract void Interact(PieceCache interactedPiece, TileCache interactedTile, PieceCache interactorPiece, TileCache interactorTile, KnifeLevelManager levelManager);
 
-        public virtual bool CheckInteractabilityAgainst(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile, KnifeLevelManager levelManager)
+        public virtual bool CheckInteractabilityAgainst(PieceCache interactedPiece, TileCache interactedTile, PieceCache interactorPiece, TileCache interactorTile, KnifeLevelManager levelManager)
         {
             return true;
         }
 
+        public virtual void ShowPreview(PieceCache interactedPiece, TileCache interactedTile, PieceCache interactorPiece, TileCache interactorTile, KnifeLevelManager levelManager)
+        {
+
+        }
     }
 }

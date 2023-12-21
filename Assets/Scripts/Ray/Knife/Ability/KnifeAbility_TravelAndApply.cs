@@ -16,16 +16,16 @@ namespace Hanako.Knife
         [SerializeField]
         List<KnifeAbility> abilities = new();
 
-        public override void Interacted(LivingPieceCache otherPiece, TileCache myTile, KnifeLevelManager levelManager)
+        public override void Interacted(LivingPieceCache interactorPiece, TileCache interactedTile, KnifeLevelManager levelManager)
         {
             foreach (var direction in directions)
             {
                 var _direction = direction;
                 while (true)
                 {
-                    if (levelManager.TryGetTile(ColRow.AddBetween(myTile.ColRow, _direction), out var foundTile))
+                    if (levelManager.TryGetTile(ColRow.AddBetween(interactedTile.ColRow, _direction), out var foundTile))
                     {
-                        if (foundTile.Tile.TryGetPiece(out var tilePiece) && tilePiece != otherPiece.Piece)
+                        if (foundTile.Tile.TryGetPiece(out var tilePiece) && tilePiece != interactorPiece.Piece)
                         {
                             if (tilePiece is KnifePiece_Living)
                             {

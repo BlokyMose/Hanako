@@ -60,8 +60,8 @@ namespace Hanako.Knife
         {
             base.Awake();
 
-            interactionInvalidMovePack = new(interactionInvalidMovePack.Icon, true, colors.TileInvalidMoveColor.ChangeAlpha(.5f), interactionInvalidMovePack.Animation);
-            interactionMovePack = new(interactionMovePack.Icon, true, colors.TileValidMoveColor.ChangeAlpha(.5f), interactionMovePack.Animation);
+            interactionInvalidMovePack = new(interactionInvalidMovePack.Icon, true, colors.TileInvalidMoveColor, interactionInvalidMovePack.Animation);
+            interactionMovePack = new(interactionMovePack.Icon, true, colors.TileValidMoveColor, interactionMovePack.Animation);
         }
 
         public void Init(KnifeLevelManager levelManager, int controllerID, List<Collider2D> tileUnhoverCols)
@@ -164,6 +164,27 @@ namespace Hanako.Knife
                         hoveredTile.Hovered(colors.TileActionColor, false, GetActionIconPack(tilePiece.Interactions));
                         if (infoCanvas != null)
                             infoCanvas.SetInformation(tilePiece, true, characterIsFlippedX);
+
+                        if (tilePiece != null && tilePiece is KnifePiece_NonLiving)
+                        {
+                            foreach (var interaction in tilePiece.Interactions)
+                            {
+                                if (interaction.IsInteractable &&
+                                    interaction.ComponentType != null &&
+                                    interaction.ComponentType.TryGetComponent<KnifePiece_Player>(out var player) &&
+                                    interaction.Interactions.Count > 0)
+                                {
+                                    var previewInteraction = interaction.Interactions[0];
+                                    previewInteraction.ShowPreview(
+                                        levelManager.GetPiece(tilePiece),
+                                        levelManager.GetTile(tile),
+                                        levelManager.PlayerPieceCache,
+                                        levelManager.GetTile(levelManager.PlayerPieceCache.ColRow),
+                                        levelManager);
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     // Hovering a tile with no piece, but can be moved into
@@ -200,6 +221,7 @@ namespace Hanako.Knife
                         foreach (var validTile in livingPieceCache.ValidTilesByMoveRule)
                             validTile.Tile.Hovered(color);
                     }
+                    
                 }
             }
 
@@ -216,11 +238,17 @@ namespace Hanako.Knife
             if (interactions.Count == 0 || interactions[0].Interactions.Count == 0) 
                 return null;
             var iconPack = interactions[0].Interactions[0].IconPack;
-            return new ActionIconPack(iconPack.Icon, true, colors.TileActionColor.ChangeAlpha(.5f), iconPack.Animation);
+            return new ActionIconPack(iconPack.Icon, true, colors.TileActionColor, iconPack.Animation);
         }
 
         void Unhover(KnifeTile tile)
         {
+            levelManager.Tiles.LoopTiles((loopedTile) =>
+            {
+                loopedTile.Tile.Idle();
+                return true;
+            });
+            /*
             if (hoveredTile.TryGetPiece(out var tilePiece))
             {
                 if (tilePiece is KnifePiece_Living)
@@ -230,6 +258,7 @@ namespace Hanako.Knife
                         validTile.Tile.Idle();
                 }
             }
+            */
 
             tile.Idle();
             audioSourceKnife.PlayOneClipFromPack(sfxTileFallName);

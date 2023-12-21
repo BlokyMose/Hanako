@@ -7,11 +7,11 @@ namespace Hanako.Knife
 
     public class KnifeAbility_Die : KnifeAbility
     {
-        public override void Interacted(LivingPieceCache otherPiece, TileCache myTile, KnifeLevelManager levelManager)
+        public override void Interacted(LivingPieceCache interactorPiece, TileCache interactedTile, KnifeLevelManager levelManager)
         {
             // TODO: stream line die to only one code
-            otherPiece.Die();
-            otherPiece.LivingPiece.Die(otherPiece);
+            interactorPiece.Die();
+            interactorPiece.LivingPiece.Die(interactorPiece);
         }
     }
 }

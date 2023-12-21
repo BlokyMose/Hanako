@@ -9,23 +9,23 @@ namespace Hanako.Knife
 
     public class KnifeInteraction_Murder : KnifeInteraction
     {
-        public override void Interact(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile, KnifeLevelManager levelManager)
+        public override void Interact(PieceCache interactedPiece, TileCache interactedTile, PieceCache interactorPiece, TileCache interactorTile, KnifeLevelManager levelManager)
         {
-            var otherLivingPiece = levelManager.GetLivingPiece(otherPiece.Piece);
-            var myLivingPiece = levelManager.GetLivingPiece(myPiece.Piece);
+            var interactorLivingPiece = levelManager.GetLivingPiece(interactorPiece.Piece);
+            var interactedLivingPiece = levelManager.GetLivingPiece(interactedPiece.Piece);
 
-            if (otherLivingPiece != null && myLivingPiece != null)
+            if (interactorLivingPiece != null && interactedLivingPiece != null)
             {
-                otherLivingPiece.LivingPiece.MoveToTile(myTile.Tile);
-                myLivingPiece.Piece.StartCoroutine(WaitToBeAttackThenDie());
+                interactorLivingPiece.LivingPiece.MoveToTile(interactedTile.Tile);
+                interactedLivingPiece.Piece.StartCoroutine(WaitToBeAttackThenDie());
                 IEnumerator WaitToBeAttackThenDie()
                 {
-                    yield return new WaitForSeconds(otherLivingPiece.LivingPiece.MoveDuration * 0.25f);
+                    yield return new WaitForSeconds(interactorLivingPiece.LivingPiece.MoveDuration * 0.25f);
                     
                     // TODO: stream line die to only one code
-                    otherLivingPiece.LivingPiece.Attack();
-                    myLivingPiece.Die();
-                    myLivingPiece.LivingPiece.Die(otherLivingPiece);
+                    interactorLivingPiece.LivingPiece.Attack();
+                    interactedLivingPiece.Die();
+                    interactedLivingPiece.LivingPiece.Die(interactorLivingPiece);
                 }
             }
         }

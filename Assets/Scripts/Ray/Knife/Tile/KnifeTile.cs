@@ -12,13 +12,14 @@ namespace Hanako.Knife
     {
         public enum TileAnimationMode { Idle, Hovered, Clicked }
 
+        [Header("Components")]
         [SerializeField]
         SpriteRenderer sr;
 
         [SerializeField]
         bool useSRAsPieceParent = true;
 
-        [SerializeField, ShowIf(nameof(useSRAsPieceParent))]
+        [SerializeField, HideIf(nameof(useSRAsPieceParent))]
         Transform pieceParent;
 
         [SerializeField]
@@ -27,6 +28,7 @@ namespace Hanako.Knife
         [SerializeField]
         Collider2D col;
 
+        [Header("UI")]
         [SerializeField]
         SpriteRenderer interactionIconSR;
 
@@ -37,6 +39,7 @@ namespace Hanako.Knife
         int int_mode, tri_transition;
         TileAnimationMode animationMode = TileAnimationMode.Idle;
         float animatingColorDuration = 1f;
+        Transform hologramPieceParent;
 
         public SortingGroup SortingGroup { get => sortingGroup; }
         public SpriteRenderer SR { get => sr;  }
@@ -50,28 +53,36 @@ namespace Hanako.Knife
             tri_transition = Animator.StringToHash(nameof(tri_transition));
 
             if (useSRAsPieceParent || (!useSRAsPieceParent && pieceParent == null))
-            {
                 pieceParent = sr.transform;
-            }
+
+            SetupHologramParent();
 
             if (sr == null)
             {
-                sr = UnityUtility.ComponentUtility.GetComponentInFamily<SpriteRenderer>(this);
+                sr = ComponentUtility.GetComponentInFamily<SpriteRenderer>(this);
                 if (sr == null) Debug.LogWarning($"{gameObject.name} has no SR");
             }
 
             if (col == null)
             {
-                col = UnityUtility.ComponentUtility.GetComponentInFamily<PolygonCollider2D>(this);
+                col = ComponentUtility.GetComponentInFamily<PolygonCollider2D>(this);
                 if (col == null) Debug.LogWarning($"{gameObject.name} has no Collider2D");
             }
 
             col.isTrigger = true;
+
+            void SetupHologramParent()
+            {
+                hologramPieceParent = new GameObject("hologramParent").transform;
+                SetAsParentOf(hologramPieceParent.gameObject);
+                hologramPieceParent.localPosition = Vector3.zero;
+                hologramPieceParent.localScale = Vector3.one;
+            }
         }
 
         public void CallAwake() => Awake();
 
-        public void Hovered(Color tileColor, bool animateColor = true, ActionIconPack interactionIcon = null)
+        public void Hovered(Color tileColor, bool animateColor = true, ActionIconPack interactionIconPack = null)
         {
             sr.color = tileColor;
             if (animateColor)
@@ -82,14 +93,8 @@ namespace Hanako.Knife
             animationMode = TileAnimationMode.Hovered;
             animator.SetInteger(int_mode, (int)animationMode);
 
-            if (interactionIcon != null)
-            {
-                interactionIconSR.sprite = interactionIcon.Icon;
-                if (interactionIcon.IsOverrideColor)
-                    interactionIconSR.color = interactionIcon.Color;
-                interactionIconAnimator.SetInteger(int_mode, (int)interactionIcon.Animation);
-                interactionIconAnimator.SetTrigger(tri_transition);
-            }
+            if (interactionIconPack != null)
+                ShowInteractionIcon(interactionIconPack);
         }
 
         public void Idle(Color? tileColor = null)
@@ -98,8 +103,8 @@ namespace Hanako.Knife
             this.StopCoroutineIfExists(corAnimatingColor);
             animationMode = TileAnimationMode.Idle;
             animator.SetInteger(int_mode, (int)animationMode);
-            interactionIconAnimator.SetInteger(int_mode, (int)ActionIconMode.Hide);
-            interactionIconAnimator.SetTrigger(tri_transition);
+            HideInteractionIcon();
+            HidePieceHologram();
         }
 
         public void Hinted(Color tileColor, bool animateColor = true)
@@ -112,9 +117,7 @@ namespace Hanako.Knife
 
             animationMode = TileAnimationMode.Idle;
             animator.SetInteger(int_mode, (int)animationMode);
-            interactionIconAnimator.SetInteger(int_mode, (int)ActionIconMode.Hide);
-            interactionIconAnimator.SetTrigger(tri_transition);
-
+            HideInteractionIcon();
         }
 
         public void Clicked(Color tileColor)
@@ -123,9 +126,7 @@ namespace Hanako.Knife
             this.StopCoroutineIfExists(corAnimatingColor);
             animationMode = TileAnimationMode.Clicked;
             animator.SetInteger(int_mode, (int)animationMode);
-            interactionIconAnimator.SetInteger(int_mode, (int)ActionIconMode.Hide);
-            interactionIconAnimator.SetTrigger(tri_transition);
-
+            HideInteractionIcon();
         }
 
         public void SetAsParentOf(GameObject child)
@@ -159,6 +160,39 @@ namespace Hanako.Knife
                 }
                 yield return null;
             }
+        }
+
+        public void ShowInteractionIcon(ActionIconPack actionIconPack)
+        {
+            interactionIconSR.sprite = actionIconPack.Icon;
+            if (actionIconPack.IsOverrideColor)
+                interactionIconSR.color = actionIconPack.Color.ChangeAlpha(.5f);
+            interactionIconAnimator.SetInteger(int_mode, (int)actionIconPack.Animation);
+            interactionIconAnimator.SetTrigger(tri_transition);
+        }
+
+        public void HideInteractionIcon()
+        {
+            interactionIconAnimator.SetInteger(int_mode, (int)ActionIconMode.Hide);
+            interactionIconAnimator.SetTrigger(tri_transition);
+        }
+
+        public void ShowPieceHologram(GameObject pieceGO, Vector3 offset) 
+        {
+            var newGO = Instantiate(pieceGO);
+            newGO.transform.parent = hologramPieceParent;
+            newGO.transform.localPosition = offset;
+            newGO.transform.localScale = Vector3.one;
+
+            if (newGO.TryGetComponent<SpriteRendererEditor>(out var srEditor))
+                srEditor.ChangeAlpha(.5f);
+            else if (newGO.TryGetComponent<SpriteRenderer>(out var sr))
+                    sr.color = sr.color.ChangeAlpha(.5f);
+        }
+
+        public void HidePieceHologram()
+        {
+            hologramPieceParent.DestroyChildren();
         }
     }
 }

@@ -13,24 +13,32 @@ namespace Hanako.Knife
         [SerializeField]
         List<KnifeAbility> abilities = new();
 
-        public override void Interact(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile, KnifeLevelManager levelManager)
+        public override void Interact(PieceCache interactedPiece, TileCache interactedTile, PieceCache interactorPiece, TileCache interactorTile, KnifeLevelManager levelManager)
         {
-            if (otherPiece is LivingPieceCache)
+            if (interactorPiece is LivingPieceCache)
             {
-                var otherLivingPiece = otherPiece as LivingPieceCache;
+                var otherLivingPiece = interactorPiece as LivingPieceCache;
 
                 foreach (var ability in abilities)
-                    ability.Interacted(otherLivingPiece, myTile, levelManager);
-                otherLivingPiece.LivingPiece.MoveToTile(myTile.Tile, false);
+                    ability.Interacted(otherLivingPiece, interactedTile, levelManager);
+                otherLivingPiece.LivingPiece.MoveToTile(interactedTile.Tile, false);
 
                 otherLivingPiece.Piece.StartCoroutine(Delay(otherLivingPiece.LivingPiece.MoveDuration));
                 IEnumerator Delay(float delay)
                 {
                     yield return new WaitForSeconds(delay);
-                    levelManager.RemovePiece(myPiece.Piece);
+                    levelManager.RemovePiece(interactedPiece.Piece);
                     otherLivingPiece.LivingPiece.SetActState(PieceActingState.PostActing);
-                    Destroy(myPiece.GO);
+                    Destroy(interactedPiece.GO);
                 }
+            }
+        }
+
+        public override void ShowPreview(PieceCache interactedPiece, TileCache interactedTile, PieceCache interactorPiece, TileCache interactorTile, KnifeLevelManager levelManager)
+        {
+            foreach (var ability in abilities)
+            {
+                ability.Preview(interactorPiece as LivingPieceCache, interactedTile, levelManager);
             }
         }
     }

@@ -16,25 +16,25 @@ namespace Hanako.Knife
         [SerializeField]
         string animatorModeParam = "int_mode";
 
-        public override void Interact(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile, KnifeLevelManager levelManager)
+        public override void Interact(PieceCache interactedPiece, TileCache interactedTile, PieceCache interactorPiece, TileCache interactorTile, KnifeLevelManager levelManager)
         {
-            if (otherPiece is LivingPieceCache)
+            if (interactorPiece is LivingPieceCache)
             {
-                var otherLivingPiece = otherPiece as LivingPieceCache;
+                var interactorLivingPiece = interactorPiece as LivingPieceCache;
 
-                myPiece.Piece.StartCoroutine(Delay());
+                interactedPiece.Piece.StartCoroutine(Delay());
                 IEnumerator Delay()
                 {
-                    levelManager.MoveLivingPieceToEscapeList(otherLivingPiece.LivingPiece);
-                    otherLivingPiece.LivingPiece.MoveToTile(myTile.Tile);
-                    if(myPiece.Piece.TryGetComponentInChildren<Animator>(out var animator))
+                    levelManager.MoveLivingPieceToEscapeList(interactorLivingPiece.LivingPiece);
+                    interactorLivingPiece.LivingPiece.MoveToTile(interactedTile.Tile);
+                    if(interactedPiece.Piece.TryGetComponentInChildren<Animator>(out var animator))
                         animator.SetInteger(animatorModeParam, 0);
-                    yield return new WaitForSeconds(otherLivingPiece.LivingPiece.MoveDuration);
-                    otherLivingPiece.LivingPiece.Escape((Vector2)myPiece.Piece.transform.position * myPiece.Piece.transform.localScale + doorPosition);
-                    yield return new WaitForSeconds(otherLivingPiece.LivingPiece.MoveDuration);
+                    yield return new WaitForSeconds(interactorLivingPiece.LivingPiece.MoveDuration);
+                    interactorLivingPiece.LivingPiece.Escape((Vector2)interactedPiece.Piece.transform.position * interactedPiece.Piece.transform.localScale + doorPosition);
+                    yield return new WaitForSeconds(interactorLivingPiece.LivingPiece.MoveDuration);
                     if (animator != null)
                         animator.SetInteger(animatorModeParam, 1);
-                    otherLivingPiece.LivingPiece.SetActState(KnifePiece_Living.PieceActingState.PostActing);
+                    interactorLivingPiece.LivingPiece.SetActState(KnifePiece_Living.PieceActingState.PostActing);
                 }
             }
         }

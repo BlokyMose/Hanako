@@ -18,30 +18,30 @@ namespace Hanako.Knife
         [SerializeField]
         int maximumMove = 1;
 
-        public override void Interact(PieceCache myPiece, TileCache myTile, PieceCache otherPiece, TileCache otherTile, KnifeLevelManager levelManager)
+        public override void Interact(PieceCache interactedPiece, TileCache interactedTile, PieceCache interactorPiece, TileCache interactorTile, KnifeLevelManager levelManager)
         {
-            if (otherPiece is LivingPieceCache)
+            if (interactorPiece is LivingPieceCache)
             {
-                var otherLivingPiece = otherPiece as LivingPieceCache;
+                var otherLivingPiece = interactorPiece as LivingPieceCache;
 
-                otherLivingPiece.LivingPiece.MoveToTile(myTile.Tile, autoSetAct: false);
+                otherLivingPiece.LivingPiece.MoveToTile(interactedTile.Tile, autoSetAct: false);
 
                 otherLivingPiece.LivingPiece.StartCoroutine(MovingMyselfWhenOtherPieceIsClose());
                 IEnumerator MovingMyselfWhenOtherPieceIsClose()
                 {
                     while (true)
                     {
-                        if (Vector2.Distance(otherLivingPiece.LivingPiece.transform.position, myPiece.Piece.transform.position) < distanceToStartMoveAnimation)
+                        if (Vector2.Distance(otherLivingPiece.LivingPiece.transform.position, interactedPiece.Piece.transform.position) < distanceToStartMoveAnimation)
                             break;
                         yield return null;
                     }
 
-                    var moveColRow = ColRow.SubstractBetween(myTile.ColRow, otherPiece.ColRow);
+                    var moveColRow = ColRow.SubstractBetween(interactedTile.ColRow, interactorPiece.ColRow);
                     moveColRow.row = moveColRow.row > maximumMove ? maximumMove : moveColRow.row;
                     moveColRow.col = moveColRow.col > maximumMove ? maximumMove : moveColRow.col;
-                    var targetColRow = ColRow.AddBetween(myTile.ColRow, moveColRow);
+                    var targetColRow = ColRow.AddBetween(interactedTile.ColRow, moveColRow);
                     var targetTile = levelManager.GetTile(targetColRow);
-                    MoveToTile(myPiece, targetTile.Tile, otherLivingPiece.LivingPiece.MoveDuration);
+                    MoveToTile(interactedPiece, targetTile.Tile, otherLivingPiece.LivingPiece.MoveDuration);
 
                     yield return new WaitForSeconds(otherLivingPiece.LivingPiece.MoveDuration);
                     otherLivingPiece.LivingPiece.SetActState(PieceActingState.PostActing);
@@ -138,6 +138,22 @@ namespace Hanako.Knife
             {
                 return false;
             }
+        }
+
+        public override void ShowPreview(PieceCache interactedPiece, TileCache interactedTile, PieceCache interactorPiece, TileCache interactorTile, KnifeLevelManager levelManager)
+        {
+            var moveColRow = ColRow.SubstractBetween(interactedPiece.ColRow, interactorPiece.ColRow);
+            moveColRow.row = moveColRow.row > maximumMove ? maximumMove : moveColRow.row;
+            moveColRow.col = moveColRow.col > maximumMove ? maximumMove : moveColRow.col;
+
+            var targetColRow = ColRow.AddBetween(interactedPiece.ColRow, moveColRow);
+            if (levelManager.TryGetTile(targetColRow, out var foundTile))
+            {
+                if (foundTile.Tile.TryGetPiece(out var occupantPiece))
+                    return;
+                foundTile.Tile.ShowPieceHologram(interactedPiece.Piece.GOToPreview, interactedPiece.Piece.GOToPreviewOffset);
+            }
+           
         }
     }
 }
