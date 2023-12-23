@@ -8,7 +8,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityUtility;
-using static Hanako.Hanako.HanakoEnemySequence;
 
 namespace Hanako.Hanako
 {
@@ -174,6 +173,7 @@ namespace Hanako.Hanako
                 StartCoroutine(Delay(autoStartDuration));
                 IEnumerator Delay(float delay)
                 {
+                    gameInfoCanvas.gameObject.SetActive(true);
                     enemyList.gameObject.SetActive(true);
                     startBut.gameObject.SetActive(false);
                     enemyList.Init(enemySequence, previewPanelCount);
@@ -187,8 +187,10 @@ namespace Hanako.Hanako
                 IEnumerator Delay()
                 {
                     initProtagonist.gameObject.SetActive(true);
+                    gameInfoCanvas.gameObject.SetActive(false);
                     enemyList.gameObject.SetActive(false);
                     yield return new WaitForSeconds(delayEnemyList);
+                    gameInfoCanvas.gameObject.SetActive(true);
                     enemyList.gameObject.SetActive(true);
                     enemyList.Init(enemySequence, previewPanelCount);
                     yield return new WaitForSeconds(delayStartBut);
@@ -408,6 +410,7 @@ namespace Hanako.Hanako
             StartCoroutine(AnimatingInitHanako());
             corInitializingGame = StartCoroutine(InitializingGame());
             StartCoroutine(CountingGameTime());
+            gameInfoCanvas.StartGame();
 
             IEnumerator AnimatingInitHanako()
             {

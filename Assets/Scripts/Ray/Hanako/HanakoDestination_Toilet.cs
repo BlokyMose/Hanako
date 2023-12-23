@@ -59,7 +59,9 @@ namespace Hanako.Hanako
                     currentOccupant.transform.parent = postInteractPos;
 
                     // in case this function not called when two enemies enter & exit at the same time
-                    if (lastOccupant != null && lastOccupant.transform.parent == postInteractPos)
+                    if (lastOccupant != null && 
+                        lastOccupant != currentOccupant &&
+                        lastOccupant.transform.parent == postInteractPos)
                         lastOccupant.transform.parent = null;
                     doorAudioSource.PlayOneClipFromPack(sfxDoorOpenName);
                 }
