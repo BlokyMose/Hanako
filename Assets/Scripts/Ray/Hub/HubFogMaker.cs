@@ -15,6 +15,9 @@ namespace Hanako.Hub
         Vector2 instantiateArea = new(10,10);
 
         [SerializeField]
+        ColliderProxy col;
+
+        [SerializeField]
         HubFog fogPrefab;
 
         bool isPlaying = true;
@@ -22,9 +25,19 @@ namespace Hanako.Hub
         List<HubFog> fogs = new();
         Coroutine corPlaying;
 
-        void Start()
+        void Awake()
         {
-            Init();
+            col.OnEnter += (collider) =>
+            {
+                if (collider.TryGetComponent<HubCharacterBrain_Player>(out var player))
+                    Init();
+            };
+
+            col.OnExit += (collider) =>
+            {
+                if (collider.TryGetComponent<HubCharacterBrain_Player>(out var player))
+                    Pause();
+            };
         }
 
         void Init()
@@ -53,6 +66,8 @@ namespace Hanako.Hub
         {
             isPlaying = false;
             this.StopCoroutineIfExists(corPlaying);
+            foreach (var fog in fogs)
+                Destroy(fog.gameObject,2f);
         }
 
 

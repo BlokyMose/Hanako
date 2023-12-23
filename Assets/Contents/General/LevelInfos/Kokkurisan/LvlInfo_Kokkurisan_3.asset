@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 524ba70e04a412f459bff0a349de48db, type: 3}
+  m_Name: LvlInfo_Kokkurisan_3
+  m_EditorClassIdentifier: 
+  gameInfo: {fileID: 11400000, guid: 22a321d408c89c64c87c640ebef61692, type: 2}
+  gameType: 3
+  hanakoLevel: {fileID: 0}
+  knifeLevel: {fileID: 0}
+  tekeLevel: {fileID: 0}
+  kokkuriLevel: {fileID: 11400000, guid: 585ddf3a350deca4bb745ddeab68dd4b, type: 2}
+  scoreRules: {fileID: 11400000, guid: 745be77db96be054d927fd3a8af2e6fa, type: 2}
+  scoreThresholds: 64000000c80000002c010000
+  tutorialPreview:
+    startIndex: 0
+    endIndex: 3
+    isAutoShow: 0
+  runtimeData:
+    currentScore: 150
+    currentSoulCount: 1
+    playTime: 13
+    hasShownTutorial: 1
+    leaderboard:
+    - score: 1
+      playerID: 1

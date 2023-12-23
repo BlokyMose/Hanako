@@ -1,3 +1,4 @@
+using Hanako.Knife;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +16,9 @@ namespace Hanako.Hub
         Vector2 instantiateArea = new(10,10);
 
         [SerializeField]
+        ColliderProxy col;
+
+        [SerializeField]
         HubGhost ghostPrefab;
 
         bool isPlaying = true;
@@ -22,9 +26,19 @@ namespace Hanako.Hub
         List<HubGhost> ghosts = new();
         Coroutine corPlaying;
 
-        void Start()
+        void Awake()
         {
-            Init();
+            col.OnEnter += (collider) =>
+            {
+                if (collider.TryGetComponent<HubCharacterBrain_Player>(out var player))
+                    Init();
+            };
+            
+            col.OnExit += (collider) =>
+            {
+                if (collider.TryGetComponent<HubCharacterBrain_Player>(out var player))
+                    Pause();
+            };
         }
 
         void Init()
@@ -53,8 +67,9 @@ namespace Hanako.Hub
         {
             isPlaying = false;
             this.StopCoroutineIfExists(corPlaying);
+            foreach (var ghost in ghosts)
+                Destroy(ghost.gameObject,2f);
         }
-
 
         public void Play()
         {
