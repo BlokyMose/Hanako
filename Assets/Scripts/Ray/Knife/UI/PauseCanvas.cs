@@ -339,7 +339,7 @@ namespace Hanako.Knife
             if (allGamesInfo == null) return;
 
             var currentLevel = allGamesInfo.CurrentLevel;
-            currentLevel.SetRuntimeData(new(currentLevel.CurrentScore, currentLevel.CurrentSoulCount, currentLevel.PlayTime, true));
+            currentLevel.SetRuntimeData(new(currentLevel.CurrentScore, currentLevel.CurrentSoulCount, currentLevel.PlayTime, true, currentLevel.Leaderboard));
             var tutorialCanvas = Instantiate(tutorialCanvasPrefab);
             tutorialCanvas.Init(currentLevel.GameInfo.TutorialInfo, currentLevel.TutorialPreview);
         }

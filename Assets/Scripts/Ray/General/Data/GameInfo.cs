@@ -36,7 +36,7 @@ namespace Hanako
         public string GameID { get => gameID; }
         public string GameDisplayName { get => gameDisplayName; }
         public string GameSummary { get => gameSummary; }
-        public string SceneName { get => sceneName; set => sceneName = value; }
+        public string SceneName { get => sceneName; }
         public Sprite TitleLogo { get => titleLogo; }
         public Sprite TitleIcon { get => titleIcon; }
         public TutorialInfo TutorialInfo { get => tutorialInfo;  }

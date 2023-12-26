@@ -317,10 +317,20 @@ namespace Hanako
                 }
                 else if (allGamesInfo.CurrentGameMode == GameMode.Arcade)
                 {
-                    var hiScoredPlayerCount = levelInfo.Leaderboard.Count > 3 ? 3 : levelInfo.Leaderboard.Count;
-                    for (int i = 0; i < hiScoredPlayerCount; i++)
-                        if (levelInfo.Leaderboard[i].Score < score)
-                            return i + 1;
+                    var hiScoreDisplayCount = 3;
+                    if (levelInfo.Leaderboard.Count >= hiScoreDisplayCount)
+                    {
+                        for (int i = 0; i < hiScoreDisplayCount; i++)
+                            if (levelInfo.Leaderboard[i].Score < score)
+                                return i + 1;
+                    }
+                    else
+                    {
+                        hiScore = 1;
+                        for (int i = 0; i < levelInfo.Leaderboard.Count; i++)
+                            if (levelInfo.Leaderboard[i].Score > score)
+                                hiScore++;
+                    }
                 }
                 return hiScore;
             }
@@ -331,7 +341,7 @@ namespace Hanako
                 if (allGamesInfoManager == null) return;
                 var allGamesInfo = allGamesInfoManager.AllGamesInfo;
 
-                if (allGamesInfo.CurrentGameMode == GameMode.Solo && levelInfo.CurrentScore < score)
+                if (levelInfo.CurrentScore < score)
                 {
                     var newScore = score;
                     var newSoulCount = levelInfo.CurrentSoulCount < soulCount ? soulCount : levelInfo.CurrentSoulCount;
@@ -340,11 +350,12 @@ namespace Hanako
                         newScore,
                         newSoulCount,
                         newPlayTime,
-                        true
+                        true,
+                        levelInfo.Leaderboard
                         ));
                 }
 
-                else if (allGamesInfo.CurrentGameMode == GameMode.Arcade)
+                if (allGamesInfo.CurrentGameMode == GameMode.Arcade && allGamesInfo.CurrentPlayerID != null)
                 {
                     var recurringPlayer = levelInfo.Leaderboard.Find(x => x.PlayerID == allGamesInfo.CurrentPlayerID.ID);
                     if (recurringPlayer != null)
@@ -354,14 +365,18 @@ namespace Hanako
                         levelInfo.Leaderboard.Remove(recurringPlayer);
                     }
 
+                    bool isInserted = false;
                     for (int i = 0; i < levelInfo.Leaderboard.Count; i++)
                     {
                         if (levelInfo.Leaderboard[i].Score < score)
                         {
+                            isInserted = true;
                             levelInfo.Leaderboard.Insert(i, new(score, allGamesInfo.CurrentPlayerID.ID));
                             break;
                         }
                     }
+                    if (!isInserted)
+                        levelInfo.Leaderboard.Add(new(score, allGamesInfo.CurrentPlayerID.ID));
                 }
             }
 

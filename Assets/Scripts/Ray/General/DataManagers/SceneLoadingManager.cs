@@ -59,7 +59,7 @@ namespace Hanako
                 sceneLoadingData.SetData(levelInfo);
                 Instantiate(levelInfo.GameInfo.LoadingAnimation, transform);
                 yield return new WaitForSeconds(delay);
-                SceneManager.LoadScene(levelInfo.GameInfo.SceneName);
+                SceneManager.LoadScene(levelInfo.SceneName);
             }
         }
 

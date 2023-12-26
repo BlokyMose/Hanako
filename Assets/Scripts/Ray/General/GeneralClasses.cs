@@ -100,7 +100,7 @@ namespace Hanako
             this.currentSoulCount = currentSoulCount;
             this.playTime = playTime;
             this.hasShownTutorial = hasShownTutorial;
-            this.leaderboard = leaderboard != null ? leaderboard : new();
+            this.leaderboard = leaderboard == null ? new() : leaderboard;
         }
 
         public int CurrentScore { get => currentScore; }

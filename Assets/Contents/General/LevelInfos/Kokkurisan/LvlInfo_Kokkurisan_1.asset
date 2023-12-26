@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: LvlInfo_Kokkurisan_1
   m_EditorClassIdentifier: 
   gameInfo: {fileID: 11400000, guid: 22a321d408c89c64c87c640ebef61692, type: 2}
+  sceneNameOverride: Kokkurisan_Lv.1
   gameType: 3
   hanakoLevel: {fileID: 0}
   knifeLevel: {fileID: 0}
@@ -25,10 +26,12 @@ MonoBehaviour:
     endIndex: 3
     isAutoShow: 0
   runtimeData:
-    currentScore: 150
-    currentSoulCount: 1
-    playTime: 13
+    currentScore: 455
+    currentSoulCount: 3
+    playTime: 31
     hasShownTutorial: 1
     leaderboard:
-    - score: 1
+    - score: 95
       playerID: 1
+    - score: 70
+      playerID: 2

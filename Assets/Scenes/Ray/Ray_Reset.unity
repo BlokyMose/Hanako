@@ -237,7 +237,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   invokeIn: 0
-  delay: 1
+  delay: 0
   onInvoke:
     m_PersistentCalls:
       m_Calls:
@@ -256,6 +256,18 @@ MonoBehaviour:
       - m_Target: {fileID: 648006347}
         m_TargetAssemblyTypeName: Hanako.SceneLoadingManager, Assembly-CSharp
         m_MethodName: ResetData
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 4584902334971315427}
+        m_TargetAssemblyTypeName: Hanako.SaveDataManager, Assembly-CSharp
+        m_MethodName: LoadAllGamesInfo
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -297,13 +309,13 @@ MonoBehaviour:
   onInvoke:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 517850506}
-        m_TargetAssemblyTypeName: UnityUtility.LoadScene, Assembly-CSharp
-        m_MethodName: Load
-        m_Mode: 1
+      - m_Target: {fileID: 648006347}
+        m_TargetAssemblyTypeName: Hanako.SceneLoadingManager, Assembly-CSharp
+        m_MethodName: LoadScene
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 11400000, guid: 4c0d93aa7a228f64c860e36fa9435e2c, type: 2}
+          m_ObjectArgumentAssemblyTypeName: Hanako.LevelInfo, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -535,3 +547,75 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+--- !u!1001 &4584902334971315426
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2441021869307102056, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2441021869307102056, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2441021869307102056, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2441021869307102056, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2441021869307102056, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2441021869307102056, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2441021869307102056, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2441021869307102056, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2441021869307102056, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2441021869307102056, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2441021869307102056, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3720184455255007447, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: debugText
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5876181111806007302, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+      propertyPath: m_Name
+      value: SaveDataManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+--- !u!114 &4584902334971315427 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3720184455255007447, guid: afbc837e6999b624a9710e4d7e0edca6, type: 3}
+  m_PrefabInstance: {fileID: 4584902334971315426}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5948f8a81313aa94b966d26665bc5ec1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

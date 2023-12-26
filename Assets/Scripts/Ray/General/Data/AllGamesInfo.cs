@@ -120,8 +120,16 @@ namespace Hanako
         public void ResetAllRuntimeData()
         {
             playTime = 0;
+            playerIDs = new List<PlayerID>();
+            currentPlayerID = null;
             foreach (var level in levelInfos)
                 level.ResetRuntimeData();
+        }
+
+        public void LoadData(float playTime, List<PlayerID> playerIDs)
+        {
+            this.playTime = playTime;
+            this.playerIDs = playerIDs;
         }
 
         public AudioVolume SpinSFXVolume()
@@ -188,7 +196,7 @@ namespace Hanako
             else
             {
                 playerIDs.Add(playerID);
-                currentPlayerID = playerID;
+                currentPlayerID = playerIDs.GetLast();
             }
         }
     }

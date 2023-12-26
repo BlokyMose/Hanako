@@ -61,7 +61,7 @@ namespace Hanako.Dialogue
             MakingExcuses = 53,
             [InspectorName(nameof(Handsome) +"  :-)")]
             Handsome = 54,
-            [InspectorName(nameof(Blush) +"  O//O")]
+            [InspectorName(nameof(Blush) + "  ")]
             Blush = 55,
 
             // Sad

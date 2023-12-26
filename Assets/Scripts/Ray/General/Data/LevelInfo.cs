@@ -16,6 +16,9 @@ namespace Hanako
         GameInfo gameInfo;
 
         [SerializeField]
+        string sceneNameOverride;
+
+        [SerializeField]
         GameType gameType;
 
         [SerializeField, ShowIf("@" + nameof(gameType) + "==" + nameof(Hanako) + "." + nameof(GameType) + "." + nameof(GameType.Hanako))]
@@ -43,6 +46,7 @@ namespace Hanako
         LevelRuntimeData runtimeData;
 
         public GameInfo GameInfo { get => gameInfo; }
+        public string SceneName => string.IsNullOrWhiteSpace(sceneNameOverride) ? gameInfo.SceneName : sceneNameOverride;
         public string LevelName { get => gameType switch {
             GameType.Hub => "To Hub",
             GameType.Hanako => HanakoLevel.LevelName,
@@ -76,6 +80,21 @@ namespace Hanako
             runtimeData = newData;
         }
 
-        // TODO: set currentSouldCount when evaluating score for each game
+        public void AddLeaderboardItem(LeaderboardItem newItem)
+        {
+            var isInserted = false;
+            for (int i = 0; i < Leaderboard.Count; i++)
+            {
+                if (newItem.Score > Leaderboard[i].Score)
+                {
+                    Leaderboard.Insert(i, newItem);
+                    isInserted = true;
+                    break;
+                }
+            }
+
+            if (!isInserted)
+                Leaderboard.Add(newItem);
+        }
     }
 }
