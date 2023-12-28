@@ -16,6 +16,9 @@ namespace Hanako.Knife
         [SerializeField]
         AllGamesInfo allGamesInfo;
 
+        [SerializeField]
+        bool canHide = true;
+
         [Header("Tutorial")]
         [SerializeField]
         TutorialCanvas tutorialCanvasPrefab;
@@ -78,6 +81,12 @@ namespace Hanako.Knife
 
         [SerializeField]
         TextMeshProUGUI loginText;
+
+        [SerializeField]
+        TextMeshProUGUI playerNameText;
+
+        [SerializeField]
+        TextMeshProUGUI playerScoreText;
         
         [Header("Intro")]
         [SerializeField]
@@ -193,6 +202,7 @@ namespace Hanako.Knife
         {
             UpdateBGMVolumeText();
             UpdateSFXVolumeText();
+            UpdatePlayerInformation();
             if (IsCurrentLevelHub())
             {
                 retryBut.transform.parent.gameObject.SetActive(false);
@@ -202,6 +212,12 @@ namespace Hanako.Knife
                 introBut.transform.parent.gameObject.SetActive(false);
                 leaderboardBut.transform.parent.gameObject.SetActive(false);
                 loginBut.transform.parent.gameObject.SetActive(false);
+            }
+
+            if (!canHide)
+            {
+                hitAreaHide.gameObject.SetActive(false);
+                Show();
             }
 
             StartCoroutine(Delay(delayAutoShowTutorial));
@@ -219,7 +235,7 @@ namespace Hanako.Knife
 
         public void Hide()
         {
-            if (!isInPause) return;
+            if (!isInPause || !canHide) return;
 
             hitAreaHide.gameObject.SetActive(false);
             IdleBut(pauseButAnimator);
@@ -234,7 +250,8 @@ namespace Hanako.Knife
         {
             if (isInPause) return;
             isInPause = true;
-            hitAreaHide.gameObject.SetActive(true);
+            if (canHide)
+                hitAreaHide.gameObject.SetActive(true);
             HoverBut(pauseButAnimator);
             foreach (var but in functionalButs)
                 IdleBut(but);
@@ -392,6 +409,20 @@ namespace Hanako.Knife
             if (sceneLoading != null)
                 sceneLoading.LoadScene(introLevelInfo);
 
+        }
+
+        public void UpdatePlayerInformation()
+        {
+            var leaderboardCanvas = FindObjectOfType<LeaderboardCanvas>();
+            if (allGamesInfo == null || leaderboardCanvas == null)
+                return;
+
+            playerNameText.text = allGamesInfo.CurrentPlayerID.DisplayName;
+            var playerScore = leaderboardCanvas.GetPlayerScore(allGamesInfo.CurrentPlayerID);
+            if (playerScore != null)
+                playerScoreText.text = playerScore.TotalScore.ToString();
+            else
+                playerScoreText.text = "0";
         }
     }
 }

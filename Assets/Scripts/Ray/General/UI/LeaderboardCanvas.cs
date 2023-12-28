@@ -13,7 +13,7 @@ namespace Hanako
     [RequireComponent(typeof(Animator), typeof(CanvasGroup))]
     public class LeaderboardCanvas : MonoBehaviour
     {
-        class PlayerScore
+        public class PlayerScore
         {
             PlayerID playerID;
             LeaderboardItemPanel panel;
@@ -82,6 +82,8 @@ namespace Hanako
         List<PlayerScore> playerScores = new();
         List<LeaderboardGameHeader> gameHeaderButs = new();
         PlayerInputHandler playerInputHandler;
+
+        public List<PlayerScore> PlayerScores { get => playerScores; }
 
         void Awake()
         {
@@ -264,6 +266,11 @@ namespace Hanako
                     else 
                         player.Panel.gameObject.SetActive(true);
             }
+        }
+
+        public PlayerScore GetPlayerScore(PlayerID playerID)
+        {
+            return playerScores.Find(x => x.PlayerID.ID == playerID.ID);
         }
     }
 }

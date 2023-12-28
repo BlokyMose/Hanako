@@ -181,7 +181,7 @@ namespace Hanako
             }
         }
 
-        public PlayerID GetPlayerData(string id)
+        public PlayerID GetPlayerID(string id)
         {
             return playerIDs.Find(x => x.ID == id);
         }

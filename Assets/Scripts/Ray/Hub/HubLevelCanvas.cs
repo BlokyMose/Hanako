@@ -140,7 +140,7 @@ namespace Hanako.Hub
                     {
                         var score = levelInfo.Leaderboard[i].Score;
                         var playerID = levelInfo.Leaderboard[i].PlayerID;
-                        var playerData = allGamesInfo.AllGamesInfo.GetPlayerData(playerID);
+                        var playerData = allGamesInfo.AllGamesInfo.GetPlayerID(playerID);
                         var playerDisplayName = playerData != null ? playerData.DisplayName : "anon";
                         leaderboardTexts[i].text = $"{score} - {playerDisplayName}";
                     }
