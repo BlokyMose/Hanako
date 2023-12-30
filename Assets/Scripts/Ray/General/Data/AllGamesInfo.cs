@@ -116,6 +116,15 @@ namespace Hanako
 
         public void AddPlayTime(float increment) => playTime += increment;
 
+        public int GetMaxSoulCount()
+        {
+            var maxSoulCount = 0;
+            foreach (var level in levelInfos)
+                maxSoulCount += level.MaxSoulCount;
+
+            return maxSoulCount;
+        }
+
         [Button]
         public void ResetAllRuntimeData()
         {

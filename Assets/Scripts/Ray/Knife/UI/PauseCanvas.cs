@@ -95,6 +95,13 @@ namespace Hanako.Knife
         [SerializeField]
         TextMeshProUGUI introText;
 
+        [Header("Outro")]
+        [SerializeField]
+        Image outroBut;
+
+        [SerializeField]
+        TextMeshProUGUI outroText;
+
         [Header("Retry")]
         [SerializeField]
         Image retryBut;
@@ -116,13 +123,16 @@ namespace Hanako.Knife
         LevelInfo introLevelInfo;
 
         [SerializeField]
+        LevelInfo outroLevelInfo;
+
+        [SerializeField]
         GameObject preventClick;
 
         List<Animator> functionalButs = new();
         int int_mode, tri_click;
         Animator pauseButAnimator, sfxButAnimator, bgmButAnimator, 
             tutorialButAnimator, leaderboardButAnimator, loginButAnimator,
-            introButAnimator, retryButAnimator, exitButAnimator;
+            introButAnimator, outroButAnimator, retryButAnimator, exitButAnimator;
         bool isInPause = false;
 
         void Awake()
@@ -142,12 +152,13 @@ namespace Hanako.Knife
             tutorialButAnimator = tutorialBut.GetComponentInFamily<Animator>();
             leaderboardButAnimator = leaderboardBut.GetComponentInFamily<Animator>();
             introButAnimator = introBut.GetComponentInFamily<Animator>();
+            outroButAnimator = outroBut.GetComponentInFamily<Animator>();
             loginButAnimator = loginBut.GetComponentInFamily<Animator>();
             retryButAnimator = retryBut.GetComponentInFamily<Animator>();
             exitButAnimator = exitBut.GetComponentInFamily<Animator>();
             functionalButs = new() { 
                 sfxButAnimator, bgmButAnimator, tutorialButAnimator, 
-                leaderboardButAnimator, introButAnimator, loginButAnimator,
+                leaderboardButAnimator, introButAnimator, outroButAnimator, loginButAnimator,
                 retryButAnimator, exitButAnimator };
 
             pauseBut.AddEventTrigger(Show, EventTriggerType.PointerEnter);
@@ -183,6 +194,11 @@ namespace Hanako.Knife
                 onExit: () => { IdleBut(introButAnimator); },
                 onClick: () => { ClickBut(introButAnimator); GoToIntroScene(); } );
 
+            outroBut.AddEventTriggers(
+                onEnter: () => { HoverBut(outroButAnimator); },
+                onExit: () => { IdleBut(outroButAnimator); },
+                onClick: () => { ClickBut(outroButAnimator); GoToOutroScene(); } );
+
             retryBut.AddEventTriggers(
                 onEnter: () => { HoverBut(retryButAnimator); },
                 onExit: () => { IdleBut(retryButAnimator); },
@@ -212,6 +228,9 @@ namespace Hanako.Knife
                 introBut.transform.parent.gameObject.SetActive(false);
                 leaderboardBut.transform.parent.gameObject.SetActive(false);
                 loginBut.transform.parent.gameObject.SetActive(false);
+
+                if (allGamesInfo.CurrentSoulCount < allGamesInfo.MaxSoulCount)
+                    outroBut.transform.parent.gameObject.SetActive(false);
             }
 
             if (!canHide)
@@ -409,6 +428,13 @@ namespace Hanako.Knife
             if (sceneLoading != null)
                 sceneLoading.LoadScene(introLevelInfo);
 
+        }
+
+        public void GoToOutroScene()
+        {
+            var sceneLoading = FindObjectOfType<SceneLoadingManager>();
+            if (sceneLoading != null)
+                sceneLoading.LoadScene(outroLevelInfo);
         }
 
         public void UpdatePlayerInformation()
