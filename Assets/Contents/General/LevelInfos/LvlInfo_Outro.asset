@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 524ba70e04a412f459bff0a349de48db, type: 3}
   m_Name: LvlInfo_Outro
   m_EditorClassIdentifier: 
-  gameInfo: {fileID: 11400000, guid: 3855758246d517c4792bdb9f2d6de528, type: 2}
+  gameInfo: {fileID: 11400000, guid: 397eba52cce856a49841fdb4159cad64, type: 2}
+  sceneNameOverride: 
   gameType: -1
   hanakoLevel: {fileID: 0}
   knifeLevel: {fileID: 0}
@@ -29,3 +30,4 @@ MonoBehaviour:
     currentSoulCount: 0
     playTime: 0
     hasShownTutorial: 0
+    leaderboard: []

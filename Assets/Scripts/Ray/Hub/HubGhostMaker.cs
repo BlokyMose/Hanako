@@ -69,6 +69,7 @@ namespace Hanako.Hub
             this.StopCoroutineIfExists(corPlaying);
             foreach (var ghost in ghosts)
                 Destroy(ghost.gameObject,2f);
+            ghosts.Clear();
         }
 
         public void Play()

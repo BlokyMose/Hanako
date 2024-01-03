@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 162112bc2bea86047975e74752de83ff, type: 3}
+  m_Name: Dialogue_Dev_Miura
+  m_EditorClassIdentifier: 
+  settings: {fileID: 11400000, guid: 4440c3a7b9bcb38459f5027fbb03c9be, type: 2}
+  charProperties:
+  - charID: {fileID: 11400000, guid: e63843cf3787a6346bd3c3c544ad3cca, type: 2}
+  - charID: {fileID: 11400000, guid: 26d8f1ecc0eaa8b41850a75f32a6c84f, type: 2}
+  charPos: {fileID: 11400000, guid: 639ed81e4de65164d838137a14c1b266, type: 2}
+  textLines:
+  - charID: {fileID: 11400000, guid: 26d8f1ecc0eaa8b41850a75f32a6c84f, type: 2}
+    text: "\u9759\u304B\u306B\u3057\u3066\u306D\uFF01\n\u30B2<rotate=0>\u30FC<rotate=90>\u30E0\u3092\u4F5C\u3063\u3066\u3044\u308B\u4E2D\u306A\u306E\u3067<rotate=0>"
+    faceAnimation: 11
+    bodyAnimation: 13
+    bubbleShape: 0
+    bubbleAnimation: 1
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+  - charID: {fileID: 11400000, guid: e63843cf3787a6346bd3c3c544ad3cca, type: 2}
+    text: "\u5168\u7136\u4F5C\u696D\u3057\u3066\u306A\u3044\u306E\u306B"
+    faceAnimation: 53
+    bodyAnimation: 16
+    bubbleShape: 1
+    bubbleAnimation: 1
+    textColor: {r: 0, g: 0, b: 0, a: 1}

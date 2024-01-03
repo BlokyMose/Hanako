@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityUtility;
 
-namespace Hanako.Knife
+namespace Hanako
 {
     public class PauseCanvas : MonoBehaviour
     {
@@ -251,6 +251,8 @@ namespace Hanako.Knife
                 }
             }
         }
+
+        public void SetCanHide(bool canHide) => this.canHide = canHide;
 
         public void Hide()
         {

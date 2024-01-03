@@ -1,4 +1,5 @@
 using Encore.Utility;
+using Hanako.Knife;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -52,6 +53,10 @@ namespace Hanako.Hub
 
         [SerializeField]
         string sfxClick = "sfxClick";
+
+        [Header("Extra")]
+        [SerializeField]
+        PauseCanvas pauseCanvas;
 
         int int_mode, boo_show;
         bool isLoadingScene = false;
@@ -159,6 +164,13 @@ namespace Hanako.Hub
                 yield return new WaitForSeconds(delay);
                 playButAnimator.SetInteger(int_mode, (int)SolidButtonState.Idle);
             }
+
+
+            if (pauseCanvas != null)
+            {
+                pauseCanvas.SetCanHide(true);
+                pauseCanvas.Hide();
+            }
         }
 
         public void Hide()
@@ -167,6 +179,12 @@ namespace Hanako.Hub
             canvasGroup.blocksRaycasts = false;
             animator.SetBool(boo_show, false);
             playButAnimator.SetInteger(int_mode, (int)SolidButtonState.Pressed);
+
+            if (pauseCanvas != null)
+            {
+                pauseCanvas.Show();
+                pauseCanvas.SetCanHide(false);
+            }
         }
 
         void PlayLevel()

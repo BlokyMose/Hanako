@@ -68,6 +68,7 @@ namespace Hanako.Hub
             this.StopCoroutineIfExists(corPlaying);
             foreach (var fog in fogs)
                 Destroy(fog.gameObject,2f);
+            fogs.Clear();
         }
 
 
