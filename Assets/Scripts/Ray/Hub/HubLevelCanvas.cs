@@ -81,8 +81,6 @@ namespace Hanako.Hub
                 onExit: OnExitPlayBut
                 );
 
-            Hide();
-
             void OnClickPlayBut()
             {
                 if (isLoadingScene) return;
@@ -109,6 +107,11 @@ namespace Hanako.Hub
                 playButAudioSource.PlayOneClipFromPack(sfxHover);
                 playButAnimator.SetInteger(int_mode, (int)SolidButtonState.Idle);
             }
+        }
+
+        void Start()
+        {
+            Hide();
         }
 
         public void Init(Action<LevelInfo> onLoadScene)

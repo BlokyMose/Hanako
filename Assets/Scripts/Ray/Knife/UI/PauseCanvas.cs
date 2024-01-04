@@ -135,6 +135,8 @@ namespace Hanako
             introButAnimator, outroButAnimator, retryButAnimator, exitButAnimator;
         bool isInPause = false;
 
+        public bool IsInPause { get => isInPause;  }
+
         void Awake()
         {
             if (allGamesInfo == null)
