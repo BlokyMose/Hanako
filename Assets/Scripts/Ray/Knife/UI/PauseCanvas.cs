@@ -116,6 +116,7 @@ namespace Hanako
         [SerializeField]
         TextMeshProUGUI exitText;
 
+        [Header("Level Infos")]
         [SerializeField]
         LevelInfo hubLevelInfo;
 
@@ -221,18 +222,19 @@ namespace Hanako
             UpdateBGMVolumeText();
             UpdateSFXVolumeText();
             UpdatePlayerInformation();
+
             if (IsCurrentLevelHub())
             {
                 retryBut.transform.parent.gameObject.SetActive(false);
+                if (allGamesInfo.CurrentSoulCount < allGamesInfo.MaxSoulCount)
+                    outroBut.transform.parent.gameObject.SetActive(false);
             }
             else
             {
                 introBut.transform.parent.gameObject.SetActive(false);
+                outroBut.transform.parent.gameObject.SetActive(false);
                 leaderboardBut.transform.parent.gameObject.SetActive(false);
                 loginBut.transform.parent.gameObject.SetActive(false);
-
-                if (allGamesInfo.CurrentSoulCount < allGamesInfo.MaxSoulCount)
-                    outroBut.transform.parent.gameObject.SetActive(false);
             }
 
             if (!canHide)
@@ -450,9 +452,9 @@ namespace Hanako
             playerNameText.text = allGamesInfo.CurrentPlayerID.DisplayName;
             var playerScore = leaderboardCanvas.GetPlayerScore(allGamesInfo.CurrentPlayerID);
             if (playerScore != null)
-                playerScoreText.text = playerScore.TotalScore.ToString();
+                playerScoreText.text = playerScore.TotalScore.ToString()+"pt";
             else
-                playerScoreText.text = "0";
+                playerScoreText.text = "0pt";
         }
     }
 }

@@ -33,10 +33,6 @@ namespace Hanako
             boo_show = Animator.StringToHash(nameof(boo_show));
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
-        }
-
-        void Start()
-        {
             Hide();
         }
 

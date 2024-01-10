@@ -1,3 +1,4 @@
+using Hanako.Hub;
 using Hanako.Knife;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +21,9 @@ namespace Hanako
         [SerializeField]
         float autoShowAfter = 60;
 
+        [SerializeField]
+        Transform initialPos;
+
         bool isShowing;
         CanvasGroup canvasGroup;
         Animator animator;
@@ -38,12 +42,12 @@ namespace Hanako
             if (allGamesInfoManager != null)
                 allGamesInfo = allGamesInfoManager.AllGamesInfo;
 
-            var playerInput = FindObjectOfType<PlayerInputHandler>();
-            if (playerInput != null)
+            playerInputHandler = FindObjectOfType<PlayerInputHandler>();
+            if (playerInputHandler != null)
             {
                 var cooldown = autoShowAfter;
-                playerInput.OnClickInput += () => cooldown = autoShowAfter;
-                playerInput.OnMoveInput += (move) => cooldown = autoShowAfter;
+                playerInputHandler.OnClickInput += () => cooldown = autoShowAfter;
+                playerInputHandler.OnMoveInput += (move) => cooldown = autoShowAfter;
 
                 if (autoShowAfter > 0)
                     StartCoroutine(AutoShowingLogin());
@@ -66,8 +70,12 @@ namespace Hanako
                     }
                 }
             }
+        }
 
-            playerInputHandler = FindObjectOfType<PlayerInputHandler>();
+        void Start()
+        {
+            if (allGamesInfo != null && allGamesInfo.PlayerIDs.Count == 0)
+                Show();
         }
 
         void OnClick()
@@ -84,8 +92,18 @@ namespace Hanako
                 {
                     pauseCanvas.UpdatePlayerInformation();
                     if (foundPlayerID == null)
+                    {
                         pauseCanvas.ShowTutorialCanvas();
+                        if (initialPos != null)
+                        {
+                            var playerBrain = FindObjectOfType<HubCharacterBrain_Player>();
+                            if (playerBrain != null)
+                                playerBrain.transform.position = initialPos.position;
+                        }
+                    }
                 }
+
+
             }
 
             Hide();
