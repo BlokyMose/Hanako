@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: LvlInfo_Knife_2
   m_EditorClassIdentifier: 
   gameInfo: {fileID: 11400000, guid: 68e9c27dbdd1f144e94e799739e44f82, type: 2}
+  sceneNameOverride: 
   gameType: 1
   hanakoLevel: {fileID: 11400000, guid: 9415832ee09bdb84a9ca70d0bf61514a, type: 2}
   knifeLevel: {fileID: 11400000, guid: 6fc6b493d85911c4387316c026337b54, type: 2}
@@ -25,11 +26,13 @@ MonoBehaviour:
     endIndex: 4
     isAutoShow: 1
   runtimeData:
-    currentScore: 415
+    currentScore: 420
     currentSoulCount: 3
-    playTime: 15
+    playTime: 16
     hasShownTutorial: 1
     leaderboard:
+    - score: 420
+      playerID: 
     - score: 415
       playerID: Raynhard
     - score: 333
