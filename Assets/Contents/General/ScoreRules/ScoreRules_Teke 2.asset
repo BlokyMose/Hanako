@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a246737be2101934990d51f4690b60cd, type: 3}
-  m_Name: ScoreRules_Teke
+  m_Name: ScoreRules_Teke 2
   m_EditorClassIdentifier: 
   openToken: '{'
   closeToken: '}'
   rules:
   - paramName: score
     displayName: "\u30B9\u30B3\u30A2"
-    scoreMultiplier: 20
+    scoreMultiplier: 30
     fontColor: {r: 1, g: 1, b: 1, a: 1}
     displayFormat: '{displayName}<indent=350>{value}  x{scoreMultiplier}'
   - paramName: playTime

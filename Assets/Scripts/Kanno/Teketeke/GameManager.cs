@@ -67,17 +67,17 @@ namespace Hanako
             //Š÷‚É“–‚½‚Á‚½Žž
             if (other.gameObject.CompareTag("desk")) 
             {
-                countdownSeconds -= 10; 
+                countdownSeconds -= 5; 
             }
             //ˆÖŽq‚É“–‚½‚Á‚½Žž
             if (other.gameObject.CompareTag("chair"))
             {
-                countdownSeconds -= 10;
+                countdownSeconds -= 5;
             }
             //‹³‘ì‚É“–‚½‚Á‚½Žž
             if (other.gameObject.CompareTag("lectern"))
             {
-                countdownSeconds -= 10;
+                countdownSeconds -= 5;
             }
         }
     }
