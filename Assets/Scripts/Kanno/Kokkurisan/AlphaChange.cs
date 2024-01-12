@@ -66,7 +66,7 @@ namespace Hanako
             score++;
             if (scoreText != null)
             {
-                scoreText.text = "×" + score.ToString();
+                scoreText.text = "" + score.ToString();
             }
 
             // プレイヤーの速度を遅くする

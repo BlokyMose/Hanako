@@ -1301,10 +1301,10 @@ MonoBehaviour:
   - {fileID: 1986311894}
   - {fileID: 1874568743}
   - {fileID: 1989801039}
-  fadeDuration: 7
+  fadeDuration: 5
   delayBetweenObjects: 5
   scoreText: {fileID: 231489327}
-  playerMoveSpeedMultiplier: 2
+  playerMoveSpeedMultiplier: 0
 --- !u!1 &413930376
 GameObject:
   m_ObjectHideFlags: 0
@@ -2696,7 +2696,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d840cb7420b941d4a9baaf67b9f188c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 18
+  moveSpeed: 20
 --- !u!50 &836021978
 Rigidbody2D:
   serializedVersion: 4
@@ -5787,7 +5787,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cursor: {fileID: 1387596414}
-  levelInfo: {fileID: 11400000, guid: a74d1d1af7d955846b7107aaeef00dda, type: 2}
+  levelInfo: {fileID: 11400000, guid: 8a2c58e17a49de044875ae198f6cfee0, type: 2}
   playTimeParamName: playTime
   scoreParamName: score
   cols:
