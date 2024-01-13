@@ -13801,7 +13801,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelInfoInit: 0
-  levelInfo: {fileID: 11400000, guid: 0dbce9298e2c6464f9aa7419ee641e0f, type: 2}
+  levelInfo: {fileID: 11400000, guid: 846a4e42a53bdf4478ca42b8e7deaf34, type: 2}
   levelProperties: {fileID: 11400000, guid: 44228f02794b95343821938aec3e66e1, type: 2}
   isAutoStart: 0
   autoStartDuration: 0
@@ -19283,6 +19283,10 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1384920427}
+    - target: {fileID: 2664303243332086619, guid: 57b35991edbf827478eff8a541ac9130, type: 3}
+      propertyPath: levelInfo
+      value: 
+      objectReference: {fileID: 11400000, guid: 0dbce9298e2c6464f9aa7419ee641e0f, type: 2}
     - target: {fileID: 2664303243332086621, guid: 57b35991edbf827478eff8a541ac9130, type: 3}
       propertyPath: m_Pivot.x
       value: 0

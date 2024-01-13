@@ -13,17 +13,23 @@ MonoBehaviour:
   m_Name: LvlInfo_Yamato
   m_EditorClassIdentifier: 
   gameInfo: {fileID: 11400000, guid: 0a1d80d5823ad29479929fc255bb8ce4, type: 2}
+  sceneNameOverride: 
   gameType: 0
   hanakoLevel: {fileID: 11400000, guid: fe87d5e8835747b4d8ce7b9d5794f4f2, type: 2}
   knifeLevel: {fileID: 0}
-  scoreRules: {fileID: 11400000, guid: e94448a708919464a89dc48329fbafe7, type: 2}
+  tekeLevel: {fileID: 0}
+  kokkuriLevel: {fileID: 0}
+  scoreRules: {fileID: 11400000, guid: af843f76714c18e48b4d098f79bc6463, type: 2}
   scoreThresholds: 64000000c80000002c010000
   tutorialPreview:
     startIndex: 0
     endIndex: 3
     isAutoShow: 0
   runtimeData:
-    currentScore: 0
-    currentSoulCount: 0
-    playTime: 0
-    hasShownTutorial: 0
+    currentScore: 400
+    currentSoulCount: 3
+    playTime: 10
+    hasShownTutorial: 1
+    leaderboard:
+    - score: 400
+      playerID: www
