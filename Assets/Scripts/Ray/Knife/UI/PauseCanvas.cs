@@ -446,7 +446,7 @@ namespace Hanako
         public void UpdatePlayerInformation()
         {
             var leaderboardCanvas = FindObjectOfType<LeaderboardCanvas>();
-            if (allGamesInfo == null || leaderboardCanvas == null)
+            if (allGamesInfo == null || allGamesInfo.CurrentPlayerID == null || leaderboardCanvas == null)
                 return;
 
             playerNameText.text = allGamesInfo.CurrentPlayerID.DisplayName;
